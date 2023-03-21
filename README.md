@@ -13,7 +13,7 @@ Social Media website that pulls data from JSONPlaceholder fake API
 * [TBC] Publish your own posts and comments, Delete them, or Edit them
 <br/>\* Data is only stored in Session, restarting the webpage will erase it
 * [TBC] Find posts and users using a search bar that supports filtering
-* [TBC] Detele your photos
+* [TBC] Delete your photos
 * [TBC] Edit your profile data
 
 
