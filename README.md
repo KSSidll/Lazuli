@@ -1,31 +1,55 @@
 
 # Project Lazuli
 
-#### Introduction
+## Introduction
 
 Social Media website that pulls data from JSONPlaceholder fake API
 
-##### Main features:
+### Main features
 
-* Create and login with fake accounts that are bound to selected JSONPlaceholder profile
-* Waste your time on your profile feed filled with fake data, just like a real social media website!
+* Create and login with fake accounts that are bound to
+selected JSONPlaceholder profile
+* Waste your time on your profile feed filled with fake data,
+just like a real social media website!
 * Browse your and other profiles, check posts, comments and photo albums
-* [TBC] Publish your own posts and comments, Delete them, or Edit them
-<br/>\* Data is only stored in Session, restarting the webpage will erase it
+* [TBC] Publish your own posts and comments, Delete them, or Edit them \
+ \* Data is only stored in Session, restarting the webpage will erase it
 * [TBC] Find posts and users using a search bar that supports filtering
 * [TBC] Delete your photos
 * [TBC] Edit your profile data
 
+## How to run
+
+Requires [.NET](https://dotnet.microsoft.com/en-us/download) sdk,
+version 6.0 or higher
+
+### Visual Studio / Raider
+
+Open
+
+    Lazuli.sln
+
+Run project
+
+
+### CLI
+
+    dotnet watch
 
 ## Acceptance Tests and Project Details for Project Lazuli
 
-### 1. Platform/language/framework
+### Platform/language/framework
+
     1. ASP.NET Razor
     2. C#
-### 2. Team members
+
+### Team members
+
     1. Filip Kociok
     2. Szymon Kolasa
-### 3. Acceptance tests
+
+### Acceptance tests
+
     1. The site opens on chromium
     2. User can log in
     3. Posts are displayed along with comments
@@ -33,7 +57,9 @@ Social Media website that pulls data from JSONPlaceholder fake API
     5. The user's profile page displays their:
         1. Photo albums
         2. Posts with comments
-### 4. MoSCoW
+
+### MoSCoW
+
     - Must have
         1. Login
         2. Registration
