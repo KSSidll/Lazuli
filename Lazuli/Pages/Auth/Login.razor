@@ -1,4 +1,4 @@
-@page "/login"
+@page "/auth/login"
 @layout AuthLayout
 @inject ILogger<Login> Logger
 
@@ -7,18 +7,35 @@
 <EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
     <DataAnnotationsValidator />
 
-    <p>
-        <InputText id="login" @bind-Value="loginModel.Login" placeholder=" Login"/>
-    </p>
+    <div class="container">
+        <div class="row text-center text-white mb-4">
+            <h2>Log in</h2>
+        </div>
+        <div class="row justify-content-center m-3">
+            <InputText class="p-3 text-white" id="login" @bind-Value="loginModel.Login" placeholder=" Login"/>
+        </div>
+        <div class="row justify-content-center m-3">
+            <InputText class="p-3 text-white" type="password" id="password" @bind-Value="loginModel.Password" placeholder=" Password" />
+        </div>
+        <div class="row justify-content-center m-3 mt-5">
+            <button class="p-2 login" type="submit">Log in</button>
+        </div>
+        <div class="row text-white mt-5">
+            <p>
+                Don't have an account?
+                <a href="" @onclick="NavigateToSignup">Sign up</a>
+            </p>
+        </div>
+    </div>
 
-    <p>
-        <InputText id="password" @bind-Value="loginModel.Password" placeholder=" Password" />
-    </p>
-
-    <button type="submit">Submit</button>
 </EditForm>
 
 @code {
+    protected override void OnInitialized()
+    {
+        // TODO check if logged in
+    }
+
     private LoginModel loginModel = new();
 
     private void HandleLogin()
@@ -28,5 +45,10 @@
         Logger.LogInformation("HandleLogin Login: " + loginModel.Login);
         Logger.LogInformation("HandleLogin Password: " + loginModel.Password);
 
+    }
+
+    private void NavigateToSignup()
+    {
+        Logger.LogInformation("NavigateToSignup called in Login");
     }
 }

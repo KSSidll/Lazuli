@@ -5,12 +5,14 @@
 @code {
     protected override void OnInitialized()
     {
-        // TODO check if logged in, if yes, navigate to main page
-        Login();
+        // TODO check if logged in
+
+        // if not v
+        Authenticate();
     }
 
-    private void Login()
+    private void Authenticate()
     {
-        NavigationManager.NavigateTo("/login");
+        NavigationManager.NavigateTo("/auth/login");
     }
 }
