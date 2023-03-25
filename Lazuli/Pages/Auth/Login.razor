@@ -1,0 +1,32 @@
+@page "/login"
+@layout AuthLayout
+@inject ILogger<Login> Logger
+
+<PageTitle>Login</PageTitle>
+
+<EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
+    <DataAnnotationsValidator />
+
+    <p>
+        <InputText id="login" @bind-Value="loginModel.Login" placeholder=" Login"/>
+    </p>
+
+    <p>
+        <InputText id="password" @bind-Value="loginModel.Password" placeholder=" Password" />
+    </p>
+
+    <button type="submit">Submit</button>
+</EditForm>
+
+@code {
+    private LoginModel loginModel = new();
+
+    private void HandleLogin()
+    {
+        Logger.LogInformation("HandleLogin called");
+
+        Logger.LogInformation("HandleLogin Login: " + loginModel.Login);
+        Logger.LogInformation("HandleLogin Password: " + loginModel.Password);
+
+    }
+}
