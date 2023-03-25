@@ -1,6 +1,7 @@
 @page "/auth/login"
 @layout AuthLayout
 @inject ILogger<Login> Logger
+@inject NavigationManager NavigationManager
 
 <PageTitle>Login</PageTitle>
 
@@ -23,7 +24,7 @@
         <div class="row text-white mt-5">
             <p>
                 Don't have an account?
-                <a href="" @onclick="NavigateToSignup">Sign up</a>
+                <a href="" @onclick="NavigateToSignup" @onclick:preventDefault>Sign up</a>
             </p>
         </div>
     </div>
@@ -50,5 +51,6 @@
     private void NavigateToSignup()
     {
         Logger.LogInformation("NavigateToSignup called in Login");
+        NavigationManager.NavigateTo("/auth/signup");
     }
 }
