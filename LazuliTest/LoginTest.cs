@@ -24,7 +24,7 @@ namespace LazuliTest
         }
 
         [Fact]
-        public void TestNavToLogin()
+        public void TestNavToSignup()
         {
             using var context = new TestContext();
             var component = context.RenderComponent<Login>();
