@@ -1,5 +1,7 @@
-using Lazuli.Data.Database;
 using Microsoft.EntityFrameworkCore;
+using Lazuli.Data.Database;
+
+namespace Lazuli.Utils;
 
 public static class DatabaseUtility
 {

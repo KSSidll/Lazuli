@@ -1,7 +1,6 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 using Lazuli.Data.Database;
+using Lazuli.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
