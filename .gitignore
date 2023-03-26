@@ -402,3 +402,8 @@ FodyWeavers.xsd
 start.bat
 test.bat
 build.bat
+
+# Database Files
+*.db
+*.db-shm
+*.db-wal
