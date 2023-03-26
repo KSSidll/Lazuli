@@ -23,7 +23,7 @@
     border-color: #1d9bf0;
 }
 
-::deep .login {
+::deep .submit {
     border-radius: 2em;
     border: 2px solid #333639;
     color: white;
@@ -31,6 +31,6 @@
     transition-duration: 0.25s;
 }
 
-::deep .login:hover {
+::deep .submit:hover {
     background-color: #181919;
 }
