@@ -1,35 +1,29 @@
 ﻿using LazuliLibrary.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace LazuliLibrary.API
+namespace LazuliLibrary.API;
+
+public class UserEndpoint
 {
-    public class UserEndpoint
+    private readonly ApiHelper _apiHelper;
+
+    public UserEndpoint(ApiHelper apiHelper)
     {
-        private readonly ApiHelper _apiHelper;
+        _apiHelper = apiHelper;
+    }
 
-        public UserEndpoint(ApiHelper apiHelper)
+    public async Task<List<UserModel>> GetAll()
+    {
+        using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync("/users"))
         {
-            _apiHelper = apiHelper;
-        }
-
-        public async Task<List<UserModel>> GetAll()
-        {
-            using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/users"))
+            if (response.IsSuccessStatusCode)
             {
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsAsync<List<UserModel>>();
+                var result = await response.Content.ReadAsAsync<List<UserModel>>();
 
-                    return result;
-                }
-                else
-                {
-                    throw new Exception(response.ReasonPhrase);
-                }
+                return result;
+            }
+            else
+            {
+                throw new Exception(response.ReasonPhrase);
             }
         }
     }
