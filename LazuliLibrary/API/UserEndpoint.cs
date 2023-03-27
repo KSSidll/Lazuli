@@ -18,7 +18,7 @@ namespace LazuliLibrary.API
 
         public async Task<List<UserModel>> GetAll()
         {
-            using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/Api/User/Admin/GetAllUsers"))
+            using (HttpResponseMessage response = await _apiHelper.ApiClient.GetAsync("/users"))
             {
                 if (response.IsSuccessStatusCode)
                 {
