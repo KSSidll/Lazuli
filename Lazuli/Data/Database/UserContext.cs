@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+using LazuliLibrary.Utils;
 
 namespace Lazuli.Data.Database;
 
@@ -25,6 +26,20 @@ public class UserContext : DbContext
     /// List of <see cref="User"/>.
     /// </summary>
     public DbSet<User>? Users { get; set; }
+
+    // TODO abstract this as function that gets login and password, checks if they exist in database and if yes, return auth token
+    public bool AttemptToLogin(string username, string password)
+    {
+        byte[] hashed_password = CipherUtility.Encrypt(password, username);
+
+        if (Users is not null)
+        if (Users.Any(user =>user.Login == username && user.Password == hashed_password))
+        {
+            return true;
+        }
+
+        return false;
+    }
 
     /// <summary>
     /// Define the model.

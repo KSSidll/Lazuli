@@ -1,7 +1,11 @@
 @page "/auth/login"
 @layout AuthLayout
+
+@implements IDisposable
+
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
+@inject IDbContextFactory<UserContext> UserDbFactory
 
 <PageTitle>Login</PageTitle>
 
@@ -34,10 +38,13 @@
 @code {
     protected override void OnInitialized()
     {
+        userContext = UserDbFactory.CreateDbContext();
+
         // TODO check if logged in
     }
 
     private LoginModel loginModel = new();
+    private UserContext? userContext;
 
     private void HandleLogin()
     {
@@ -46,11 +53,18 @@
         Logger.LogInformation("HandleLogin Login: " + loginModel.Login);
         Logger.LogInformation("HandleLogin Password: " + loginModel.Password);
 
+        // TODO abstract this as function that gets login and password, checks if they exist in database and if yes, return auth token
+        Logger.LogInformation("HandleLogin, Logged in: " + userContext!.AttemptToLogin(loginModel.Login!, loginModel.Password!));
     }
 
     private void NavigateToSignup()
     {
         Logger.LogInformation("NavigateToSignup called in Login");
         NavigationManager.NavigateTo("/auth/signup");
+    }
+
+    public void Dispose()
+    {
+        userContext?.Dispose();
     }
 }

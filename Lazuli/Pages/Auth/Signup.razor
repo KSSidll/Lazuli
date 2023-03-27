@@ -1,7 +1,14 @@
 @page "/auth/signup"
 @layout AuthLayout
+
+@using LazuliLibrary.Utils
+
+@implements IDisposable
+
 @inject ILogger<Signup> Logger
 @inject NavigationManager NavigationManager
+@inject UserService UserService
+@inject IDbContextFactory<UserContext> UserDbFactory
 
 <PageTitle>Signup</PageTitle>
 
@@ -18,6 +25,14 @@
         <div class="row justify-content-center m-3">
             <InputText class="p-3 text-white" type="password" id="password" @bind-Value="signupModel.Password" placeholder=" Password" />
         </div>
+        <div class="row justify-content-center m-3">
+            <InputSelect class="p-3  text-white" @bind-Value=@signupModel.BoundToUserId>
+                @foreach (var user in users!)
+                {
+                    <option value=@user.Id>@user.Name</option>
+                }
+            </InputSelect>
+        </div>
         <div class="row justify-content-center m-3 mt-5">
             <button class="p-2 submit" type="submit">Sign up</button>
         </div>
@@ -32,12 +47,22 @@
 </EditForm>
 
 @code {
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
+        users = await UserService.GetAll();
+        userContext = UserDbFactory.CreateDbContext();
+
+        // don't know how to make placeholder look different from
+        // selected value in InputSelect, so we assign first found user
+        // as the selected one instead to not break color logic
+        signupModel.BoundToUserId = users[0].Id;
+
         // TODO check if logged in
     }
 
-    private SignupModel signupModel = new();
+    private SignupModel signupModel = new ();
+    private List<UserModel>? users = new ();
+    private UserContext? userContext;
 
     private void HandleSignup()
     {
@@ -45,12 +70,20 @@
 
         Logger.LogInformation("HandleSignup Login: " + signupModel.Login);
         Logger.LogInformation("HandleSignup Password: " + signupModel.Password);
+        Logger.LogInformation("HandleSignup BoundTo: " + signupModel.BoundToUserId);
 
+        userContext!.Add<User>(new User(signupModel.Login!, signupModel.Password!, signupModel.BoundToUserId));
+        userContext.SaveChanges();
     }
 
     private void NavigateToLogin()
     {
         Logger.LogInformation("NavigateToLogin called in Signup");
         NavigationManager.NavigateTo("/auth/login");
+    }
+
+    public void Dispose()
+    {
+        userContext?.Dispose();
     }
 }
