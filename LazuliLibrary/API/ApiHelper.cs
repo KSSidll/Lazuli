@@ -29,6 +29,19 @@ namespace LazuliLibrary.API
             _loggedInUser = loggedInUser;
         }
 
+        public static void ApiHelperValidator(ApiHelper? apiHelper)
+        {
+            if (apiHelper is null)
+            {
+                throw new NullReferenceException("ApiHelper cannot be null");
+            }
+
+            if (apiHelper.ApiClient is null)
+            {
+                throw new NullReferenceException("ApiClient cannot be null");
+            }
+        }
+
         private void InitializeClient()
         {
             //TODO get api from appsettings.json
@@ -44,7 +57,7 @@ namespace LazuliLibrary.API
         public void LoggOffUser()
         {
             _apiClient?.DefaultRequestHeaders.Clear();
-        }
+        }   
 
     }
 }
