@@ -7,8 +7,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddDbContextFactory<UserContext>(opt =>
-        opt.UseSqlite($"Data Source={nameof(UserContext.UserDb)}.db"));
+builder.Services.AddDbContextFactory<UserContext>(
+    opt => opt.UseSqlite($"Data Source={nameof(UserContext.UserDb)}.db")
+);
 
 var app = builder.Build();
 
@@ -21,7 +22,6 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Special/Error");
 }
-
 
 app.UseStaticFiles();
 

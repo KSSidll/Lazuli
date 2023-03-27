@@ -1,36 +1,36 @@
 @media (min-width: 650px) {
-    .container {
-        max-width: 600px;
-    }
+  .container {
+    max-width: 600px;
+  }
 }
 
-::deep .valid.modified:not([type=checkbox]) {
-    outline: none;
+::deep .valid.modified:not([type="checkbox"]) {
+  outline: none;
 }
 
 ::deep .invalid {
-    outline: none;
+  outline: none;
 }
 
 ::deep input {
-    border: 2px solid #333639;
-    background-color: black;
-    border-radius: 0.5em;
+  border: 2px solid #333639;
+  background-color: black;
+  border-radius: 0.5em;
 }
 
 ::deep input:focus {
-    outline: none;
-    border-color: #1d9bf0;
+  outline: none;
+  border-color: #1d9bf0;
 }
 
 ::deep .submit {
-    border-radius: 2em;
-    border: 2px solid #333639;
-    color: white;
-    background-color: black;
-    transition-duration: 0.25s;
+  border-radius: 2em;
+  border: 2px solid #333639;
+  color: white;
+  background-color: black;
+  transition-duration: 0.25s;
 }
 
 ::deep .submit:hover {
-    background-color: #181919;
+  background-color: #181919;
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
+
 namespace Lazuli.Data.Database;
 
 /// <summary>
@@ -18,7 +19,7 @@ public class UserContext : DbContext
     public static readonly string UserDb = nameof(UserDb).ToLower();
 
     public UserContext(DbContextOptions<UserContext> options)
-        : base(options) {}
+        : base(options) { }
 
     /// <summary>
     /// List of <see cref="User"/>.
@@ -33,9 +34,7 @@ public class UserContext : DbContext
     {
         // this property isn't on the C# class
         // so we set it up as a "shadow" property and use it for concurrency
-        modelBuilder.Entity<User>()
-            .Property<byte[]>(RowVersion)
-            .IsRowVersion();
+        modelBuilder.Entity<User>().Property<byte[]>(RowVersion).IsRowVersion();
 
         base.OnModelCreating(modelBuilder);
     }

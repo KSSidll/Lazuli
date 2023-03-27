@@ -17,7 +17,6 @@ public static class CipherUtility
         return argon.GetBytes(128);
     }
 
-    public static byte[] Encrypt(string data, string salt)
-        => Encrypt(Encoding.ASCII.GetBytes(data), Encoding.ASCII.GetBytes(salt));
-
+    public static byte[] Encrypt(string data, string salt) =>
+        Encrypt(Encoding.ASCII.GetBytes(data), Encoding.ASCII.GetBytes(salt));
 }

@@ -34,7 +34,8 @@ namespace LazuliTest
 
             navbtn.Click();
 
-            // check if after clicking nav-to-signup button, navigation manager navigated to correct site
+            // check if after clicking nav-to-signup button, navigation manager
+            // navigated to correct site
             Assert.Equal("auth/signup", navManager!.ToBaseRelativePath(navManager.Uri));
         }
     }
