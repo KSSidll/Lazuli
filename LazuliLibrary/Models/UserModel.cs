@@ -16,6 +16,5 @@ namespace LazuliLibrary.Models
         public string Phone { get; set; }
         public string Website { get; set; }
         public CompanyModel Company { get; set; }
-
     }
 }

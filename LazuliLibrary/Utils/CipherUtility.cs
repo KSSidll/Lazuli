@@ -1,7 +1,7 @@
 using Konscious.Security.Cryptography;
 using System.Text;
 
-namespace Lazuli.Utils;
+namespace LazuliLibrary.Utils;
 
 public static class CipherUtility
 {

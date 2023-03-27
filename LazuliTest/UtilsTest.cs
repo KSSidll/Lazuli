@@ -1,4 +1,4 @@
-using Lazuli.Utils;
+using LazuliLibrary.Utils;
 using System.Text;
 
 namespace LazuliTest
