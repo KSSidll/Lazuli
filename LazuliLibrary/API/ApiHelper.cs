@@ -31,13 +31,9 @@ namespace LazuliLibrary.API
 
         private void InitializeClient()
         {
-            string? api = ConfigurationManager.AppSettings["api"];
+            //TODO get api from appsettings.json
+            string api = "https://jsonplaceholder.typicode.com/users";
 
-            if (String.IsNullOrWhiteSpace(api))
-            {
-                //throw new Exception("Could not find api path in appsettings");
-                api = "https://jsonplaceholder.typicode.com/users";
-            }
 
             _apiClient = new HttpClient();
             _apiClient.BaseAddress = new Uri(api);
