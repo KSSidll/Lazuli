@@ -14,7 +14,7 @@ namespace LazuliLibrary.API
 		private HttpClient? _apiClient;
         private readonly LoggedInUserModel _loggedInUser;
 
-        public HttpClient ApiClient
+        public HttpClient? ApiClient
 		{
 			get 
 			{ 
@@ -41,6 +41,11 @@ namespace LazuliLibrary.API
             _apiClient.BaseAddress = new Uri(api);
             _apiClient.DefaultRequestHeaders.Accept.Clear();
             _apiClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        }
+
+        public void LoggOffUser()
+        {
+            _apiClient?.DefaultRequestHeaders.Clear();
         }
 
     }
