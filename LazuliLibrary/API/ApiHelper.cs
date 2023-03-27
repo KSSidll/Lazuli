@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Net.WebRequestMethods;
 
 namespace LazuliLibrary.API
 {
@@ -34,7 +35,8 @@ namespace LazuliLibrary.API
 
             if (String.IsNullOrWhiteSpace(api))
             {
-                throw new Exception("Could not find api path in appsettings");
+                //throw new Exception("Could not find api path in appsettings");
+                api = "https://jsonplaceholder.typicode.com/users";
             }
 
             _apiClient = new HttpClient();
