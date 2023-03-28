@@ -22,6 +22,9 @@ public class User
 
     public User() { }
 
+    /// <summary>
+    /// User constructor, takes in non-encrypted password, takes care of the encryption
+    /// </summary>
     public User(string login, string password, int boundToUserId)
     {
         Login = login;
