@@ -8,6 +8,7 @@ using Lazuli;
 using Microsoft.EntityFrameworkCore.Internal;
 using LazuliLibrary.Utils;
 using Lazuli.Utils;
+using LazuliLibrary.API.Endpoints;
 
 namespace LazuliTest
 {
@@ -25,12 +26,7 @@ namespace LazuliTest
                 opt => opt.UseInMemoryDatabase("userdb")
             );
 
-            // set injected services, TODO mock them instead
-        
-            //context.Services.AddSingleton<UserService>();
-            //var api = new ApiHelper();
-            //var userService = context.Services.GetRequiredService<UserService>();
-            //userService.setApihelper(api);
+            context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
 
             var component = context.RenderComponent<Signup>();
 
@@ -62,11 +58,7 @@ namespace LazuliTest
                 opt => opt.UseInMemoryDatabase("userdb")
             );
 
-            // set injected services, TODO mock them instead
-            //context.Services.AddSingleton<UserService>();
-            //var api = new ApiHelper();
-            //var userService = context.Services.GetRequiredService<UserService>();
-            //userService.setApihelper(api);
+            context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
 
             var component = context.RenderComponent<Signup>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
@@ -91,13 +83,8 @@ namespace LazuliTest
             context.Services.AddDbContextFactory<UserContext>(
                 opt => opt.UseInMemoryDatabase("userdb")
             );
-            
-            // set injected services, TODO mock them instead
-            context.Services.AddSingleton<UserService>();
-            var api = new ApiHelper();
-            var userService = context.Services.GetRequiredService<UserService>();
-            userService.setApihelper(api);
-            //
+
+            context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
 
             var component = context.RenderComponent<Signup>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
