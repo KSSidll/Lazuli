@@ -6,14 +6,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LazuliLibrary.API
+namespace LazuliLibrary.API.Endpoints
 {
-    public class AlbumEndpoint
+    public class AlbumEndpoint : IAlbumEndpoint
     {
-        private readonly ApiHelper _apiHelper;
+        private readonly IApiHelper _apiHelper;
         private const string _page = "albums";
 
-        public AlbumEndpoint(ApiHelper apiHelper)
+        public AlbumEndpoint(IApiHelper apiHelper)
         {
             _apiHelper = apiHelper;
         }

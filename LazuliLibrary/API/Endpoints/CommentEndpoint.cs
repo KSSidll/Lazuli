@@ -5,28 +5,28 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LazuliLibrary.API
+namespace LazuliLibrary.API.Endpoints
 {
-    public class PhotoEndpoint
+    public class CommentEndpoint : ICommentEndpoint
     {
-        private readonly ApiHelper _apiHelper;
-        private const string _page = "posts";
+        private readonly IApiHelper _apiHelper;
+        private const string _page = "comments";
 
-        public PhotoEndpoint(ApiHelper apiHelper)
+        public CommentEndpoint(IApiHelper apiHelper)
         {
-            _apiHelper = apiHelper; 
+            _apiHelper = apiHelper;
         }
 
-        public async Task<List<PhotoModel>> GetAll()
+        public async Task<List<CommentModel>> GetAll()
         {
-                // checks if there are null values
+            // checks if there are null values
             ApiHelper.ApiHelperValidator(_apiHelper);
 
             using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}"))
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = await response.Content.ReadAsAsync<List<PhotoModel>>();
+                    var result = await response.Content.ReadAsAsync<List<CommentModel>>();
 
                     return result;
                 }
@@ -37,16 +37,16 @@ namespace LazuliLibrary.API
             }
         }
 
-        public async Task<PhotoModel> GetByPhotoId(int photoId)
+        public async Task<CommentModel> GetByCommentId(int commentId)
         {
             // checks if there are null values
             ApiHelper.ApiHelperValidator(_apiHelper);
 
-            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}/{photoId}"))
+            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}/{commentId}"))
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = await response.Content.ReadAsAsync<PhotoModel>();
+                    var result = await response.Content.ReadAsAsync<CommentModel>();
 
                     return result;
                 }
@@ -57,16 +57,16 @@ namespace LazuliLibrary.API
             }
         }
 
-        public async Task<List<PhotoModel>> GetByPostId(int postId)
+        public async Task<List<CommentModel>> GetByUserId(int userId)
         {
             // checks if there are null values
             ApiHelper.ApiHelperValidator(_apiHelper);
 
-            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}?postId={postId}"))
+            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}?userId={userId}"))
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = await response.Content.ReadAsAsync<List<PhotoModel>>();
+                    var result = await response.Content.ReadAsAsync<List<CommentModel>>();
 
                     return result;
                 }

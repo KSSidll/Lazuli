@@ -43,7 +43,7 @@ public class ApiHelper : IApiHelper
         _apiClient?.DefaultRequestHeaders.Clear();
     }
 
-    public static void ApiHelperValidator(ApiHelper apiHelper)
+    public static void ApiHelperValidator(IApiHelper apiHelper)
     {
         if (apiHelper is null)
         {

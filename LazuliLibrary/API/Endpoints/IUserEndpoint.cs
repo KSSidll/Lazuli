@@ -1,6 +1,6 @@
 ﻿using LazuliLibrary.Models;
 
-namespace LazuliLibrary.API
+namespace LazuliLibrary.API.Endpoints
 {
     public interface IUserEndpoint
     {
