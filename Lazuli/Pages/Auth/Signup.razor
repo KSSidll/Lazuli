@@ -49,8 +49,8 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        users = await UserService.GetAll();
         userContext = UserDbFactory.CreateDbContext();
+        users = await UserService.GetAll();
 
         // don't know how to make placeholder look different from
         // selected value in InputSelect, so we assign first found user
