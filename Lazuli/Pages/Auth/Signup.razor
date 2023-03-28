@@ -7,7 +7,10 @@
 
 @inject ILogger<Signup> Logger
 @inject NavigationManager NavigationManager
-@inject UserService UserService
+
+@*@inject UserService UserService*@
+@inject IUserEndpoint userEndpoint
+
 @inject IDbContextFactory<UserContext> UserDbFactory
 
 <PageTitle>Signup</PageTitle>
@@ -49,7 +52,7 @@
 @code {
     protected override async Task OnInitializedAsync()
     {
-        users = await UserService.GetAll();
+        users = await userEndpoint.GetAll();
         userContext = UserDbFactory.CreateDbContext();
 
         // don't know how to make placeholder look different from
