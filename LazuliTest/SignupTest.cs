@@ -1,9 +1,9 @@
-using Lazuli;
 using Lazuli.Data.Database;
 using Lazuli.Pages.Auth;
 using Lazuli.Service;
 using LazuliLibrary.API;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.EntityFrameworkCore;
 
 namespace LazuliTest
 {
@@ -14,8 +14,11 @@ namespace LazuliTest
         {
             using var context = new TestContext();
 
+            context.Services.AddDbContextFactory<UserContext>(
+                opt => opt.UseInMemoryDatabase("userdb")
+            );
+
             // set injected services, TODO mock them instead
-            context.Services.AddDbContextFactory<UserContext>();
             context.Services.AddSingleton<UserService>();
             var api = new ApiHelper();
             var userService = context.Services.GetRequiredService<UserService>();
@@ -44,8 +47,11 @@ namespace LazuliTest
         {
             using var context = new TestContext();
 
+            context.Services.AddDbContextFactory<UserContext>(
+                opt => opt.UseInMemoryDatabase("userdb")
+            );
+
             // set injected services, TODO mock them instead
-            context.Services.AddDbContextFactory<UserContext>();
             context.Services.AddSingleton<UserService>();
             var api = new ApiHelper();
             var userService = context.Services.GetRequiredService<UserService>();

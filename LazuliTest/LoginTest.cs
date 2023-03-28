@@ -1,8 +1,7 @@
 using Lazuli.Data.Database;
 using Lazuli.Pages.Auth;
-using Lazuli.Service;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace LazuliTest
 {
@@ -12,7 +11,9 @@ namespace LazuliTest
         public void TestLoginPageRender()
         {
             using var context = new TestContext();
-            context.Services.AddDbContextFactory<UserContext>();
+            context.Services.AddDbContextFactory<UserContext>(
+                opt => opt.UseInMemoryDatabase("userdb")
+            );
 
             var component = context.RenderComponent<Login>();
 
@@ -33,7 +34,10 @@ namespace LazuliTest
         public void TestNavToSignup()
         {
             using var context = new TestContext();
-            context.Services.AddDbContextFactory<UserContext>();
+
+            context.Services.AddDbContextFactory<UserContext>(
+                opt => opt.UseInMemoryDatabase("userdb")
+            );
 
             var component = context.RenderComponent<Login>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
