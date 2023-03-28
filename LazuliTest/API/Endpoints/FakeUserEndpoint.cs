@@ -8,17 +8,23 @@ public class FakeUserEndpoint : IUserEndpoint
 {
     public async Task<List<UserModel>> GetAll()
     {
-        return TestDataHelper.GetFakeUserModelList();
+        return await Task.Run(() => 
+        { 
+            return TestDataHelper.GetFakeUserModelList();
+        });
     }
 
 
     public async Task<UserModel> GetByUserId(int userId)
     {
-        var data = TestDataHelper.GetFakeUserModelList().Find(user => user.Id == userId);
+        return await Task.Run(() =>
+        {
+            var data = TestDataHelper.GetFakeUserModelList().Find(user => user.Id == userId);
 
-        if (data is null) throw new HttpRequestException();
+            if (data is null) throw new HttpRequestException();
 
-        return data;
+            return data;
+        });
     }
 }
 
