@@ -1,16 +1,10 @@
 @page "/auth/signup"
 @layout AuthLayout
-
-@using LazuliLibrary.Utils
-
 @implements IDisposable
 
 @inject ILogger<Signup> Logger
 @inject NavigationManager NavigationManager
-
-@*@inject UserService UserService*@
 @inject IUserEndpoint userEndpoint
-
 @inject IDbContextFactory<UserContext> UserDbFactory
 
 <PageTitle>Signup</PageTitle>

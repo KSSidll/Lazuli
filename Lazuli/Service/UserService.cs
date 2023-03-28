@@ -1,5 +1,6 @@
 using LazuliLibrary.Models;
 using LazuliLibrary.API;
+using LazuliLibrary.API.Endpoints;
 
 namespace Lazuli.Service;
 
