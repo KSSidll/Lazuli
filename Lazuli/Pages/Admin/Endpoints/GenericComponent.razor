@@ -4,7 +4,7 @@
 	<table class="table table-striped">
 		<thead class="table-dark">
 			<tr>
-				@foreach (var p in this.ModelType.GetProperties())
+				@foreach (var p in this.ModelType!.GetProperties())
 				{
 					<th>@p.Name</th>
 				}
@@ -33,7 +33,7 @@ else
 
 @code {
 	[Parameter]
-	public Type ModelType { get; set; }
+	public Type? ModelType { get; set; }
 
 	[Parameter]
 	public List<object>? Models{ get; set; }

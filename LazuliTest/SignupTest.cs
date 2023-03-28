@@ -1,13 +1,8 @@
 using Lazuli.Data.Database;
 using Lazuli.Pages.Auth;
-using Lazuli.Service;
-using LazuliLibrary.API;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Lazuli;
-using Microsoft.EntityFrameworkCore.Internal;
 using LazuliLibrary.Utils;
-using Lazuli.Utils;
 using LazuliLibrary.API.Endpoints;
 
 namespace LazuliTest
