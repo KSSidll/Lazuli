@@ -2,6 +2,9 @@ using Lazuli.Data.Database;
 using Lazuli.Pages.Auth;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using Lazuli.Service;
+using LazuliLibrary.API;
+using LazuliLibrary.Utils;
 
 namespace LazuliTest
 {
@@ -11,6 +14,10 @@ namespace LazuliTest
         public void TestLoginPageRender()
         {
             using var context = new TestContext();
+
+            // TODO somehow mock this (couldn't find anything about how to do that as of yet)
+            // creates a database in memory instead of using an actual database
+            // might create unexpected behaviour when done in several tests, especially if run asynchronously
             context.Services.AddDbContextFactory<UserContext>(
                 opt => opt.UseInMemoryDatabase("userdb")
             );
@@ -35,6 +42,9 @@ namespace LazuliTest
         {
             using var context = new TestContext();
 
+            // TODO somehow mock this (couldn't find anything about how to do that as of yet)
+            // creates a database in memory instead of using an actual database
+            // might create unexpected behaviour when done in several tests, especially if run asynchronously
             context.Services.AddDbContextFactory<UserContext>(
                 opt => opt.UseInMemoryDatabase("userdb")
             );
