@@ -11,44 +11,44 @@ public class UserEndpoint
         _apiHelper = apiHelper;
     }
 
-        public async Task<List<UserModel>> GetAll()
+    public async Task<List<UserModel>> GetAll()
+    {
+        // checks if there are null values
+        ApiHelper.ApiHelperValidator(_apiHelper);
+
+        using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync("/users"))
         {
-            // checks if there are null values
-            ApiHelper.ApiHelperValidator(_apiHelper);
-
-            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync("/users"))
+            if (response.IsSuccessStatusCode)
             {
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsAsync<List<UserModel>>();
+                var result = await response.Content.ReadAsAsync<List<UserModel>>();
 
-                    return result;
-                }
-                else
-                {
-                    throw new HttpRequestException(response.ReasonPhrase);
-                }
+                return result;
+            }
+            else
+            {
+                throw new HttpRequestException(response.ReasonPhrase);
             }
         }
+    }
 
+    public async Task<UserModel> GetByUserId(int userId)
+    {
+        // checks if there are null values
+        ApiHelper.ApiHelperValidator(_apiHelper);
 
-        public async Task<UserModel> GetByUserId(int userId)
+        using (
+            HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/users/{userId}")
+        )
         {
-            // checks if there are null values
-            ApiHelper.ApiHelperValidator(_apiHelper);
-
-            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/users/{userId}"))
+            if (response.IsSuccessStatusCode)
             {
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsAsync<UserModel>();
+                var result = await response.Content.ReadAsAsync<UserModel>();
 
-                    return result;
-                }
-                else
-                {
-                    throw new HttpRequestException(response.ReasonPhrase);
-                }
+                return result;
+            }
+            else
+            {
+                throw new HttpRequestException(response.ReasonPhrase);
             }
         }
     }
