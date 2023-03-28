@@ -12,7 +12,10 @@ builder.Services.AddServerSideBlazor();
 builder.Services.AddDbContextFactory<UserContext>(
     opt => opt.UseSqlite($"Data Source={nameof(UserContext.UserDb)}.db")
 );
-builder.Services.AddSingleton<UserService>();
+
+// Personal Services
+builder.Services.AddTransient<IApiHelper, ApiHelper>();
+builder.Services.AddTransient<IUserEndpoint, UserEndpoint>();
 
 var app = builder.Build();
 
@@ -20,9 +23,11 @@ await using var scope = app.Services.GetRequiredService<IServiceScopeFactory>().
 var options = scope.ServiceProvider.GetRequiredService<DbContextOptions<UserContext>>();
 await DatabaseUtility.EnsureUserDbCreatedAsync(options);
 
-var api = new ApiHelper();
-var userService = app.Services.GetRequiredService<UserService>();
-userService.setApihelper(api);
+//var api = new ApiHelper();
+//var userService = app.Services.GetRequiredService<UserService>();
+//userService.setApihelper(api);
+
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
