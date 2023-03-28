@@ -7,4 +7,9 @@ public class AddressModel
     public string? City { get; set; }
     public string? Zipcode { get; set; }
     public GeoLocationModel? GeoLocation { get; set; }
+
+    public override string ToString()
+    {
+        return $"{Zipcode} {City} {Street}";
+    }
 }

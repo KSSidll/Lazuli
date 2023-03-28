@@ -10,4 +10,9 @@ public class UserModel
     public string? Phone { get; set; }
     public string? Website { get; set; }
     public CompanyModel? Company { get; set; }
+
+    public override string ToString()
+    {
+        return $"{Id} {Name} {Username}";
+    }
 }
