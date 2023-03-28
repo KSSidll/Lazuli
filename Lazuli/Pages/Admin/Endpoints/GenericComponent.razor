@@ -1,0 +1,40 @@
+﻿
+@if (Models is not null && Models.Count > 0)
+{
+	<table class="table table-striped">
+		<thead class="table-dark">
+			<tr>
+				@foreach (var p in this.ModelType.GetProperties())
+				{
+					<th>@p.Name</th>
+				}
+			</tr>
+		</thead>
+		<tbody>
+			@foreach (var model in Models)
+			{
+				<tr>
+					@foreach (var p in this.ModelType.GetProperties())
+					{
+						<td>@p.GetValue(model)</td>
+					}
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+else
+{
+	<p>List is empty or null</p>
+}
+
+
+
+
+@code {
+	[Parameter]
+	public Type ModelType { get; set; }
+
+	[Parameter]
+	public List<object>? Models{ get; set; }
+}

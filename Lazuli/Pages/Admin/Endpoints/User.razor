@@ -1,0 +1,20 @@
+﻿@page "/admin/endpoints/user"
+@using LazuliLibrary.API
+
+<h3>User</h3>
+<GenericComponent Models="@_users" ModelType="@typeof(UserModel)"/>
+
+@code {
+	private List<object> _users;
+
+	protected async override Task OnInitializedAsync()
+	{
+		UserEndpoint endpoint = new UserEndpoint(new ApiHelper());
+
+		//get all users
+		_users = (await endpoint.GetAll()).ToList<object>();
+
+		// todo get user by id on button click
+
+	}
+}
