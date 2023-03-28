@@ -2,32 +2,30 @@ using Microsoft.EntityFrameworkCore;
 using LazuliLibrary.API;
 using Lazuli.Data.Database;
 using Lazuli.Utils;
-using Lazuli.Service;
+using LazuliLibrary.API.Endpoints;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
+// Personal Services
 builder.Services.AddDbContextFactory<UserContext>(
     opt => opt.UseSqlite($"Data Source={nameof(UserContext.UserDb)}.db")
 );
-
-// Personal Services
 builder.Services.AddTransient<IApiHelper, ApiHelper>();
 builder.Services.AddTransient<IUserEndpoint, UserEndpoint>();
+builder.Services.AddTransient<IPostEndpoint, PostEndpoint>();
+builder.Services.AddTransient<IAlbumEndpoint, AlbumEndpoint>();
+builder.Services.AddTransient<ICommentEndpoint, CommentEndpoint>();
+builder.Services.AddTransient<IPhotoEndpoint, PhotoEndpoint>();
 
 var app = builder.Build();
 
 await using var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();
 var options = scope.ServiceProvider.GetRequiredService<DbContextOptions<UserContext>>();
 await DatabaseUtility.EnsureUserDbCreatedAsync(options);
-
-//var api = new ApiHelper();
-//var userService = app.Services.GetRequiredService<UserService>();
-//userService.setApihelper(api);
-
-
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
