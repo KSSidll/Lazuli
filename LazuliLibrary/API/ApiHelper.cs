@@ -1,25 +1,34 @@
-﻿using System.Net.Http.Headers;
+﻿using Microsoft.Extensions.Configuration;
+using System.Configuration;
+using System.Net.Http.Headers;
 
 namespace LazuliLibrary.API;
 
-public class ApiHelper
+public class ApiHelper : IApiHelper
 {
     private HttpClient? _apiClient;
+    private readonly IConfiguration _config;
 
     public HttpClient? ApiClient
     {
         get { return _apiClient; }
     }
 
-    public ApiHelper()
+    public ApiHelper(IConfiguration config)
     {
-        InitializeClient();
+        _config = config;
+        InitializeClient();     
     }
 
     private void InitializeClient()
     {
-        // TODO get api from appsettings.json
-        string api = "https://jsonplaceholder.typicode.com/";
+        // gets api url from appsettings.json
+        string? api = _config?.GetSection("Api")["url"];
+
+        if (api is null)
+        {
+            throw new ArgumentNullException(nameof(api));
+        }
 
         _apiClient = new HttpClient();
         _apiClient.BaseAddress = new Uri(api);
