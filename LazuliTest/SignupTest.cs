@@ -15,11 +15,12 @@ namespace LazuliTest
             using var context = new TestContext();
 
             // set injected services, TODO mock them instead
-            context.Services.AddDbContextFactory<UserContext>();
-            context.Services.AddSingleton<UserService>();
-            var api = new ApiHelper();
-            var userService = context.Services.GetRequiredService<UserService>();
-            userService.setApihelper(api);
+        
+            //context.Services.AddDbContextFactory<UserContext>();
+            //context.Services.AddSingleton<UserService>();
+            //var api = new ApiHelper();
+            //var userService = context.Services.GetRequiredService<UserService>();
+            //userService.setApihelper(api);
 
             var component = context.RenderComponent<Signup>();
 
@@ -45,11 +46,11 @@ namespace LazuliTest
             using var context = new TestContext();
 
             // set injected services, TODO mock them instead
-            context.Services.AddDbContextFactory<UserContext>();
-            context.Services.AddSingleton<UserService>();
-            var api = new ApiHelper();
-            var userService = context.Services.GetRequiredService<UserService>();
-            userService.setApihelper(api);
+            //context.Services.AddDbContextFactory<UserContext>();
+            //context.Services.AddSingleton<UserService>();
+            //var api = new ApiHelper();
+            //var userService = context.Services.GetRequiredService<UserService>();
+            //userService.setApihelper(api);
 
             var component = context.RenderComponent<Signup>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
