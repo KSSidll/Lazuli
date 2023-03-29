@@ -1,7 +1,6 @@
 using LazuliLibrary.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using System.ComponentModel;
 using System.Security.Claims;
 
 namespace Lazuli.Authentication;
@@ -31,6 +30,14 @@ public class UserAuthenticationStateProvider : AuthenticationStateProvider
     public async Task Logout()
     {
         await UpdateAuthenticationState(null);
+    }
+
+    public async Task Login(int boundToUserId)
+    {
+        await UpdateAuthenticationState(new AuthenticatedUserModel
+        {
+            BoundToUserId = boundToUserId.ToString()
+        });
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()

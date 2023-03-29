@@ -70,7 +70,7 @@
 
     private async void HandleSignup()
     {
-        if (signupModel.Login is null || signupModel.Password is null)
+        if (signupModel.Login is null || signupModel.Password is null || signupModel.BoundToUserId < 1)
             throw new InvalidOperationException("HandleSignup was called without signup form being filled, DataAnnotationsValidator failed");
 
         if (userContext is null)
@@ -86,10 +86,7 @@
         // update authentication status and navigate to index/controller page
         var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
 
-        await userAuthStateProvider.UpdateAuthenticationState(new AuthenticatedUserModel
-            {
-                BoundToUserId = user.BoundToUserId.ToString()
-            });
+        await userAuthStateProvider.Login(user.BoundToUserId);
 
         NavigationManager.NavigateTo("/");
     }

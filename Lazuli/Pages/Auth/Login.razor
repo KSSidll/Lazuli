@@ -66,10 +66,7 @@
         // update authentication status and navigate to index/controller page
         var userAuthStateProvider = (UserAuthenticationStateProvider) authStateProvider;
 
-        await userAuthStateProvider.UpdateAuthenticationState(new AuthenticatedUserModel
-            {
-                BoundToUserId = user.BoundToUserId.ToString()
-            });
+        await userAuthStateProvider.Login(user.BoundToUserId);
 
         NavigationManager.NavigateTo("/");
     }

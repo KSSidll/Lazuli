@@ -1,13 +1,7 @@
 ﻿using Lazuli.Data.Database;
-using Lazuli.Pages.Auth;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using LazuliLibrary.Utils;
-using LazuliLibrary.API.Endpoints;
-using LazuliTest.TestDataHelper;
-using Lazuli.Authentication;
-using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 namespace LazuliTest;
 
@@ -22,7 +16,7 @@ public class UserContextTest
         // creates a database in memory instead of using an actual database
         // might create unexpected behaviour when done in several tests, especially if run asynchronously
         context.Services.AddDbContextFactory<UserContext>(
-            opt => opt.UseInMemoryDatabase("TestGetUserDB")
+            opt => opt.UseInMemoryDatabase("TestGetUser")
         );
 
         // create scope of factory service and use it to create database context

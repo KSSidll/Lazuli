@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
+namespace Lazuli.Data;
+
 public class SignupModel
 {
     [Required]
@@ -9,5 +11,6 @@ public class SignupModel
     public string? Password { get; set; }
 
     [Required]
+    [Range(1, int.MaxValue)]
     public int BoundToUserId { get; set; }
 }

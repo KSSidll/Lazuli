@@ -4,7 +4,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using LazuliLibrary.Utils;
 using LazuliLibrary.API.Endpoints;
-using LazuliTest.TestDataHelper;
 using Lazuli.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
@@ -23,7 +22,7 @@ namespace LazuliTest
             // creates a database in memory instead of using an actual database
             // might create unexpected behaviour when done in several tests, especially if run asynchronously
             context.Services.AddDbContextFactory<UserContext>(
-                opt => opt.UseInMemoryDatabase("TestSignupPageRenderDB")
+                opt => opt.UseInMemoryDatabase("TestSignupPageRender")
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
@@ -51,7 +50,7 @@ namespace LazuliTest
         }
 
         [Fact]
-        public void TestNavToLogin()
+        public void TestNavToLoginOnNavBtnClick()
         {
             using var context = new TestContext();
 
@@ -59,7 +58,7 @@ namespace LazuliTest
             // creates a database in memory instead of using an actual database
             // might create unexpected behaviour when done in several tests, especially if run asynchronously
             context.Services.AddDbContextFactory<UserContext>(
-                opt => opt.UseInMemoryDatabase("TestNavToLoginDB")
+                opt => opt.UseInMemoryDatabase("TestNavToLoginOnNavBtnClick")
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
@@ -81,7 +80,7 @@ namespace LazuliTest
         }
 
         [Fact]
-        public void TestSignup()
+        public async void TestCorrectSignupSuccess()
         {
             using var context = new TestContext();
 
@@ -89,7 +88,7 @@ namespace LazuliTest
             // creates a database in memory instead of using an actual database
             // might create unexpected behaviour when done in several tests, especially if run asynchronously
             context.Services.AddDbContextFactory<UserContext>(
-                opt => opt.UseInMemoryDatabase("TestSignupDB")
+                opt => opt.UseInMemoryDatabase("TestCorrectSignupSuccess")
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
@@ -101,32 +100,196 @@ namespace LazuliTest
             var component = context.RenderComponent<Signup>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
 
-            // create scope of factory service and use it to create database context
+            // create scope of factory service and use it to create database context and auth state provider
             using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
+            var userAuthStateProvider = (UserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
             var userContext = userDbFactory.CreateDbContext();
 
             // check if no user in the database
             Assert.Equal(0, userContext.Users?.Count());
 
+            // check if not authenticated
+            Assert.False(await userAuthStateProvider.IsAuthenticated());
+
             string username = "username";
             string password = "passwd";
             int boundToUserId = 3;
 
-            // set username and password in signup form, then submit
+            // set data in signup form, then submit
             component.FindAll("input")[0].Change(username);
             component.FindAll("input")[1].Change(password);
             component.FindAll("select")[0].Change(boundToUserId);
-            component.Find("form").Submit();
+            component.Find(".submit").Click();
 
             // check if only 1 user was added to database
             Assert.Equal(1, userContext.Users?.Count());
+
+            // TODO configure bUnit's JSInterop to handle calls below
+            //// check if authenticated
+            //Assert.True(await userAuthStateProvider.IsAuthenticated());
 
             byte[] hashed_password = CipherUtility.Encrypt(password, username);
 
             // check if added user has expected data
             Assert.True(userContext.Users?.Any(user => user.Login == username && user.Password == hashed_password && user.BoundToUserId == boundToUserId));
             
+            userContext.Dispose();
+        }
+
+        [Fact]
+        public async void TestNoUsernameInFormFail()
+        {
+            using var context = new TestContext();
+
+            // TODO somehow mock this (couldn't find anything about how to do that as of yet)
+            // creates a database in memory instead of using an actual database
+            // might create unexpected behaviour when done in several tests, especially if run asynchronously
+            context.Services.AddDbContextFactory<UserContext>(
+                opt => opt.UseInMemoryDatabase("TestNoUsernameInFormFail")
+            );
+
+            context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
+            context.Services.AddAuthenticationCore();
+            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
+            context.Services.AddScoped<ProtectedSessionStorage>();
+            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+
+            var component = context.RenderComponent<Signup>();
+            var navManager = context.Services.GetService<FakeNavigationManager>();
+
+            // create scope of factory service and use it to create database context and auth state provider
+            using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
+            var userAuthStateProvider = (UserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
+            var userContext = userDbFactory.CreateDbContext();
+
+            // check if no user in the database
+            Assert.Equal(0, userContext.Users?.Count());
+
+            // check if not authenticated
+            Assert.False(await userAuthStateProvider.IsAuthenticated());
+
+            string username = "";
+            string password = "passwd";
+            int boundToUserId = 3;
+
+            // set data in signup form, then submit
+            component.FindAll("input")[0].Change(username);
+            component.FindAll("input")[1].Change(password);
+            component.FindAll("select")[0].Change(boundToUserId);
+            component.Find(".submit").Click();
+
+            // check if no user in the database
+            Assert.Equal(0, userContext.Users?.Count());
+
+            // check if not authenticated
+            Assert.False(await userAuthStateProvider.IsAuthenticated());
+
+            userContext.Dispose();
+        }
+
+        [Fact]
+        public async void TestNoPasswordInFormFail()
+        {
+            using var context = new TestContext();
+
+            // TODO somehow mock this (couldn't find anything about how to do that as of yet)
+            // creates a database in memory instead of using an actual database
+            // might create unexpected behaviour when done in several tests, especially if run asynchronously
+            context.Services.AddDbContextFactory<UserContext>(
+                opt => opt.UseInMemoryDatabase("TestNoPasswordInFormFail")
+            );
+
+            context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
+            context.Services.AddAuthenticationCore();
+            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
+            context.Services.AddScoped<ProtectedSessionStorage>();
+            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+
+            var component = context.RenderComponent<Signup>();
+            var navManager = context.Services.GetService<FakeNavigationManager>();
+
+            // create scope of factory service and use it to create database context and auth state provider
+            using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
+            var userAuthStateProvider = (UserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
+            var userContext = userDbFactory.CreateDbContext();
+
+            // check if no user in the database
+            Assert.Equal(0, userContext.Users?.Count());
+
+            // check if not authenticated
+            Assert.False(await userAuthStateProvider.IsAuthenticated());
+
+            string username = "yser";
+            string password = "";
+            int boundToUserId = 3;
+
+            // set data in signup form, then submit
+            component.FindAll("input")[0].Change(username);
+            component.FindAll("input")[1].Change(password);
+            component.FindAll("select")[0].Change(boundToUserId);
+            component.Find(".submit").Click();
+
+            // check if no user in the database
+            Assert.Equal(0, userContext.Users?.Count());
+
+            // check if not authenticated
+            Assert.False(await userAuthStateProvider.IsAuthenticated());
+
+            userContext.Dispose();
+        }
+
+        [Fact]
+        public async void TestNoSelectedSelectInFormFail()
+        {
+            using var context = new TestContext();
+
+            // TODO somehow mock this (couldn't find anything about how to do that as of yet)
+            // creates a database in memory instead of using an actual database
+            // might create unexpected behaviour when done in several tests, especially if run asynchronously
+            context.Services.AddDbContextFactory<UserContext>(
+                opt => opt.UseInMemoryDatabase("TestNoSelectedSelectInFormFail")
+            );
+
+            context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
+            context.Services.AddAuthenticationCore();
+            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
+            context.Services.AddScoped<ProtectedSessionStorage>();
+            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+
+            var component = context.RenderComponent<Signup>();
+            var navManager = context.Services.GetService<FakeNavigationManager>();
+
+            // create scope of factory service and use it to create database context and auth state provider
+            using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
+            var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
+            var userAuthStateProvider = (UserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
+            var userContext = userDbFactory.CreateDbContext();
+
+            // check if no user in the database
+            Assert.Equal(0, userContext.Users?.Count());
+
+            // check if not authenticated
+            Assert.False(await userAuthStateProvider.IsAuthenticated());
+
+            string username = "ysr";
+            string password = "passwd";
+            int boundToUserId = 0; // 0 -> null
+
+            // set data in signup form, then submit
+            component.FindAll("input")[0].Change(username);
+            component.FindAll("input")[1].Change(password);
+            component.FindAll("select")[0].Change(boundToUserId);
+            component.Find(".submit").Click();
+
+            // check if no user in the database
+            Assert.Equal(0, userContext.Users?.Count());
+
+            // check if not authenticated
+            Assert.False(await userAuthStateProvider.IsAuthenticated());
+
             userContext.Dispose();
         }
     }

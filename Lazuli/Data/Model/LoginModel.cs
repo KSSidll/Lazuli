@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
+namespace Lazuli.Data;
+
 public class LoginModel
 {
     [Required]
