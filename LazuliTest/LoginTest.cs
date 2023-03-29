@@ -2,6 +2,10 @@ using Lazuli.Data.Database;
 using Lazuli.Pages.Auth;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
+using Lazuli.Authentication;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace LazuliTest
 {
@@ -16,8 +20,13 @@ namespace LazuliTest
             // creates a database in memory instead of using an actual database
             // might create unexpected behaviour when done in several tests, especially if run asynchronously
             context.Services.AddDbContextFactory<UserContext>(
-                opt => opt.UseInMemoryDatabase("userdb")
+                opt => opt.UseInMemoryDatabase("TestLoginPageRenderDB")
             );
+
+            context.Services.AddAuthenticationCore();
+            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
+            context.Services.AddScoped<ProtectedSessionStorage>();
+            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
 
             var component = context.RenderComponent<Login>();
 
@@ -43,8 +52,13 @@ namespace LazuliTest
             // creates a database in memory instead of using an actual database
             // might create unexpected behaviour when done in several tests, especially if run asynchronously
             context.Services.AddDbContextFactory<UserContext>(
-                opt => opt.UseInMemoryDatabase("userdb")
+                opt => opt.UseInMemoryDatabase("TestNavToSignupDB")
             );
+
+            context.Services.AddAuthenticationCore();
+            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
+            context.Services.AddScoped<ProtectedSessionStorage>();
+            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
 
             var component = context.RenderComponent<Login>();
             var navManager = context.Services.GetService<FakeNavigationManager>();

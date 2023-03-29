@@ -3,9 +3,9 @@
 
 @implements IDisposable
 
-@inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
 @inject IDbContextFactory<UserContext> UserDbFactory
+@inject AuthenticationStateProvider authStateProvider
 
 <PageTitle>Login</PageTitle>
 
@@ -36,30 +36,46 @@
 </EditForm>
 
 @code {
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         userContext = UserDbFactory.CreateDbContext();
 
-        // TODO check if logged in
+        // check if user is authenticated
+        var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
+
+        if (await userAuthStateProvider.IsAuthenticated())
+            NavigationManager.NavigateTo("/");
     }
 
     private LoginModel loginModel = new();
     private UserContext? userContext;
 
-    private void HandleLogin()
+    private async void HandleLogin()
     {
-        Logger.LogInformation("HandleLogin called");
+        if (loginModel.Login is null || loginModel.Password is null)
+            throw new InvalidOperationException("HandleLogin was called without login form being filled, DataAnnotationsValidator failed");
 
-        Logger.LogInformation("HandleLogin Login: " + loginModel.Login);
-        Logger.LogInformation("HandleLogin Password: " + loginModel.Password);
+        if (userContext is null)
+            throw new InvalidOperationException("userContext is null in HandleLogin method, which shouldn't be possible");
 
-        // TODO abstract this as function that gets login and password, checks if they exist in database and if yes, return auth token
-        Logger.LogInformation("HandleLogin, Logged in: " + userContext!.AttemptToLogin(loginModel.Login!, loginModel.Password!));
+        var user = userContext.GetUser(loginModel.Login, loginModel.Password);
+
+        // TODO add message when there is no user that matches provided credentials in the database
+        if (user is null) return;
+
+        // update authentication status and navigate to index/controller page
+        var userAuthStateProvider = (UserAuthenticationStateProvider) authStateProvider;
+
+        await userAuthStateProvider.UpdateAuthenticationState(new AuthenticatedUserModel
+            {
+                BoundToUserId = user.BoundToUserId.ToString()
+            });
+
+        NavigationManager.NavigateTo("/");
     }
 
     private void NavigateToSignup()
     {
-        Logger.LogInformation("NavigateToSignup called in Login");
         NavigationManager.NavigateTo("/auth/signup");
     }
 

@@ -4,6 +4,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using LazuliLibrary.Utils;
 using LazuliLibrary.API.Endpoints;
+using LazuliTest.TestDataHelper;
+using Lazuli.Authentication;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace LazuliTest
 {
@@ -18,10 +23,14 @@ namespace LazuliTest
             // creates a database in memory instead of using an actual database
             // might create unexpected behaviour when done in several tests, especially if run asynchronously
             context.Services.AddDbContextFactory<UserContext>(
-                opt => opt.UseInMemoryDatabase("userdb")
+                opt => opt.UseInMemoryDatabase("TestSignupPageRenderDB")
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
+            context.Services.AddAuthenticationCore();
+            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
+            context.Services.AddScoped<ProtectedSessionStorage>();
+            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
 
             var component = context.RenderComponent<Signup>();
 
@@ -50,10 +59,14 @@ namespace LazuliTest
             // creates a database in memory instead of using an actual database
             // might create unexpected behaviour when done in several tests, especially if run asynchronously
             context.Services.AddDbContextFactory<UserContext>(
-                opt => opt.UseInMemoryDatabase("userdb")
+                opt => opt.UseInMemoryDatabase("TestNavToLoginDB")
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
+            context.Services.AddAuthenticationCore();
+            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
+            context.Services.AddScoped<ProtectedSessionStorage>();
+            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
 
             var component = context.RenderComponent<Signup>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
@@ -76,10 +89,14 @@ namespace LazuliTest
             // creates a database in memory instead of using an actual database
             // might create unexpected behaviour when done in several tests, especially if run asynchronously
             context.Services.AddDbContextFactory<UserContext>(
-                opt => opt.UseInMemoryDatabase("userdb")
+                opt => opt.UseInMemoryDatabase("TestSignupDB")
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
+            context.Services.AddAuthenticationCore();
+            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
+            context.Services.AddScoped<ProtectedSessionStorage>();
+            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
 
             var component = context.RenderComponent<Signup>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
@@ -89,12 +106,17 @@ namespace LazuliTest
             var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
             var userContext = userDbFactory.CreateDbContext();
 
+            // check if no user in the database
+            Assert.Equal(0, userContext.Users?.Count());
+
             string username = "username";
             string password = "passwd";
+            int boundToUserId = 3;
 
             // set username and password in signup form, then submit
             component.FindAll("input")[0].Change(username);
             component.FindAll("input")[1].Change(password);
+            component.FindAll("select")[0].Change(boundToUserId);
             component.Find("form").Submit();
 
             // check if only 1 user was added to database
@@ -102,8 +124,8 @@ namespace LazuliTest
 
             byte[] hashed_password = CipherUtility.Encrypt(password, username);
 
-            // check if added user has expected login and password
-            Assert.True(userContext.Users?.Any(user => user.Login == username && user.Password == hashed_password));
+            // check if added user has expected data
+            Assert.True(userContext.Users?.Any(user => user.Login == username && user.Password == hashed_password && user.BoundToUserId == boundToUserId));
             
             userContext.Dispose();
         }

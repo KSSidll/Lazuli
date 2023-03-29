@@ -7,6 +7,7 @@
 @inject NavigationManager NavigationManager
 @inject IUserEndpoint userEndpoint
 @inject IDbContextFactory<UserContext> UserDbFactory
+@inject AuthenticationStateProvider authStateProvider
 
 <PageTitle>Signup</PageTitle>
 
@@ -48,30 +49,49 @@
     protected override async Task OnInitializedAsync()
     {
         userContext = UserDbFactory.CreateDbContext();
+
+        // check if user is authenticated
+        var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
+
+        if (await userAuthStateProvider.IsAuthenticated())
+            NavigationManager.NavigateTo("/");
+
         users = await userEndpoint.GetAll();
 
         // don't know how to make placeholder look different from
         // selected value in InputSelect, so we assign first found user
         // as the selected one instead to not break color logic
         signupModel.BoundToUserId = users[0].Id;
-
-        // TODO check if logged in
     }
 
     private SignupModel signupModel = new ();
     private List<UserModel>? users = new ();
     private UserContext? userContext;
 
-    private void HandleSignup()
+    private async void HandleSignup()
     {
-        Logger.LogInformation("HandleSignup called");
+        if (signupModel.Login is null || signupModel.Password is null)
+            throw new InvalidOperationException("HandleSignup was called without signup form being filled, DataAnnotationsValidator failed");
 
-        Logger.LogInformation("HandleSignup Login: " + signupModel.Login);
-        Logger.LogInformation("HandleSignup Password: " + signupModel.Password);
-        Logger.LogInformation("HandleSignup BoundTo: " + signupModel.BoundToUserId);
+        if (userContext is null)
+            throw new InvalidOperationException("userContext is null in HandleSignup method, which shouldn't be possible");
 
-        userContext!.Add<User>(new User(signupModel.Login!, signupModel.Password!, signupModel.BoundToUserId));
+        userContext.Add<User>(new User(signupModel.Login, signupModel.Password, signupModel.BoundToUserId));
         userContext.SaveChanges();
+
+        var user = userContext.GetUser(signupModel.Login, signupModel.Password);
+
+        if (user is null) throw new DbUpdateException("User wasn't found in the database after add operation");
+
+        // update authentication status and navigate to index/controller page
+        var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
+
+        await userAuthStateProvider.UpdateAuthenticationState(new AuthenticatedUserModel
+            {
+                BoundToUserId = user.BoundToUserId.ToString()
+            });
+
+        NavigationManager.NavigateTo("/");
     }
 
     private void NavigateToLogin()

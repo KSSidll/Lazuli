@@ -28,17 +28,13 @@ public class UserContext : DbContext
     public DbSet<User>? Users { get; set; }
 
     // TODO abstract this as function that gets login and password, checks if they exist in database and if yes, return auth token
-    public bool AttemptToLogin(string username, string password)
+    public User? GetUser(string username, string password)
     {
         byte[] hashed_password = CipherUtility.Encrypt(password, username);
 
-        if (Users is not null)
-        if (Users.Any(user =>user.Login == username && user.Password == hashed_password))
-        {
-            return true;
-        }
+        var user = Users?.Where(user => user.Login == username && user.Password == hashed_password).FirstOrDefault();
 
-        return false;
+        return user;
     }
 
     /// <summary>
@@ -60,6 +56,7 @@ public class UserContext : DbContext
     public override void Dispose()
     {
         Debug.WriteLine($"{ContextId} context disposed.");
+        GC.SuppressFinalize(this);
         base.Dispose();
     }
 
@@ -70,6 +67,7 @@ public class UserContext : DbContext
     public override ValueTask DisposeAsync()
     {
         Debug.WriteLine($"{ContextId} context disposed async.");
+        GC.SuppressFinalize(this);
         return base.DisposeAsync();
     }
 }

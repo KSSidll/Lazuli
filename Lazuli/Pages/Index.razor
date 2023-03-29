@@ -1,15 +1,21 @@
 ﻿@page "/"
+
 @inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider authStateProvider
 
 @code {
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        // TODO check if logged in
-        Authenticate();
-    }
+        // check if user is authenticated
+        var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
 
-    private void Authenticate()
-    {
-        NavigationManager.NavigateTo("/auth/login");
+        if (await userAuthStateProvider.IsAuthenticated())
+        {
+            NavigationManager.NavigateTo("/main");
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/auth/login");
+        }
     }
 }
