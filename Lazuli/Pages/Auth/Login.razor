@@ -41,7 +41,7 @@
         userContext = UserDbFactory.CreateDbContext();
 
         // check if user is authenticated
-        var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
+        var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
 
         if (await userAuthStateProvider.IsAuthenticated())
             NavigationManager.NavigateTo("/");
@@ -64,7 +64,7 @@
         if (user is null) return;
 
         // update authentication status and navigate to index/controller page
-        var userAuthStateProvider = (UserAuthenticationStateProvider) authStateProvider;
+        var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
 
         await userAuthStateProvider.Login(user.BoundToUserId);
 

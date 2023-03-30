@@ -12,7 +12,7 @@
     protected override async Task OnInitializedAsync()
     {
         // check if user is authenticated
-        var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
+        var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
 
         if (!await userAuthStateProvider.IsAuthenticated())
         {
@@ -22,7 +22,7 @@
 
     private async void Logout()
     {
-        var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
+        var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
         await userAuthStateProvider.Logout();
 
         NavigationManager.NavigateTo("/");

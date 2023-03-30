@@ -1,10 +1,11 @@
-﻿using LazuliTest.Fakes;
+﻿using Lazuli.Authentication;
+using LazuliTest.Fakes;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LazuliTest
 {
-    public class AuthenticationTest
+    public class FakeAuthenticationTest
     {
         [Fact]
         public async void TestAuthentication()
@@ -14,7 +15,7 @@ namespace LazuliTest
             context.Services.AddScoped<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
             using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-            var userAuthStateProvider = (FakeUserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
+            var userAuthStateProvider = (IUserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
 
             // check if not authenticated by default
             Assert.False(await userAuthStateProvider.IsAuthenticated());

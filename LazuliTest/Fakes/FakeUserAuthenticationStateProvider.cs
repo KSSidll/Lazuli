@@ -8,26 +8,25 @@ using System.Security.Claims;
 namespace LazuliTest.Fakes;
 
 // unfortunately it looks like making a fake state provider might be the only option for test use case
-public class FakeUserAuthenticationStateProvider : UserAuthenticationStateProvider
+public class FakeUserAuthenticationStateProvider : UserAuthenticationStateProvider, IUserAuthenticationStateProvider
 {
-    public FakeUserAuthenticationStateProvider() : base(new ProtectedSessionStorage(new BunitJSInterop().JSRuntime, DataProtectionProvider.Create("dummyname"))) { }
+    public FakeUserAuthenticationStateProvider() : base(new ProtectedSessionStorage(new BunitJSInterop().JSRuntime, new EphemeralDataProtectionProvider())) { }
 
-
-    private int boundToUserId = 0;
+    private int _boundToUserId = 0;
     private readonly ClaimsPrincipal _anonymous = new(new ClaimsIdentity());
 
     public new Task<bool> IsAuthenticated()
     {
-        return Task.Run(() => boundToUserId != 0);
+        return Task.Run(() => _boundToUserId != 0);
     }
 
     public new Task Logout()
     {
-        return Task.Run(() => boundToUserId = 0);
+        return Task.Run(() => _boundToUserId = 0);
     }
     public new Task Login(int boundToUserId)
     {
-        return Task.Run(() => this.boundToUserId = boundToUserId);
+        return Task.Run(() => _boundToUserId = boundToUserId);
     }
 
     public new Task UpdateAuthenticationState(AuthenticatedUserModel? userSession)
@@ -36,23 +35,23 @@ public class FakeUserAuthenticationStateProvider : UserAuthenticationStateProvid
         {
             if (userSession == null || userSession.BoundToUserId == null)
             {
-                boundToUserId = 0;
+                _boundToUserId = 0;
             }
             else
             {
-                boundToUserId = int.Parse(userSession.BoundToUserId);
+                _boundToUserId = int.Parse(userSession.BoundToUserId);
             }
         });
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        if (boundToUserId == 0)
+        if (_boundToUserId == 0)
             return await Task.FromResult(new AuthenticationState(_anonymous));
 
         AuthenticatedUserModel userSession = new()
         {
-            BoundToUserId = boundToUserId.ToString()
+            BoundToUserId = _boundToUserId.ToString()
         };
 
         var claimsPrincipal = new ClaimsPrincipal(

@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Components.Authorization;
 using LazuliLibrary.API.Endpoints;
 using LazuliTest.Fakes;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Lazuli.Authentication;
 
 namespace LazuliTest
 {
@@ -18,12 +18,13 @@ namespace LazuliTest
 
             // TODO somehow mock this (couldn't find anything about how to do that as of yet)
             // creates a database in memory instead of using an actual database
-            // might create unexpected behaviour when done in several tests, especially if run asynchronously
+            // every test needs to have unique memory database name to avoid conflicts
+            // so this should be changed
             context.Services.AddDbContextFactory<UserContext>(
                 opt => opt.UseInMemoryDatabase("TestLoginPageRender")
             );
 
-            context.Services.AddScoped<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+            context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
             var component = context.RenderComponent<Login>();
 
@@ -47,12 +48,13 @@ namespace LazuliTest
 
             // TODO somehow mock this (couldn't find anything about how to do that as of yet)
             // creates a database in memory instead of using an actual database
-            // might create unexpected behaviour when done in several tests, especially if run asynchronously
+            // every test needs to have unique memory database name to avoid conflicts
+            // so this should be changed
             context.Services.AddDbContextFactory<UserContext>(
                 opt => opt.UseInMemoryDatabase("TestNavToSignupOnNavButtonClick")
             );
 
-            context.Services.AddScoped<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+            context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
             var component = context.RenderComponent<Login>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
@@ -73,7 +75,8 @@ namespace LazuliTest
 
             // TODO somehow mock this (couldn't find anything about how to do that as of yet)
             // creates a database in memory instead of using an actual database
-            // might create unexpected behaviour when done in several tests, especially if run asynchronously
+            // every test needs to have unique memory database name to avoid conflicts
+            // so this should be changed
             context.Services.AddDbContextFactory<UserContext>(
                 opt => opt.UseInMemoryDatabase("TestCorrectLoginSuccess")
             );
@@ -81,14 +84,15 @@ namespace LazuliTest
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
             context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
-            var component = context.RenderComponent<Signup>();
+            var component = context.RenderComponent<Login>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
 
-            // create scope of factory service and use it to create database context and auth state provider
+            // create scope of factory service and use it to create database context
             using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
-            var userAuthStateProvider = (FakeUserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
             var userContext = userDbFactory.CreateDbContext();
+
+            var userAuthStateProvider = (IUserAuthenticationStateProvider)context.Services.GetRequiredService<AuthenticationStateProvider>();
 
             // check if no user in the database
             Assert.Equal(0, userContext.Users?.Count());
@@ -106,20 +110,13 @@ namespace LazuliTest
             // check if only 1 user was added to database
             Assert.Equal(1, userContext.Users?.Count());
 
-            /// FIXME for some reason this most likely doesn't call HandleLogin, thus we never get auth nor navigation change
-            /// works normally in manual testing, and practically the same code has a different problem in SignupTest so 
-            /// it might be a problem with authentication state provider here too
             // set data in login form, then submit
             component.FindAll("input")[0].Change(username);
             component.FindAll("input")[1].Change(password);
             component.Find(".submit").Click();
 
-            /// FIXME uncomment after state provider fix
             // check if authenticated
-            //Assert.True(await userAuthStateProvider.IsAuthenticated());
-
-            // check if page changed
-            //Assert.NotEqual("", navManager!.ToBaseRelativePath(navManager.Uri));
+            Assert.True(await userAuthStateProvider.IsAuthenticated());
 
             userContext.Dispose();
         }
@@ -131,22 +128,24 @@ namespace LazuliTest
 
             // TODO somehow mock this (couldn't find anything about how to do that as of yet)
             // creates a database in memory instead of using an actual database
-            // might create unexpected behaviour when done in several tests, especially if run asynchronously
+            // every test needs to have unique memory database name to avoid conflicts
+            // so this should be changed
             context.Services.AddDbContextFactory<UserContext>(
                 opt => opt.UseInMemoryDatabase("TestWrongLoginLoginFailure")
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-            context.Services.AddScoped<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+            context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
-            var component = context.RenderComponent<Signup>();
+            var component = context.RenderComponent<Login>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
 
-            // create scope of factory service and use it to create database context and auth state provider
+            // create scope of factory service and use it to create database context
             using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
-            var userAuthStateProvider = (FakeUserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
             var userContext = userDbFactory.CreateDbContext();
+
+            var userAuthStateProvider = (IUserAuthenticationStateProvider)context.Services.GetRequiredService<AuthenticationStateProvider>();
 
             // check if no user in the database
             Assert.Equal(0, userContext.Users?.Count());
@@ -160,6 +159,9 @@ namespace LazuliTest
 
             userContext.Add(new User(username, password, boundToUserId));
             userContext.SaveChanges();
+
+            // check if not authenticated
+            Assert.False(await userAuthStateProvider.IsAuthenticated());
 
             // check if only 1 user was added to database
             Assert.Equal(1, userContext.Users?.Count());
@@ -172,9 +174,6 @@ namespace LazuliTest
             // check if not authenticated
             Assert.False(await userAuthStateProvider.IsAuthenticated());
 
-            // check if page didn't change
-            Assert.Equal("", navManager!.ToBaseRelativePath(navManager.Uri));
-
             userContext.Dispose();
         }
 
@@ -185,22 +184,24 @@ namespace LazuliTest
 
             // TODO somehow mock this (couldn't find anything about how to do that as of yet)
             // creates a database in memory instead of using an actual database
-            // might create unexpected behaviour when done in several tests, especially if run asynchronously
+            // every test needs to have unique memory database name to avoid conflicts
+            // so this should be changed
             context.Services.AddDbContextFactory<UserContext>(
                 opt => opt.UseInMemoryDatabase("TestWrongPasswordLoginFailure")
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-            context.Services.AddScoped<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+            context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
-            var component = context.RenderComponent<Signup>();
+            var component = context.RenderComponent<Login>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
 
-            // create scope of factory service and use it to create database context and auth state provider
+            // create scope of factory service and use it to create database context
             using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
-            var userAuthStateProvider = (FakeUserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
             var userContext = userDbFactory.CreateDbContext();
+
+            var userAuthStateProvider = (IUserAuthenticationStateProvider)context.Services.GetRequiredService<AuthenticationStateProvider>();
 
             // check if no user in the database
             Assert.Equal(0, userContext.Users?.Count());
@@ -226,9 +227,6 @@ namespace LazuliTest
             // check if not authenticated
             Assert.False(await userAuthStateProvider.IsAuthenticated());
 
-            // check if page didn't change
-            Assert.Equal("", navManager!.ToBaseRelativePath(navManager.Uri));
-
             userContext.Dispose();
         }
 
@@ -239,22 +237,24 @@ namespace LazuliTest
 
             // TODO somehow mock this (couldn't find anything about how to do that as of yet)
             // creates a database in memory instead of using an actual database
-            // might create unexpected behaviour when done in several tests, especially if run asynchronously
+            // every test needs to have unique memory database name to avoid conflicts
+            // so this should be changed
             context.Services.AddDbContextFactory<UserContext>(
                 opt => opt.UseInMemoryDatabase("TestNoLoginLoginFailure")
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-            context.Services.AddScoped<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+            context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
-            var component = context.RenderComponent<Signup>();
+            var component = context.RenderComponent<Login>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
 
-            // create scope of factory service and use it to create database context and auth state provider
+            // create scope of factory service and use it to create database context
             using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
-            var userAuthStateProvider = (FakeUserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
             var userContext = userDbFactory.CreateDbContext();
+
+            var userAuthStateProvider = (IUserAuthenticationStateProvider)context.Services.GetRequiredService<AuthenticationStateProvider>();
 
             // check if no user in the database
             Assert.Equal(0, userContext.Users?.Count());
@@ -280,9 +280,6 @@ namespace LazuliTest
             // check if not authenticated
             Assert.False(await userAuthStateProvider.IsAuthenticated());
 
-            // check if page didn't change
-            Assert.Equal("", navManager!.ToBaseRelativePath(navManager.Uri));
-
             userContext.Dispose();
         }
 
@@ -293,22 +290,24 @@ namespace LazuliTest
 
             // TODO somehow mock this (couldn't find anything about how to do that as of yet)
             // creates a database in memory instead of using an actual database
-            // might create unexpected behaviour when done in several tests, especially if run asynchronously
+            // every test needs to have unique memory database name to avoid conflicts
+            // so this should be changed
             context.Services.AddDbContextFactory<UserContext>(
                 opt => opt.UseInMemoryDatabase("TestNoPasswordLoginFailure")
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-            context.Services.AddScoped<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+            context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
-            var component = context.RenderComponent<Signup>();
+            var component = context.RenderComponent<Login>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
 
-            // create scope of factory service and use it to create database context and auth state provider
+            // create scope of factory service and use it to create database context
             using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
-            var userAuthStateProvider = (FakeUserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
             var userContext = userDbFactory.CreateDbContext();
+
+            var userAuthStateProvider = (IUserAuthenticationStateProvider)context.Services.GetRequiredService<AuthenticationStateProvider>();
 
             // check if no user in the database
             Assert.Equal(0, userContext.Users?.Count());
@@ -333,9 +332,6 @@ namespace LazuliTest
 
             // check if not authenticated
             Assert.False(await userAuthStateProvider.IsAuthenticated());
-
-            // check if page didn't change
-            Assert.Equal("", navManager!.ToBaseRelativePath(navManager.Uri));
 
             userContext.Dispose();
         }

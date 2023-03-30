@@ -51,7 +51,7 @@
         userContext = UserDbFactory.CreateDbContext();
 
         // check if user is authenticated
-        var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
+        var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
 
         if (await userAuthStateProvider.IsAuthenticated())
             NavigationManager.NavigateTo("/");
@@ -85,7 +85,7 @@
 
         // update authentication status and navigate to index/controller page
         // FIXME for some reason state doesn't change here even though the method that changes it is called, and it works normally in manual testing
-        var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
+        var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
 
         await userAuthStateProvider.Login(user.BoundToUserId);
 
