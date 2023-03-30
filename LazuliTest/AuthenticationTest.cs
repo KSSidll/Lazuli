@@ -1,7 +1,5 @@
-﻿using Lazuli.Authentication;
+﻿using LazuliTest.Fakes;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LazuliTest
@@ -13,29 +11,23 @@ namespace LazuliTest
         {
             using var context = new TestContext();
 
-            context.Services.AddAuthenticationCore();
-            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
-            context.Services.AddScoped<ProtectedSessionStorage>();
-            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+            context.Services.AddScoped<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
-            // create scope of factory service and use it to create database context
             using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-            var userAuthStateProvider = (UserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
+            var userAuthStateProvider = (FakeUserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
 
             // check if not authenticated by default
             Assert.False(await userAuthStateProvider.IsAuthenticated());
 
-            // TODO configure bUnit's JSInterop to handle calls below
+            await userAuthStateProvider.Login(4);
 
-            //await userAuthStateProvider.Login(1);
+            // check if authenticated after login
+            Assert.True(await userAuthStateProvider.IsAuthenticated());
 
-            //// check if authenticated after login
-            //Assert.True(await userAuthStateProvider.IsAuthenticated());
+            await userAuthStateProvider.Logout();
 
-            //await userAuthStateProvider.Logout();
-
-            //// check if not authenticated after logout
-            //Assert.False(await userAuthStateProvider.IsAuthenticated());   
+            // check if not authenticated after logout
+            Assert.False(await userAuthStateProvider.IsAuthenticated());
         }
     }
 }

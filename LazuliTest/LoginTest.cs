@@ -2,11 +2,10 @@ using Lazuli.Data.Database;
 using Lazuli.Pages.Auth;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Lazuli.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using Microsoft.AspNetCore.DataProtection;
 using LazuliLibrary.API.Endpoints;
+using LazuliTest.Fakes;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 namespace LazuliTest
 {
@@ -24,10 +23,7 @@ namespace LazuliTest
                 opt => opt.UseInMemoryDatabase("TestLoginPageRender")
             );
 
-            context.Services.AddAuthenticationCore();
-            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
-            context.Services.AddScoped<ProtectedSessionStorage>();
-            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+            context.Services.AddScoped<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
             var component = context.RenderComponent<Login>();
 
@@ -56,10 +52,7 @@ namespace LazuliTest
                 opt => opt.UseInMemoryDatabase("TestNavToSignupOnNavButtonClick")
             );
 
-            context.Services.AddAuthenticationCore();
-            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
-            context.Services.AddScoped<ProtectedSessionStorage>();
-            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+            context.Services.AddScoped<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
             var component = context.RenderComponent<Login>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
@@ -72,9 +65,6 @@ namespace LazuliTest
             // navigated to correct site
             Assert.Equal("auth/signup", navManager!.ToBaseRelativePath(navManager.Uri));
         }
-
-        // TODO test correct login scenario, check if authenticated afterwards and that navigation isn't on login page anymore
-        // TODO test incorrect login scenarios, nothing should happen
 
         [Fact]
         public async Task TestCorrectLoginSuccess()
@@ -89,10 +79,7 @@ namespace LazuliTest
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-            context.Services.AddAuthenticationCore();
-            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
-            context.Services.AddScoped<ProtectedSessionStorage>();
-            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+            context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
             var component = context.RenderComponent<Signup>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
@@ -100,7 +87,7 @@ namespace LazuliTest
             // create scope of factory service and use it to create database context and auth state provider
             using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
-            var userAuthStateProvider = (UserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
+            var userAuthStateProvider = (FakeUserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
             var userContext = userDbFactory.CreateDbContext();
 
             // check if no user in the database
@@ -119,17 +106,19 @@ namespace LazuliTest
             // check if only 1 user was added to database
             Assert.Equal(1, userContext.Users?.Count());
 
+            /// FIXME for some reason this most likely doesn't call HandleLogin, thus we never get auth nor navigation change
+            /// works normally in manual testing, and practically the same code has a different problem in SignupTest so 
+            /// it might be a problem with authentication state provider here too
             // set data in login form, then submit
             component.FindAll("input")[0].Change(username);
             component.FindAll("input")[1].Change(password);
             component.Find(".submit").Click();
 
-            // TODO configure bUnit's JSInterop to handle calls below
-            //// check if authenticated
-            //Assert.True(await userAuthStateProvider.IsAuthenticated());
+            // check if authenticated
+            Assert.True(await userAuthStateProvider.IsAuthenticated());
 
             // check if page changed
-            //Assert.NotEqual("", navManager!.ToBaseRelativePath(navManager.Uri));
+            Assert.NotEqual("", navManager!.ToBaseRelativePath(navManager.Uri));
 
             userContext.Dispose();
         }
@@ -147,10 +136,7 @@ namespace LazuliTest
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-            context.Services.AddAuthenticationCore();
-            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
-            context.Services.AddScoped<ProtectedSessionStorage>();
-            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+            context.Services.AddScoped<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
             var component = context.RenderComponent<Signup>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
@@ -158,7 +144,7 @@ namespace LazuliTest
             // create scope of factory service and use it to create database context and auth state provider
             using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
-            var userAuthStateProvider = (UserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
+            var userAuthStateProvider = (FakeUserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
             var userContext = userDbFactory.CreateDbContext();
 
             // check if no user in the database
@@ -182,9 +168,8 @@ namespace LazuliTest
             component.FindAll("input")[1].Change(password);
             component.Find(".submit").Click();
 
-            // TODO configure bUnit's JSInterop to handle calls below
-            //// check if authenticated
-            //Assert.True(await userAuthStateProvider.IsAuthenticated());
+            // check if not authenticated
+            Assert.False(await userAuthStateProvider.IsAuthenticated());
 
             // check if page didn't change
             Assert.Equal("", navManager!.ToBaseRelativePath(navManager.Uri));
@@ -205,10 +190,7 @@ namespace LazuliTest
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-            context.Services.AddAuthenticationCore();
-            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
-            context.Services.AddScoped<ProtectedSessionStorage>();
-            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+            context.Services.AddScoped<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
             var component = context.RenderComponent<Signup>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
@@ -216,7 +198,7 @@ namespace LazuliTest
             // create scope of factory service and use it to create database context and auth state provider
             using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
-            var userAuthStateProvider = (UserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
+            var userAuthStateProvider = (FakeUserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
             var userContext = userDbFactory.CreateDbContext();
 
             // check if no user in the database
@@ -240,9 +222,8 @@ namespace LazuliTest
             component.FindAll("input")[1].Change($"{password}a");
             component.Find(".submit").Click();
 
-            // TODO configure bUnit's JSInterop to handle calls below
-            //// check if authenticated
-            //Assert.True(await userAuthStateProvider.IsAuthenticated());
+            // check if not authenticated
+            Assert.False(await userAuthStateProvider.IsAuthenticated());
 
             // check if page didn't change
             Assert.Equal("", navManager!.ToBaseRelativePath(navManager.Uri));
@@ -263,10 +244,7 @@ namespace LazuliTest
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-            context.Services.AddAuthenticationCore();
-            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
-            context.Services.AddScoped<ProtectedSessionStorage>();
-            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+            context.Services.AddScoped<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
             var component = context.RenderComponent<Signup>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
@@ -274,7 +252,7 @@ namespace LazuliTest
             // create scope of factory service and use it to create database context and auth state provider
             using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
-            var userAuthStateProvider = (UserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
+            var userAuthStateProvider = (FakeUserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
             var userContext = userDbFactory.CreateDbContext();
 
             // check if no user in the database
@@ -298,9 +276,8 @@ namespace LazuliTest
             component.FindAll("input")[1].Change(password);
             component.Find(".submit").Click();
 
-            // TODO configure bUnit's JSInterop to handle calls below
-            //// check if authenticated
-            //Assert.True(await userAuthStateProvider.IsAuthenticated());
+            // check if not authenticated
+            Assert.False(await userAuthStateProvider.IsAuthenticated());
 
             // check if page didn't change
             Assert.Equal("", navManager!.ToBaseRelativePath(navManager.Uri));
@@ -321,10 +298,7 @@ namespace LazuliTest
             );
 
             context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-            context.Services.AddAuthenticationCore();
-            context.Services.AddScoped<IDataProtectionProvider, EphemeralDataProtectionProvider>();
-            context.Services.AddScoped<ProtectedSessionStorage>();
-            context.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+            context.Services.AddScoped<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
             var component = context.RenderComponent<Signup>();
             var navManager = context.Services.GetService<FakeNavigationManager>();
@@ -332,7 +306,7 @@ namespace LazuliTest
             // create scope of factory service and use it to create database context and auth state provider
             using var scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
             var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
-            var userAuthStateProvider = (UserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
+            var userAuthStateProvider = (FakeUserAuthenticationStateProvider)scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
             var userContext = userDbFactory.CreateDbContext();
 
             // check if no user in the database
@@ -356,9 +330,8 @@ namespace LazuliTest
             component.FindAll("input")[1].Change("");
             component.Find(".submit").Click();
 
-            // TODO configure bUnit's JSInterop to handle calls below
-            //// check if authenticated
-            //Assert.True(await userAuthStateProvider.IsAuthenticated());
+            // check if not authenticated
+            Assert.False(await userAuthStateProvider.IsAuthenticated());
 
             // check if page didn't change
             Assert.Equal("", navManager!.ToBaseRelativePath(navManager.Uri));

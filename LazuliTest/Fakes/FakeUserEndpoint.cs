@@ -1,15 +1,15 @@
-﻿using AngleSharp.Io;
+﻿using LazuliLibrary.API.Endpoints;
 using LazuliLibrary.Models;
-using LazuliTest.TestDataHelper;
+using LazuliTest.Helpers;
 
-namespace LazuliLibrary.API.Endpoints;
+namespace LazuliTest.Fakes;
 
 public class FakeUserEndpoint : IUserEndpoint
 {
     public async Task<List<UserModel>> GetAll()
     {
-        return await Task.Run(() => 
-        { 
+        return await Task.Run(() =>
+        {
             return TestDataHelper.GetFakeUserModelList();
         });
     }

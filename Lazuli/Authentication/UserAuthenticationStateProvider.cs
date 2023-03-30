@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace Lazuli.Authentication;
 
-public class UserAuthenticationStateProvider : AuthenticationStateProvider
+public class UserAuthenticationStateProvider : AuthenticationStateProvider, IUserAuthenticationStateProvider
 {
     private readonly ProtectedSessionStorage _sessionStorage;
     private readonly ClaimsPrincipal _anonymous = new (new ClaimsIdentity());
@@ -15,17 +15,13 @@ public class UserAuthenticationStateProvider : AuthenticationStateProvider
         _sessionStorage = sessionStorage;
     }
 
-    /// <summary>
-    /// Returns whether a user is currently logged in or not
-    /// </summary>
+    
     public async Task<bool> IsAuthenticated()
     {
         var state = await GetAuthenticationStateAsync();
         return state.User.Identity!.IsAuthenticated;
 
     }
-
-    // TODO add method that returns BoundToUserId of currently logged in user as int 
 
     public async Task Logout()
     {
@@ -71,10 +67,6 @@ public class UserAuthenticationStateProvider : AuthenticationStateProvider
         }
     }
 
-    /// <summary>
-    ///     Update the state of the authentication to passed AuthenticatedUserModel, pass null to logout
-    /// </summary>
-    /// <param name="userSession">AuthenticatedUserModel with data to use as user, null to logout</param>
     public async Task UpdateAuthenticationState(AuthenticatedUserModel? userSession)
     {
         ClaimsPrincipal claimsPrincipal;
@@ -100,4 +92,6 @@ public class UserAuthenticationStateProvider : AuthenticationStateProvider
 
         NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(claimsPrincipal)));
     }
+
+    
 }

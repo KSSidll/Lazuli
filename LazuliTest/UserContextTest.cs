@@ -53,7 +53,6 @@ public class UserContextTest
         Assert.Equal(hashed_password, added_user!.Password);
         Assert.Equal(boundToUserId, added_user!.BoundToUserId);
 
-
         // check if received user that wasn't added has null value
         Assert.Null( not_added_user );
 

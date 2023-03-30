@@ -2,7 +2,7 @@ using Lazuli.Data.Database;
 using LazuliLibrary.Models;
 using LazuliLibrary.Utils;
 
-namespace LazuliTest.TestDataHelper;
+namespace LazuliTest.Helpers;
 
 public static class TestDataHelper
 {

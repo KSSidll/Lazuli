@@ -84,6 +84,7 @@
         if (user is null) throw new DbUpdateException("User wasn't found in the database after add operation");
 
         // update authentication status and navigate to index/controller page
+        // FIXME for some reason state doesn't change here even though the method that changes it is called, and it works normally in manual testing
         var userAuthStateProvider = (UserAuthenticationStateProvider)authStateProvider;
 
         await userAuthStateProvider.Login(user.BoundToUserId);
