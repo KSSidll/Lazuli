@@ -32,16 +32,16 @@ public class UserEndpoint : IUserEndpoint
     }
 
 
-    public async Task<UserModel> GetByUserId(int userId)
+    public async Task<List<UserModel>> GetByUserId(int userId)
     {
         // checks if there are null values
         ApiHelper.ApiHelperValidator(_apiHelper);
 
-        using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/users/{userId}"))
+        using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/users?id={userId}"))
         {
             if (response.IsSuccessStatusCode)
             {
-                var result = await response.Content.ReadAsAsync<UserModel>();
+                var result = await response.Content.ReadAsAsync<List<UserModel>>();
 
                 return result;
             }

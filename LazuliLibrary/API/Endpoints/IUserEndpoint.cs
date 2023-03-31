@@ -5,6 +5,6 @@ namespace LazuliLibrary.API.Endpoints
     public interface IUserEndpoint
     {
         Task<List<UserModel>> GetAll();
-        Task<UserModel> GetByUserId(int userId);
+        Task<List<UserModel>> GetByUserId(int userId);
     }
 }
