@@ -37,7 +37,7 @@ namespace LazuliLibrary.API.Endpoints
             }
         }
 
-        public async Task<PhotoModel> GetByPhotoId(int photoId)
+        public async Task<List<PhotoModel>> GetByPhotoId(int photoId)
         {
             // checks if there are null values
             ApiHelper.ApiHelperValidator(_apiHelper);
@@ -46,7 +46,7 @@ namespace LazuliLibrary.API.Endpoints
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = await response.Content.ReadAsAsync<PhotoModel>();
+                    var result = await response.Content.ReadAsAsync<List<PhotoModel>>();
 
                     return result;
                 }

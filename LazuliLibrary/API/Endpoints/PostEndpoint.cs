@@ -38,7 +38,7 @@ namespace LazuliLibrary.API.Endpoints
         }
 
 
-        public async Task<PostModel> GetByPostId(int postId)
+        public async Task<List<PostModel>> GetByPostId(int postId)
         {
             // checks if there are null values
             ApiHelper.ApiHelperValidator(_apiHelper);
@@ -47,7 +47,7 @@ namespace LazuliLibrary.API.Endpoints
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = await response.Content.ReadAsAsync<PostModel>();
+                    var result = await response.Content.ReadAsAsync<List<PostModel>>();
 
                     return result;
                 }

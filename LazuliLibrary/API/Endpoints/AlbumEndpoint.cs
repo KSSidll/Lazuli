@@ -38,18 +38,18 @@ namespace LazuliLibrary.API.Endpoints
             }
         }
 
-        public async Task<AlbumModel> GetByAlbumId(int albumId)
+        public async Task<List<AlbumModel>> GetByAlbumId(int albumId)
         {
             // checks if there are null values
             ApiHelper.ApiHelperValidator(_apiHelper);
 
-            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}/{albumId}"))
+            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}?id={albumId}"))
             {
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = await response.Content.ReadAsAsync<AlbumModel>();
+                    var result = await response.Content.ReadAsAsync<List<AlbumModel>>();
 
-                    return result;
+                    return result;                    
                 }
                 else
                 {
