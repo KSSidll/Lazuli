@@ -2,18 +2,55 @@
 @inject IUserEndpoint userEndpoint
 
 <h3>User</h3>
-<GenericComponent Models="@_users" ModelType="@typeof(UserModel)"/>
+
+<br />
+
+<div>
+	<h4>All users</h4>
+	<button class="btn btn-primary" @onclick="ShowAllUsers">Show All Users</button>
+	@if (_users is not null)
+	{
+		<GenericComponent Models="@_users" ModelType="@typeof(UserModel)" />
+	}
+</div>
+
+<br />
+
+<div>
+	<h4>Filter Users by id</h4>
+	<div>
+		<label>User Id</label>
+		<input @bind-value="_userId"/>
+		<button class="btn btn-primary" @onclick="GetUser">Search</button>
+	</div>
+
+	@if (_filteredUsers is not null)
+	{
+		@if (_filteredUsers.Count > 0)
+		{
+			<GenericComponent Models="@_filteredUsers" ModelType="@typeof(UserModel)" />
+		}
+		else
+		{
+			<p class="text-danger">No matching result found</p>
+		}
+	}
+</div>
+
+
 
 @code {
 	private List<object>? _users;
+	private List<object>? _filteredUsers;
+	private int _userId = 1;
 
-	protected async override Task OnInitializedAsync()
+	private async Task ShowAllUsers()
 	{
+		_users = (_users is null) ? (await userEndpoint.GetAll()).ToList<object>() : null;
+	}
 
-		//get all users
-		_users = (await userEndpoint.GetAll()).ToList<object>();
-
-		// todo get user by id on button click
-
+	private async Task GetUser()
+	{
+		_filteredUsers = (await userEndpoint.GetByUserId(_userId)).ToList<object>();
 	}
 }
