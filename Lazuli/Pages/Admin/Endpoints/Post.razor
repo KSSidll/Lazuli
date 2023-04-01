@@ -1,0 +1,79 @@
+﻿@page "/admin/endpoints/post"
+@inject IPostEndpoint postEndpoint
+
+<h3>Post</h3>
+
+<br />
+
+<div>
+	<h4>All posts</h4>
+	<button class="btn btn-primary" @onclick="GetAllPosts">Show All Posts</button>
+	@if (_posts is not null)
+	{
+		<ListComponent Models="@_posts" ModelType="@typeof(PostModel)" />
+	}
+</div>
+
+<br />
+
+<div>
+	<h4>Filter Posts by PostId</h4>
+	<div class="col-2">
+		<FilterComponent OnIdFilter="GetPostByPostId" />
+	</div>
+
+	@if (_filteredByPostId is not null)
+	{
+		@if (_filteredByPostId.Count > 0)
+		{
+			<ListComponent Models="@_filteredByPostId" ModelType="@typeof(PostModel)" />
+		}
+		else
+		{
+			<p class="text-danger">No matching result found</p>
+		}
+	}
+</div>
+
+<br />
+
+<div>
+	<h4>Filter Posts by UserId</h4>
+	<div class="col-2">
+		<FilterComponent OnIdFilter="GetPostByUserId" />
+	</div>
+
+	@if (_filteredByUserId is not null)
+	{
+		@if (_filteredByUserId.Count > 0)
+		{
+			<ListComponent Models="@_filteredByUserId" ModelType="@typeof(PostModel)" />
+		}
+		else
+		{
+			<p class="text-danger">No matching result found</p>
+		}
+	}
+</div>
+
+
+@code {
+	private List<object>? _posts;
+	private List<object>? _filteredByPostId;
+	private List<object>? _filteredByUserId;
+
+	private async Task GetAllPosts()
+	{
+		_posts = (_posts is null) ? (await postEndpoint.GetAll()).ToList<object>() : null;
+	}
+
+	private async Task GetPostByPostId(int postId)
+	{
+		_filteredByPostId = (await postEndpoint.GetByPostId(postId)).ToList<object>();
+	}
+
+	private async Task GetPostByUserId(int userId)
+	{
+		_filteredByUserId = (await postEndpoint.GetByUserId(userId)).ToList<object>();
+	}
+}

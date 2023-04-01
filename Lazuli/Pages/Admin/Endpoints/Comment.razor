@@ -1,0 +1,79 @@
+﻿@page "/admin/endpoints/comment"
+@inject ICommentEndpoint commentEndpoint
+
+<h3>Comment</h3>
+
+<br />
+
+<div>
+	<h4>All comments</h4>
+	<button class="btn btn-primary" @onclick="GetAllComments">Show All Comments</button>
+	@if (_comments is not null)
+	{
+		<ListComponent Models="@_comments" ModelType="@typeof(CommentModel)" />
+	}
+</div>
+
+<br />
+
+<div>
+	<h4>Filter Comments by CommentId</h4>
+	<div class="col-2">
+		<FilterComponent OnIdFilter="GetCommentByCommentId" />
+	</div>
+
+	@if (_filteredByCommentId is not null)
+	{
+		@if (_filteredByCommentId.Count > 0)
+		{
+			<ListComponent Models="@_filteredByCommentId" ModelType="@typeof(CommentModel)" />
+		}
+		else
+		{
+			<p class="text-danger">No matching result found</p>
+		}
+	}
+</div>
+
+<br />
+
+<div>
+	<h4>Filter Comments by UserId</h4>
+	<div class="col-2">
+		<FilterComponent OnIdFilter="GetCommentByUserId" />
+	</div>
+
+	@if (_filteredByUserId is not null)
+	{
+		@if (_filteredByUserId.Count > 0)
+		{
+			<ListComponent Models="@_filteredByUserId" ModelType="@typeof(CommentModel)" />
+		}
+		else
+		{
+			<p class="text-danger">No matching result found</p>
+		}
+	}
+</div>
+
+
+@code {
+	private List<object>? _comments;
+	private List<object>? _filteredByCommentId;
+	private List<object>? _filteredByUserId;
+
+	private async Task GetAllComments()
+	{
+		_comments = (_comments is null) ? (await commentEndpoint.GetAll()).ToList<object>() : null;
+	}
+
+	private async Task GetCommentByCommentId(int commentId)
+	{
+		_filteredByCommentId = (await commentEndpoint.GetByCommentId(commentId)).ToList<object>();
+	}
+
+	private async Task GetCommentByUserId(int userId)
+	{
+		_filteredByUserId = (await commentEndpoint.GetByUserId(userId)).ToList<object>();
+	}
+}

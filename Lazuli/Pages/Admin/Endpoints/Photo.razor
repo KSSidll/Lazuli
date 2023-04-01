@@ -1,0 +1,79 @@
+﻿@page "/admin/endpoints/photo"
+@inject IPhotoEndpoint photoEndpoint
+
+<h3>Photo</h3>
+
+<br />
+
+<div>
+	<h4>All photos</h4>
+	<button class="btn btn-primary" @onclick="GetAllPhotos">Show All Photos</button>
+	@if (_photos is not null)
+	{
+		<ListComponent Models="@_photos" ModelType="@typeof(PhotoModel)" />
+	}
+</div>
+
+<br />
+
+<div>
+	<h4>Filter Photos by PhotoId</h4>
+	<div class="col-2">
+		<FilterComponent OnIdFilter="GetPhotoByPhotoId" />
+	</div>
+
+	@if (_filteredByPhotoId is not null)
+	{
+		@if (_filteredByPhotoId.Count > 0)
+		{
+			<ListComponent Models="@_filteredByPhotoId" ModelType="@typeof(PhotoModel)" />
+		}
+		else
+		{
+			<p class="text-danger">No matching result found</p>
+		}
+	}
+</div>
+
+<br />
+
+<div>
+	<h4>Filter Photos by Post</h4>
+	<div class="col-2">
+		<FilterComponent OnIdFilter="GetPhotoByPostId" />
+	</div>
+
+	@if (_filteredByPostId is not null)
+	{
+		@if (_filteredByPostId.Count > 0)
+		{
+			<ListComponent Models="@_filteredByPostId" ModelType="@typeof(PhotoModel)" />
+		}
+		else
+		{
+			<p class="text-danger">No matching result found</p>
+		}
+	}
+</div>
+
+
+@code {
+	private List<object>? _photos;
+	private List<object>? _filteredByPhotoId;
+	private List<object>? _filteredByPostId;
+
+	private async Task GetAllPhotos()
+	{
+		_photos = (_photos is null) ? (await photoEndpoint.GetAll()).ToList<object>() : null;
+	}
+
+	private async Task GetPhotoByPhotoId(int photoId)
+	{
+		_filteredByPhotoId = (await photoEndpoint.GetByPhotoId(photoId)).ToList<object>();
+	}
+
+	private async Task GetPhotoByPostId(int postId)
+	{
+		_filteredByPostId = (await photoEndpoint.GetByPostId(postId)).ToList<object>();
+	}
+}
