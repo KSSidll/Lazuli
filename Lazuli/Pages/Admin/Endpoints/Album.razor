@@ -1,0 +1,79 @@
+﻿@page "/admin/endpoints/album"
+@inject IAlbumEndpoint albumEndpoint
+
+<h3>Album</h3>
+
+<br />
+
+<div>
+	<h4>All albums</h4>
+	<button class="btn btn-primary" @onclick="GetAllAlbums">Show All Albums</button>
+	@if (_albums is not null)
+	{
+		<ListComponent Models="@_albums" ModelType="@typeof(AlbumModel)" />
+	}
+</div>
+
+<br />
+
+<div>
+	<h4>Filter Albums by AlbumId</h4>
+	<div class="col-2">
+		<FilterComponent OnIdFilter="GetAlbumByAlbumId" />
+	</div>
+
+	@if (_filteredByAlbumId is not null)
+	{
+		@if (_filteredByAlbumId.Count > 0)
+		{
+			<ListComponent Models="@_filteredByAlbumId" ModelType="@typeof(AlbumModel)" />
+		}
+		else
+		{
+			<p class="text-danger">No matching result found</p>
+		}
+	}
+</div>
+
+<br />
+
+<div>
+	<h4>Filter Albums by UserId</h4>
+	<div class="col-2">
+		<FilterComponent OnIdFilter="GetAlbumByUserId" />
+	</div>
+
+	@if (_filteredByUserId is not null)
+	{
+		@if (_filteredByUserId.Count > 0)
+		{
+			<ListComponent Models="@_filteredByUserId" ModelType="@typeof(AlbumModel)" />
+		}
+		else
+		{
+			<p class="text-danger">No matching result found</p>
+		}
+	}
+</div>
+
+
+@code {
+	private List<object>? _albums;
+	private List<object>? _filteredByAlbumId;
+	private List<object>? _filteredByUserId;
+
+	private async Task GetAllAlbums()
+	{
+		_albums = (_albums is null) ? (await albumEndpoint.GetAll()).ToList<object>() : null;
+	}
+
+	private async Task GetAlbumByAlbumId(int albumId)
+	{
+		_filteredByAlbumId = (await albumEndpoint.GetByAlbumId(albumId)).ToList<object>();
+	}
+
+	private async Task GetAlbumByUserId(int userId)
+	{
+		_filteredByUserId = (await albumEndpoint.GetByUserId(userId)).ToList<object>();
+	}
+}

@@ -7,7 +7,7 @@
 
 <div>
 	<h4>All users</h4>
-	<button class="btn btn-primary" @onclick="ShowAllUsers">Show All Users</button>
+	<button class="btn btn-primary" @onclick="GetAllUsers">Show All Users</button>
 	@if (_users is not null)
 	{
 		<ListComponent Models="@_users" ModelType="@typeof(UserModel)" />
@@ -41,7 +41,7 @@
 	private List<object>? _users;
 	private List<object>? _filteredUsers;
 
-	private async Task ShowAllUsers()
+	private async Task GetAllUsers()
 	{
 		_users = (_users is null) ? (await userEndpoint.GetAll()).ToList<object>() : null;
 	}
