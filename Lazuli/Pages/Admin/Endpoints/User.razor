@@ -18,10 +18,8 @@
 
 <div>
 	<h4>Filter Users by id</h4>
-	<div>
-		<label>User Id</label>
-		<input @bind-value="_userId"/>
-		<button class="btn btn-primary" @onclick="GetUser">Search</button>
+	<div class="col-2">
+		<FilterComponent OnIdFilter="GetUser"/>
 	</div>
 
 	@if (_filteredUsers is not null)
@@ -42,15 +40,14 @@
 @code {
 	private List<object>? _users;
 	private List<object>? _filteredUsers;
-	private int _userId = 1;
 
 	private async Task ShowAllUsers()
 	{
 		_users = (_users is null) ? (await userEndpoint.GetAll()).ToList<object>() : null;
 	}
 
-	private async Task GetUser()
+	private async Task GetUser(int id)
 	{
-		_filteredUsers = (await userEndpoint.GetByUserId(_userId)).ToList<object>();
+		_filteredUsers = (await userEndpoint.GetByUserId(id)).ToList<object>();
 	}
 }
