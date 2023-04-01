@@ -42,7 +42,7 @@ namespace LazuliLibrary.API.Endpoints
             // checks if there are null values
             ApiHelper.ApiHelperValidator(_apiHelper);
 
-            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}/{commentId}"))
+            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}?id={commentId}"))
             {
                 if (response.IsSuccessStatusCode)
                 {
