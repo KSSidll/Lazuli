@@ -22,17 +22,15 @@
 		<FilterComponent OnIdFilter="GetAlbumByAlbumId" />
 	</div>
 
-	@if (_filteredByAlbumId is not null)
+	@if (_album is not null)
 	{
-		@if (_filteredByAlbumId.Count > 0)
-		{
-			<ListComponent Models="@_filteredByAlbumId" ModelType="@typeof(AlbumModel)" />
-		}
-		else
-		{
-			<p class="text-danger">No matching result found</p>
-		}
+		<ListComponent Models="@(new List<object> { _album })" ModelType="@typeof(AlbumModel)" />
 	}
+	else if (_searched)
+	{
+		<p class="text-danger">No matching result found</p>
+	}
+	
 </div>
 
 <br />
@@ -59,8 +57,10 @@
 
 @code {
 	private List<object>? _albums;
-	private List<object>? _filteredByAlbumId;
+	private object? _album;
 	private List<object>? _filteredByUserId;
+
+	private bool _searched = false;
 
 	private async Task GetAllAlbums()
 	{
@@ -69,7 +69,8 @@
 
 	private async Task GetAlbumByAlbumId(int albumId)
 	{
-		_filteredByAlbumId = (await albumEndpoint.GetByAlbumId(albumId)).ToList<object>();
+		_album = (object?) (await albumEndpoint.GetByAlbumId(albumId));
+		_searched = true;
 	}
 
 	private async Task GetAlbumByUserId(int userId)

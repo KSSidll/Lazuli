@@ -22,16 +22,13 @@
 		<FilterComponent OnIdFilter="GetCommentByCommentId" />
 	</div>
 
-	@if (_filteredByCommentId is not null)
+	@if (_comment is not null)
 	{
-		@if (_filteredByCommentId.Count > 0)
-		{
-			<ListComponent Models="@_filteredByCommentId" ModelType="@typeof(CommentModel)" />
-		}
-		else
-		{
-			<p class="text-danger">No matching result found</p>
-		}
+		<ListComponent Models="@(new List<object> { _comment })" ModelType="@typeof(CommentModel)" />
+	}	
+	else if (_searched)
+	{
+		<p class="text-danger">No matching result found</p>
 	}
 </div>
 
@@ -59,8 +56,10 @@
 
 @code {
 	private List<object>? _comments;
-	private List<object>? _filteredByCommentId;
+	private object? _comment;
 	private List<object>? _filteredByUserId;
+
+	private bool _searched = false;
 
 	private async Task GetAllComments()
 	{
@@ -69,7 +68,8 @@
 
 	private async Task GetCommentByCommentId(int commentId)
 	{
-		_filteredByCommentId = (await commentEndpoint.GetByCommentId(commentId)).ToList<object>();
+		_comment = (object?)(await commentEndpoint.GetByCommentId(commentId));
+		_searched = true;
 	}
 
 	private async Task GetCommentByUserId(int userId)
