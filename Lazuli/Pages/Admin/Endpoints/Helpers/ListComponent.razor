@@ -1,5 +1,5 @@
 ﻿
-@if (Models is not null && Models.Count > 0)
+@if (Models is not null && Models.Count > 0 && ModelType is not null)
 {
 	<table class="table table-striped">
 		<thead class="table-dark">
@@ -33,7 +33,7 @@ else
 
 @code {
 	[Parameter]
-	public Type ModelType { get; set; }
+	public Type? ModelType { get; set; }
 
 	[Parameter]
 	public List<object>? Models{ get; set; }

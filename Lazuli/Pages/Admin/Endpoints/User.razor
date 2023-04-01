@@ -10,7 +10,7 @@
 	<button class="btn btn-primary" @onclick="ShowAllUsers">Show All Users</button>
 	@if (_users is not null)
 	{
-		<GenericComponent Models="@_users" ModelType="@typeof(UserModel)" />
+		<ListComponent Models="@_users" ModelType="@typeof(UserModel)" />
 	}
 </div>
 
@@ -26,7 +26,7 @@
 	{
 		@if (_filteredUsers.Count > 0)
 		{
-			<GenericComponent Models="@_filteredUsers" ModelType="@typeof(UserModel)" />
+			<ListComponent Models="@_filteredUsers" ModelType="@typeof(UserModel)" />
 		}
 		else
 		{
