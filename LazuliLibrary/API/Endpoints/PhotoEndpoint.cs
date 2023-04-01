@@ -10,7 +10,7 @@ namespace LazuliLibrary.API.Endpoints
     public class PhotoEndpoint : IPhotoEndpoint
     {
         private readonly IApiHelper _apiHelper;
-        private const string _page = "posts";
+        private const string _page = "photos";
 
         public PhotoEndpoint(IApiHelper apiHelper)
         {
