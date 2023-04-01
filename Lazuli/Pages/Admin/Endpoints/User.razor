@@ -22,24 +22,24 @@
 		<FilterComponent OnIdFilter="GetUser"/>
 	</div>
 
-	@if (_filteredUsers is not null)
+	@if (_user is not null)
 	{
-		@if (_filteredUsers.Count > 0)
-		{
-			<ListComponent Models="@_filteredUsers" ModelType="@typeof(UserModel)" />
-		}
-		else
-		{
-			<p class="text-danger">No matching result found</p>
-		}
+		<ListComponent Models="@(new List<object> { _user })" ModelType="@typeof(UserModel)" />
 	}
+	else if (_searched)
+	{
+		<p class="text-danger">No matching result found</p>
+	}
+
 </div>
 
 
 
 @code {
 	private List<object>? _users;
-	private List<object>? _filteredUsers;
+	private object? _user;
+
+	private bool _searched = false;
 
 	private async Task GetAllUsers()
 	{
@@ -48,6 +48,7 @@
 
 	private async Task GetUser(int id)
 	{
-		_filteredUsers = (await userEndpoint.GetByUserId(id)).ToList<object>();
+		_user = (object?) (await userEndpoint.GetByUserId(id));
+		_searched = true;
 	}
 }

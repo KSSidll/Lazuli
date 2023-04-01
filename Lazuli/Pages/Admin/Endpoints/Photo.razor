@@ -22,17 +22,15 @@
 		<FilterComponent OnIdFilter="GetPhotoByPhotoId" />
 	</div>
 
-	@if (_filteredByPhotoId is not null)
+	@if (_photo is not null)
 	{
-		@if (_filteredByPhotoId.Count > 0)
-		{
-			<ListComponent Models="@_filteredByPhotoId" ModelType="@typeof(PhotoModel)" />
-		}
-		else
-		{
-			<p class="text-danger">No matching result found</p>
-		}
+		<ListComponent Models="@(new List<object> { _photo })" ModelType="@typeof(PhotoModel)" />
 	}
+	else if (_searched)
+	{
+		<p class="text-danger">No matching result found</p>
+	}
+	
 </div>
 
 <br />
@@ -59,8 +57,10 @@
 
 @code {
 	private List<object>? _photos;
-	private List<object>? _filteredByPhotoId;
+	private object? _photo;
 	private List<object>? _filteredByPostId;
+
+	private bool _searched = false;
 
 	private async Task GetAllPhotos()
 	{
@@ -69,7 +69,8 @@
 
 	private async Task GetPhotoByPhotoId(int photoId)
 	{
-		_filteredByPhotoId = (await photoEndpoint.GetByPhotoId(photoId)).ToList<object>();
+		_photo = (object?)(await photoEndpoint.GetByPhotoId(photoId));
+		_searched = true;
 	}
 
 	private async Task GetPhotoByPostId(int postId)
