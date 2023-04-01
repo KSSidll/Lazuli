@@ -4,7 +4,7 @@
 	<table class="table table-striped">
 		<thead class="table-dark">
 			<tr>
-				@foreach (var p in this.ModelType.GetProperties())
+				@foreach (var p in this.ModelType!.GetProperties())
 				{
 					<th>@p.Name</th>
 				}

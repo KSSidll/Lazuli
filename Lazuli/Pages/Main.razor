@@ -1,0 +1,30 @@
+﻿@page "/main"
+
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider authStateProvider
+@inject IUserEndpoint userEndpoint
+
+<h3>Hello Hi :syadouWave:</h3>
+
+<button @onclick="Logout" class="btn btn-primary">Logout</button>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // check if user is authenticated
+        var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
+
+        if (!await userAuthStateProvider.IsAuthenticated())
+        {
+            NavigationManager.NavigateTo("/");
+        }
+    }
+
+    private async void Logout()
+    {
+        var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
+        await userAuthStateProvider.Logout();
+
+        NavigationManager.NavigateTo("/");
+    }
+}
