@@ -38,7 +38,7 @@ namespace LazuliLibrary.API.Endpoints
         }
 
 
-        public async Task<List<PostModel>> GetByPostId(int postId)
+        public async Task<PostModel?> GetByPostId(int postId)
         {
             // checks if there are null values
             ApiHelper.ApiHelperValidator(_apiHelper);
@@ -49,7 +49,12 @@ namespace LazuliLibrary.API.Endpoints
                 {
                     var result = await response.Content.ReadAsAsync<List<PostModel>>();
 
-                    return result;
+                    if (result.Count > 1)
+                    {
+                        throw new Exception("More than one matching object found.");
+                    }
+
+                    return result.FirstOrDefault(defaultValue: null);
                 }
                 else
                 {

@@ -37,7 +37,7 @@ namespace LazuliLibrary.API.Endpoints
             }
         }
 
-        public async Task<List<CommentModel>> GetByCommentId(int commentId)
+        public async Task<CommentModel?> GetByCommentId(int commentId)
         {
             // checks if there are null values
             ApiHelper.ApiHelperValidator(_apiHelper);
@@ -48,7 +48,12 @@ namespace LazuliLibrary.API.Endpoints
                 {
                     var result = await response.Content.ReadAsAsync<List<CommentModel>>();
 
-                    return result;
+                    if (result.Count > 1)
+                    {
+                        throw new Exception("More than one matching object found.");
+                    }
+
+                    return result.FirstOrDefault(defaultValue: null);
                 }
                 else
                 {
