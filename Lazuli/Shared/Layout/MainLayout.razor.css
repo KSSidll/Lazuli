@@ -4,8 +4,45 @@
   flex-direction: column;
 }
 
+input,
+select {
+    border: 2px solid #333639;
+    background-color: black;
+    border-radius: 0.5em;
+}
+
+input:focus {
+    outline: none;
+    border-color: #1d9bf0;
+}
+
+.profile_menu_button {
+    text-decoration: none;
+    border-radius: 100%;
+    border: none;
+    background-color: black;
+    color: white;
+    width: 3em;
+    height: 3em;
+}
+
+.profile_menu_button:hover {
+    border: 2px solid #1d9bf0;
+}
+
+.dropdown-item:hover { 
+    background-color: #121212;
+}
+
 @media (min-width: 750px) {
     .container {
         max-width: 700px;
+    }
+}
+
+@media (max-width: 250px) {
+    .profile_menu_button {
+        width: 2.5em;
+        height: 2.5em;
     }
 }

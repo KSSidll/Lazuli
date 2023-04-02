@@ -1,17 +1,59 @@
 ﻿@inherits LayoutComponentBase
 
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider authStateProvider
+
 <PageTitle>Lazuli</PageTitle>
 
 <div class="page">
-    <div class="d-flex justify-content-center bg-dark">
-        <div class="container text-white p-0 m-0 min-vh-100">
-            @*top row*@
-            <div class="p-3 m-0">
-                search + profile circle button with first letter of boundtouserid name that opens up a menu with typical links on click
-            </div>
-
-            @Body
-        </div>
-    </div>
+	<div class="d-flex justify-content-center bg-dark">
+		<div class="container text-white p-0 m-0 min-vh-100">
+			@* top row *@
+			<div class="p-1 m-0 bg-dark sticky-top">
+				@* search + profile circle button with first letter of boundtouserid name that opens up a menu with typical links on click *@
+				@* would require somehow injecting search data to Body *@
+				<div class="row justify-content-center m-3">
+					<div class="col-1"></div>
+					<div class="flex-column col-8 d-flex">
+						<input class="p-3 text-white" placeholder=" Search"/>
+					</div>
+					<div class="flex-column col-1 d-flex justify-content-center p-0 m-0">
+						<div class="dropdown">
+							<button class="align-self-center profile_menu_button text-center dropdown-toggle" id="profileDropdownMenuButton" @onclick="ToggleDropdown">
+								P
+							</button>
+							<div class="@DropdownClass  bg-black p-0 m-0" aria-labelledby="profileDropdownMenuButton">
+								<div class="dropdown-item text-white p-3" @onclick="Logout">
+									Log Off
+								</div>
+							</div>
+						</div>	
+					</div>
+				</div>
+			</div>
+            
+			@Body
+		</div>
+	</div>
 </div>
 
+@code {
+
+	private bool _isDropdownOpen = false;
+    
+	private void ToggleDropdown()
+	{
+		_isDropdownOpen = !_isDropdownOpen;
+	}
+    
+	private string DropdownClass => _isDropdownOpen ? "dropdown-menu show" : "dropdown-menu";
+	
+	private async void Logout()
+	{
+		var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
+		await userAuthStateProvider.Logout();
+    
+		NavigationManager.NavigateTo("/");
+	}
+
+}
