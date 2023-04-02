@@ -1,20 +1,78 @@
 ﻿@inherits LayoutComponentBase
 
+@inject NavigationManager NavigationManager
+@inject AuthenticationStateProvider authStateProvider
+@inject IUserEndpoint userEndpoint
+
 <PageTitle>Lazuli</PageTitle>
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+	<div class="d-flex justify-content-center bg-dark">
+		<div class="container text-white p-0 m-0 min-vh-100">
+			@* top row *@
+			<div class="p-1 m-0 bg-dark sticky-top">
+				@* search + profile circle button with first letter of boundtouserid name that opens up a menu with typical links on click *@
+				@* would require somehow injecting search data to Body *@
+				<div class="row justify-content-center m-3">
+					<div class="col-1"></div>
+					<div class="flex-column col-8 d-flex">
+						<input class="p-3 text-white" placeholder=" Search"/>
+					</div>
+					<div class="flex-column col-1 d-flex justify-content-center p-0 m-0">
+						<div class="dropdown">
+							<button class="align-self-center profile_menu_button text-center dropdown-toggle" id="profileDropdownMenuButton" @onclick="ToggleDropdown">
+								@_firstLetterOfUser
+							</button>
+							<div class="@DropdownClass  bg-black p-0 m-0" aria-labelledby="profileDropdownMenuButton">
+								<div class="dropdown-item text-white p-3" @onclick="Logout">
+									Log Off
+								</div>
+							</div>
+						</div>	
+					</div>
+				</div>
+			</div>
+            
+			@Body
+		</div>
+	</div>
 </div>
 
+@code {
+
+	protected override async Task OnInitializedAsync()
+	{
+		// check if user is authenticated
+		var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
+
+		if (!await userAuthStateProvider.IsAuthenticated())
+		{
+			NavigationManager.NavigateTo("/");
+		}
+		else
+		{
+			// set profile button text to first letter of user that currently logged in user is bound to
+			var boundToUserId = await userAuthStateProvider.GetBoundToUserId();
+			_firstLetterOfUser = (await userEndpoint.GetByUserId(boundToUserId))!.Name![0];
+		}
+	}
+
+	private bool _isDropdownOpen = false;
+    
+	private void ToggleDropdown()
+	{
+		_isDropdownOpen = !_isDropdownOpen;
+	}
+    
+	private string DropdownClass => _isDropdownOpen ? "dropdown-menu show" : "dropdown-menu";
+	private char _firstLetterOfUser = ' '; 
+	
+	private async void Logout()
+	{
+		var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
+		await userAuthStateProvider.Logout();
+    
+		NavigationManager.NavigateTo("/");
+	}
+
+}
