@@ -2,6 +2,7 @@
 
 @inject NavigationManager NavigationManager
 @inject AuthenticationStateProvider authStateProvider
+@inject IUserEndpoint userEndpoint
 
 <PageTitle>Lazuli</PageTitle>
 
@@ -20,7 +21,7 @@
 					<div class="flex-column col-1 d-flex justify-content-center p-0 m-0">
 						<div class="dropdown">
 							<button class="align-self-center profile_menu_button text-center dropdown-toggle" id="profileDropdownMenuButton" @onclick="ToggleDropdown">
-								P
+								@_firstLetterOfUser
 							</button>
 							<div class="@DropdownClass  bg-black p-0 m-0" aria-labelledby="profileDropdownMenuButton">
 								<div class="dropdown-item text-white p-3" @onclick="Logout">
@@ -39,6 +40,23 @@
 
 @code {
 
+	protected override async Task OnInitializedAsync()
+	{
+		// check if user is authenticated
+		var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
+
+		if (!await userAuthStateProvider.IsAuthenticated())
+		{
+			NavigationManager.NavigateTo("/");
+		}
+		else
+		{
+			// set profile button text to first letter of user that currently logged in user is bound to
+			var boundToUserId = await userAuthStateProvider.GetBoundToUserId();
+			_firstLetterOfUser = (await userEndpoint.GetByUserId(boundToUserId))!.Name![0];
+		}
+	}
+
 	private bool _isDropdownOpen = false;
     
 	private void ToggleDropdown()
@@ -47,6 +65,7 @@
 	}
     
 	private string DropdownClass => _isDropdownOpen ? "dropdown-menu show" : "dropdown-menu";
+	private char _firstLetterOfUser = ' '; 
 	
 	private async void Logout()
 	{

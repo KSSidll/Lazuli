@@ -7,22 +7,5 @@
 <h3>Hello Hi :syadouWave:</h3>
 
 @code {
-    protected override async Task OnInitializedAsync()
-    {
-        // check if user is authenticated
-        var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
-
-        if (!await userAuthStateProvider.IsAuthenticated())
-        {
-            NavigationManager.NavigateTo("/");
-        }
-    }
-
-    private async void Logout()
-    {
-        var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
-        await userAuthStateProvider.Logout();
-
-        NavigationManager.NavigateTo("/");
-    }
+	
 }
