@@ -1,9 +1,9 @@
-﻿using Lazuli.Authentication;
+﻿using System.Security.Claims;
+using Lazuli.Authentication;
 using LazuliLibrary.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.DataProtection;
-using System.Security.Claims;
 
 namespace LazuliTest.Fakes;
 
@@ -29,6 +29,11 @@ public class FakeUserAuthenticationStateProvider : UserAuthenticationStateProvid
         return Task.Run(() => _boundToUserId = boundToUserId);
     }
 
+    public new Task<int> GetBoundToUserId()
+    {
+        return Task.Run(() => _boundToUserId);
+    }
+    
     public new Task UpdateAuthenticationState(AuthenticatedUserModel? userSession)
     {
         return Task.Run(() =>

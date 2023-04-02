@@ -25,6 +25,8 @@ namespace LazuliTest
             // check if authenticated after login
             Assert.True(await userAuthStateProvider.IsAuthenticated());
 
+            Assert.Equal(4, await userAuthStateProvider.GetBoundToUserId());
+            
             await userAuthStateProvider.Logout();
 
             // check if not authenticated after logout

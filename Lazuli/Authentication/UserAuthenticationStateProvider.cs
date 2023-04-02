@@ -1,7 +1,7 @@
+using System.Security.Claims;
 using LazuliLibrary.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
-using System.Security.Claims;
 
 namespace Lazuli.Authentication;
 
@@ -34,6 +34,15 @@ public class UserAuthenticationStateProvider : AuthenticationStateProvider, IUse
         {
             BoundToUserId = boundToUserId.ToString()
         });
+    }
+
+    public async Task<int> GetBoundToUserId()
+    {
+        if (!await IsAuthenticated()) return 0;
+
+        var boundToUserId = (await GetAuthenticationStateAsync()).User.FindFirst(x => x.Type == ClaimTypes.Actor)!.Value;
+
+        return int.Parse(boundToUserId!);
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
