@@ -1,7 +1,7 @@
 ﻿using Lazuli.Data.Models;
 using LazuliLibrary.Models;
 
-namespace Lazuli.Data.Model
+namespace Lazuli.Data.Models
 {
 	public class PostViewModel
 	{
