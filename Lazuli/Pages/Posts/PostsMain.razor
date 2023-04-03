@@ -1,14 +1,15 @@
-﻿@page "/main"
+﻿@page "/posts"
 @inherits MainLayout
 @inject IUserEndpoint userEndpoint
 @inject IPostEndpoint postEndpoint
 @inject ICommentEndpoint commentEndpoint
 
-if (Posts is not null) 
+@if (Posts is not null) 
 {
 	@foreach (var post in Posts)
 	{
 		<PostComponent Post="post" />
+		<hr />
 	}
 }
 
@@ -40,6 +41,7 @@ if (Posts is not null)
 
 			Posts.Add(postView);
 		}
+		Posts.OrderBy(x => Random.Shared.NextDouble());
 	}
 
 }
