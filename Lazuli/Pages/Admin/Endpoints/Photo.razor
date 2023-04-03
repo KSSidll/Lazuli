@@ -38,16 +38,16 @@
 <br />
 
 <div>
-	<h4>Filter Photos by Post</h4>
+	<h4>Filter Photos by AlbumId</h4>
 	<div class="col-2">
-		<FilterComponent OnIdFilter="GetPhotoByPostId" />
+		<FilterComponent OnIdFilter="GetPhotoByAlbumId" />
 	</div>
 
-	@if (_filteredByPostId is not null)
+	@if (_filteredByAlbumId is not null)
 	{
-		@if (_filteredByPostId.Count > 0)
+		@if (_filteredByAlbumId.Count > 0)
 		{
-			<ListComponent Models="@_filteredByPostId" ModelType="@typeof(PhotoModel)" />
+			<ListComponent Models="@_filteredByAlbumId" ModelType="@typeof(PhotoModel)" />
 		}
 		else
 		{
@@ -60,7 +60,7 @@
 @code {
 	private List<object>? _photos;
 	private object? _photo;
-	private List<object>? _filteredByPostId;
+	private List<object>? _filteredByAlbumId;
 
 	private bool _searched = false;
 
@@ -75,8 +75,8 @@
 		_searched = true;
 	}
 
-	private async Task GetPhotoByPostId(int postId)
+	private async Task GetPhotoByAlbumId(int albumId)
 	{
-		_filteredByPostId = (await photoEndpoint.GetByPostId(postId)).ToList<object>();
+		_filteredByAlbumId = (await photoEndpoint.GetByAlbumId(albumId)).ToList<object>();
 	}
 }

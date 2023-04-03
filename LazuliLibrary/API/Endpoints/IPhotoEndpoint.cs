@@ -6,6 +6,6 @@ namespace LazuliLibrary.API.Endpoints
     {
         Task<List<PhotoModel>> GetAll();
         Task<PhotoModel?> GetByPhotoId(int photoId);
-        Task<List<PhotoModel>> GetByPostId(int postId);
+        Task<List<PhotoModel>> GetByAlbumId(int albumId);
     }
 }

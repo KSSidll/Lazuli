@@ -62,12 +62,12 @@ namespace LazuliLibrary.API.Endpoints
             }
         }
 
-        public async Task<List<PhotoModel>> GetByPostId(int postId)
+        public async Task<List<PhotoModel>> GetByAlbumId(int albumId)
         {
             // checks if there are null values
             ApiHelper.ApiHelperValidator(_apiHelper);
 
-            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}?postId={postId}"))
+            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}?albumId={albumId}"))
             {
                 if (response.IsSuccessStatusCode)
                 {
