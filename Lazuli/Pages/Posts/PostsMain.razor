@@ -41,7 +41,8 @@
 
 			Posts.Add(postView);
 		}
-		Posts.OrderBy(x => Random.Shared.NextDouble());
+
+		Posts = Posts.OrderBy(x => Random.Shared.NextDouble()).ToList();
 	}
 
 }
