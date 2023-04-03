@@ -1,31 +1,30 @@
-﻿@page "/admin/post"
-@layout AdminLayout
+﻿
+@if (Post is not null)
+{
+	<div class="d-grid gap-2">
+		<div>
+			<a href="">
+				<label class="fw-bold">@@@Post.Username</label>
+			</a>
+		</div>
+		<div class="fs-5">
+			<label class="fst-italic">@Post.Title</label>
+		</div>
+		<div class="border border-1 rounded rounded-5 p-sm-2 shadow-sm">
+			<label>@Post.Body</label>
+		</div>
+		<div>
+			<button class="btn btn-primary">
+				<span class="oi oi-comment-square me-1"></span>
+				<span>@Post.Comments?.Count</span>
+			</button>
+		</div>
+	</div>
+}
 
-<div class="d-grid gap-2">
-	<div>
-		<a href="">
-			<label class="fw-bold">@@@username</label>
-		</a>
-	</div>
-	<div class="fs-5">
-		<label class="fst-italic">@title</label>
-	</div>
-	<div class="border border-1 rounded rounded-5 p-sm-2 shadow-sm">
-		<label>@body</label>
-	</div>
-	<div>
-		<button class="btn btn-primary">
-			<span class="oi oi-comment-square me-1"></span>
-			<span>@comments</span>
-		</button>
-	</div>
-</div>
 
 @code {
-
-	private string username = "Drôme";
-	private string title = "Triors";
-	private string body = @"Według danych na rok 1990 gminę zamieszkiwały 383 osoby, a gęstość zaludnienia wynosiła 68 osób/km² (wśród 2880 gmin regionu Rodan-Alpy Triors plasuje się na 1249. miejscu pod względem liczby ludności, natomiast pod względem powierzchni na miejscu 1464.). W Triors znajduje się opactwo benedyktyńskie opactwo Matki Bożej, należące do Kongregacji Solesmeńskiej.";
-	private int comments = 10;
+	[Parameter]
+	public PostViewModel? Post { get; set; } = null;
 
 }

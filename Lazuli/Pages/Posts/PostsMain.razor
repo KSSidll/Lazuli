@@ -1,0 +1,45 @@
+﻿@page "/main"
+@inherits MainLayout
+@inject IUserEndpoint userEndpoint
+@inject IPostEndpoint postEndpoint
+@inject ICommentEndpoint commentEndpoint
+
+if (Posts is not null) 
+{
+	@foreach (var post in Posts)
+	{
+		<PostComponent Post="post" />
+	}
+}
+
+@code {
+	public List<PostViewModel> Posts { get; set; } = new();
+
+	protected async override Task OnInitializedAsync()
+	{
+		var posts = await postEndpoint.GetAll();
+		Posts = new List<PostViewModel>();
+		foreach (var post in posts)
+		{
+			var postView = new PostViewModel
+			{
+				Id = post.Id,
+				Title = post.Title,
+				Body = post.Body,
+				UserId = post.UserId
+			};
+
+			postView.Username = (await userEndpoint.GetByUserId(postView.UserId))?.Username;
+			var comments = await commentEndpoint.GetByPostId(postView.Id);
+			postView.Comments = new(comments.Select(x => new CommentViewModel() 
+			{
+				Email = x.Email,
+				Id = x.Id,
+				Body = x.Body
+			}));
+
+			Posts.Add(postView);
+		}
+	}
+
+}
