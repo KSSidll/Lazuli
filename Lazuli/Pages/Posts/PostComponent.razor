@@ -14,9 +14,11 @@
 			<label>@Post.Body</label>
 		</div>
 		<div>
-			<button class="btn btn-primary">
+			<button type="button" class="btn btn-primary position-relative">
 				<span class="oi oi-comment-square me-1"></span>
-				<span>@Post.Comments?.Count</span>
+				<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+					@Post.Comments?.Count
+				</span>
 			</button>
 		</div>
 	</div>
@@ -25,5 +27,4 @@
 @code {
 	[Parameter]
 	public PostViewModel? Post { get; set; }
-
 }
