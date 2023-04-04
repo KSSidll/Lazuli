@@ -10,6 +10,3 @@ public static class DatabaseUtility
         var builder = new DbContextOptionsBuilder<UserContext>(options);
 
         await using var context = new UserContext(builder.Options);
-        await context.Database.EnsureCreatedAsync();
-    }
-}
