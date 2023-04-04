@@ -12,11 +12,44 @@ namespace LazuliLibrary.API.Endpoints
         private readonly IApiHelper _apiHelper;
         private const string _page = "posts";
 
-        public PostEndpoint(IApiHelper apiHelper)
+        public int RecordLimit { get; set; } = 10;
+
+        public int StartIndex { get; set; } = 1;
+
+		public PostEndpoint(IApiHelper apiHelper)
         {
             _apiHelper = apiHelper;
         }
 
+        /// <summary>
+        /// If an empty list is returned you can change the value
+        /// of StartIndex or RecordLimit (e.g. StartIndex = 1)
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="HttpRequestException"></exception>
+        public async Task<List<PostModel>> GetPartially()
+        {
+            // checks if there are null values
+            ApiHelper.ApiHelperValidator(_apiHelper);
+
+            string url = $"/{_page}?_start={StartIndex}&_limit={RecordLimit}";
+
+            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync(url))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsAsync<List<PostModel>>();
+
+                    StartIndex += RecordLimit;
+
+                    return result;
+                }
+                else
+                {
+                    throw new HttpRequestException(response.ReasonPhrase);
+                }
+            }
+        }
         public async Task<List<PostModel>> GetAll()
         {
             // checks if there are null values
