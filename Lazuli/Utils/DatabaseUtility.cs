@@ -1,5 +1,5 @@
-using Microsoft.EntityFrameworkCore;
 using Lazuli.Data.Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace Lazuli.Utils;
 
@@ -9,7 +9,7 @@ public static class DatabaseUtility
     {
         var builder = new DbContextOptionsBuilder<UserContext>(options);
 
-        using var context = new UserContext(builder.Options);
+        await using var context = new UserContext(builder.Options);
         await context.Database.EnsureCreatedAsync();
     }
 }
