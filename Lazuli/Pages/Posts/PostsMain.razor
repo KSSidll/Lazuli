@@ -4,21 +4,34 @@
 @inject IPostEndpoint postEndpoint
 @inject ICommentEndpoint commentEndpoint
 
-@if (Posts is not null) 
+@if (Posts is not null && _loadingData == false) 
 {
 	@foreach (var post in Posts)
 	{
-		<PostComponent Post="post" />
-		<hr />
+		<div class="border rounded rounded-3 p-2 m-2 bg-light text-dark">
+			<PostComponent Post="post" />
+		</div>
 	}
+}
+else if (_loadingData)
+{
+	<div class="d-flex align-items-center">
+		<strong>Loading...</strong>
+		<div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+	</div>
 }
 
 @code {
-	public List<PostViewModel> Posts { get; set; } = new();
+	private bool _loadingData = false;
+
+	public List<PostViewModel>? Posts { get; set; }
 
 	protected async override Task OnInitializedAsync()
 	{
+		_loadingData = true;
+
 		var posts = await postEndpoint.GetAll();
+
 		Posts = new List<PostViewModel>();
 		foreach (var post in posts)
 		{
@@ -43,6 +56,8 @@
 		}
 
 		Posts = Posts.OrderBy(x => Random.Shared.NextDouble()).ToList();
+
+		_loadingData = false;
 	}
 
 }
