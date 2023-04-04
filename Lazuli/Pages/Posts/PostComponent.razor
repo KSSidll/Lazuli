@@ -11,13 +11,13 @@
 		<div class="fs-5">
 			<label class="fst-italic">@Post.Title</label>
 		</div>
-		<div class="border border-1 rounded rounded-5 p-sm-2 shadow-sm">
+		<div class="p-sm-2">
 			<label>@Post.Body</label>
 		</div>
 		<div>
-			<button type="button" class="btn btn-primary position-relative">
+			<button type="button" class="btn btn-dark position-relative">
 				<span class="oi oi-comment-square me-1"></span>
-				<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+				<span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-dark">
 					@Post.Comments?.Count
 				</span>
 			</button>

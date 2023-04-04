@@ -8,7 +8,7 @@
 {
 	@foreach (var post in Posts)
 	{
-		<div class="border rounded rounded-3 p-2 m-2 bg-light text-dark">
+		<div class="border border-dark m-0 p-3 bg-black text-white border-top-0">
 			<PostComponent Post="post" />
 		</div>
 	}
@@ -26,7 +26,7 @@ else if (_loadingData)
 
 	public List<PostViewModel>? Posts { get; set; }
 
-	protected async override Task OnInitializedAsync()
+	protected override async Task OnInitializedAsync()
 	{
 		_loadingData = true;
 

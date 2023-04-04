@@ -6,29 +6,37 @@
 
 <UserProfileComponent UserModel="UserModel" />
 
-<div class="row mt-3">
+<style>
+.btn-outline-dark:hover {
+    background-color: #101010 !important;
+}
+</style>
 
-	<div class="col d-flex form-check form-check-inline justify-content-center">
-		<input class="btn-check" type="radio" checked="@(_displaying == DisplayType.Posts)"
-			   name="Displaying" @onchange="@(() => _displaying = DisplayType.Posts)"
-			   id="displaying-posts"/>
-		<label class="w-100 p-3 text-white btn btn-outline-secondary" for="displaying-posts">Posts</label>
-	</div>
+<div class="border border-dark border-top-0">
+	<div class="d-flex">
+		
+		<div class="col m-0 p-0">
+			<input class="btn-check" type="radio" checked="@(_displaying == DisplayType.Posts)"
+				   name="Displaying" @onchange="@(() => _displaying = DisplayType.Posts)"
+				   id="displaying-posts"/>
+			<label class="w-100 p-3 text-white btn btn-outline-dark rounded-0 border-0" for="displaying-posts">Posts</label>
+		</div>
 	
-	<div class="col d-flex form-check form-check-inline justify-content-center">
-		<input class="btn-check" type="radio" checked="@(_displaying == DisplayType.Comments)"
-			   name="Displaying" @onchange="@(() => _displaying = DisplayType.Comments)"
-			   id="displaying-comments"/>
-		<label class="w-100 p-3 text-white btn btn-outline-secondary" for="displaying-comments">Comments</label>
-	</div>
+		<div class="col m-0 p-0">
+			<input class="btn-check" type="radio" checked="@(_displaying == DisplayType.Comments)"
+				   name="Displaying" @onchange="@(() => _displaying = DisplayType.Comments)"
+				   id="displaying-comments"/>
+			<label class="w-100 p-3 text-white btn btn-outline-dark rounded-0 border-dark border-top-0 border-bottom-0" for="displaying-comments">Comments</label>
+		</div>
 	
-	<div class="col d-flex form-check form-check-inline justify-content-center">
-		<input class="btn-check" type="radio" checked="@(_displaying == DisplayType.Pictures)"
-			   name="Displaying" @onchange="@(() => _displaying = DisplayType.Pictures)"
-			   id="displaying-pictures"/>
-		<label class="w-100 p-3 text-white btn btn-outline-secondary" for="displaying-pictures">Pictures</label>
+		<div class="col m-0 p-0">
+			<input class="btn-check" type="radio" checked="@(_displaying == DisplayType.Pictures)"
+				   name="Displaying" @onchange="@(() => _displaying = DisplayType.Pictures)"
+				   id="displaying-pictures"/>
+			<label class="w-100 p-3 text-white btn btn-outline-dark rounded-0 border-0" for="displaying-pictures">Pictures</label>
+		</div>
+		
 	</div>
-	
 </div>
 
 	
@@ -44,9 +52,9 @@ else switch (_displaying)
 	case DisplayType.Posts:
 		if (Posts is not null)
 		{
-			foreach (var post in Posts)
+			@foreach (var post in Posts)
 			{
-				<div class="border rounded rounded-3 p-2 m-2 bg-light text-dark">
+				<div class="border border-dark m-0 p-3 bg-black text-white border-top-0">
 					<PostComponent Post="post" />
 				</div>
 			}
