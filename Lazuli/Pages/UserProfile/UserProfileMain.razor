@@ -52,12 +52,7 @@ else switch (_displaying)
 	case DisplayType.Posts:
 		if (Posts is not null)
 		{
-			@foreach (var post in Posts)
-			{
-				<div class="border border-dark m-0 p-3 bg-black text-white border-top-0">
-					<PostComponent Post="post" />
-				</div>
-			}
+			<PostsDisplayComponent Posts="Posts" />
 		}
 	
 		break;
