@@ -1,5 +1,18 @@
-﻿<div>
-	<button class="btn btn-outline-light col-3 mt-1" type="button" @onclick="Collapse">		
+﻿<style>
+
+.btn:focus,.btn:active {
+	box-shadow: none;
+}
+    
+input:focus {
+    box-shadow: none !important;
+    border-color: #1d9bf0 !important;
+}
+
+</style>
+
+<div class="border border-top-0 border-dark">
+	<button class="btn btn-outline-dark text-white col-3 rounded-0 border-top-0 border-start-0" type="button" @onclick="Collapse">		
 		@if (_collapse)
 		{
 			<span>Filter options <span class="oi oi-caret-bottom ms-1"></span></span>
@@ -13,20 +26,20 @@
 	@if (_collapse == false)
 	{
 		@*TODO add an edit form*@
-		<div class="m-3 bg-light rounded bg-opacity-75 p-sm-2">
+		<div class="m-3 p-sm-2">
 			<div class="mb-3 input-group">
-				<label for="phraseInput"><span class="input-group-text">Phrase in post</span></label>
-				<input class="form-control ms-2" id="phraseInput">
+				<label for="phraseInput"><span class="input-group-text bg-black text-white border-0">Phrase in post</span></label>
+				<input class="form-control ms-2 bg-black text-white border-dark" id="phraseInput">
 			</div>
 			<div class="input-group">
-				<label for="characterCountInput"><span class="input-group-text">Character Count</span></label>
-				<label for="characterCountInput"><span class="input-group-text">from</span></label>
-				<input class="form-control mx-2" id="characterCountInput">
-				<label for="characterUpperLimit"><span class="input-group-text">to</span></label>
-				<input class="form-control ms-2" id="characterUpperLimit">
+				<label for="characterCountInput"><span class="input-group-text bg-black text-white border-top-0 border-start-0 border-bottom-0 rounded-0 border-dark me-1">Character Count</span></label>
+				<label for="characterCountInput"><span class="input-group-text bg-black text-white border-0">from</span></label>
+				<input class="form-control mx-2 bg-black text-white border-dark" id="characterCountInput">
+				<label for="characterUpperLimit"><span class="input-group-text bg-black text-white border-0">to</span></label>
+				<input class="form-control ms-2 bg-black text-white border-dark" id="characterUpperLimit">
 			</div>
 			<div class="d-grid gap-2 d-md-flex justify-content-md-end mt-2">
-				<button type="submit" class="btn btn-primary">Filter</button>
+				<button type="submit" class="btn btn-dark">Filter</button>
 			</div>
 		</div>
 	}

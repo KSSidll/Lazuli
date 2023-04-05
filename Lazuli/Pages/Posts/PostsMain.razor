@@ -21,13 +21,13 @@
 		<div class="container text-center">
 			@if (_loadedAllContent == false)
 			{
-				<button class="btn btn-outline-primary btn-lg" @onclick="LoadNextData">
+				<button class="btn btn-outline-primary btn-lg mt-2" @onclick="LoadNextData">
 					Load More Content
 				</button>
 			}
 			else
 			{
-				<button class="btn btn-outline-danger btn-lg" disabled>
+				<button class="btn btn-outline-danger btn-lg mt-2" disabled>
 					No more content
 				</button>
 			}
