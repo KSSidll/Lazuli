@@ -1,9 +1,10 @@
+@inject NavigationManager NavigationManager
 
 @if (Post is not null)
 {	<div>
 		<div class="d-grid gap-2">
 			<div>
-				<a href="">
+				<a href="" @onclick="NavToProfile" @onclick:preventDefault>
 					<label class="fw-bold">@@@Post.Username</label>
 				</a>
 			</div>
@@ -16,9 +17,9 @@
 			<div>
 				@if (_showComments == false)
 				{
-					<button type="button" class="btn btn-outline-primary col-2 border-0" @onclick="ShowComments">
+					<button type="button" class="btn btn-dark" @onclick="ShowComments">
 						<span class="oi oi-comment-square me-2"></span>
-						<span>
+						<span class="bg-dark">
 							@Post.Comments?.Count
 						</span>
 					</button>
@@ -41,12 +42,16 @@
 			</div>
 		}
 	</div>
-
 }
 
 @code {
 	[Parameter]
 	public PostViewModel? Post { get; set; }
+
+	public void NavToProfile()
+	{
+		NavigationManager.NavigateTo($"/user/{Post!.UserId}");
+	}
 
 	private bool _showComments = false;
 
