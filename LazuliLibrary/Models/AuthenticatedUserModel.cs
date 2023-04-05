@@ -2,5 +2,5 @@
 
 public class AuthenticatedUserModel
 {
-    public string? BoundToUserId { get; set; }
+	public string? BoundToUserId { get; set; }
 }

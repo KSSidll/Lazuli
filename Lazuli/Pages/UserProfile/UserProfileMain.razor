@@ -1,10 +1,10 @@
 ﻿@page "/user/{userId}"
 
-@inject IUserEndpoint userEndpoint
-@inject IPostEndpoint postEndpoint
-@inject ICommentEndpoint commentEndpoint
+@inject IUserEndpoint UserEndpoint
+@inject IPostEndpoint PostEndpoint
+@inject ICommentEndpoint CommentEndpoint
 
-<UserProfileComponent UserModel="UserModel" />
+<UserProfileComponent UserModel="UserModel"/>
 
 <style>
 .btn-outline-dark:hover {
@@ -14,32 +14,32 @@
 
 <div class="border border-dark border-top-0">
 	<div class="d-flex">
-		
+
 		<div class="col m-0 p-0">
 			<input class="btn-check" type="radio" checked="@(_displaying == DisplayType.Posts)"
 				   name="Displaying" @onchange="@(() => _displaying = DisplayType.Posts)"
 				   id="displaying-posts"/>
 			<label class="w-100 p-3 text-white btn btn-outline-dark rounded-0 border-0" for="displaying-posts">Posts</label>
 		</div>
-	
+
 		<div class="col m-0 p-0">
 			<input class="btn-check" type="radio" checked="@(_displaying == DisplayType.Comments)"
 				   name="Displaying" @onchange="@(() => _displaying = DisplayType.Comments)"
 				   id="displaying-comments"/>
 			<label class="w-100 p-3 text-white btn btn-outline-dark rounded-0 border-dark border-top-0 border-bottom-0" for="displaying-comments">Comments</label>
 		</div>
-	
+
 		<div class="col m-0 p-0">
 			<input class="btn-check" type="radio" checked="@(_displaying == DisplayType.Pictures)"
 				   name="Displaying" @onchange="@(() => _displaying = DisplayType.Pictures)"
 				   id="displaying-pictures"/>
 			<label class="w-100 p-3 text-white btn btn-outline-dark rounded-0 border-0" for="displaying-pictures">Pictures</label>
 		</div>
-		
+
 	</div>
 </div>
 
-	
+
 @if (_loadingData)
 {
 	<div class="d-flex align-items-center">
@@ -47,45 +47,48 @@
 		<div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
 	</div>
 }
-else switch (_displaying)
-{
-	case DisplayType.Posts:
-		if (Posts is not null)
-		{
-			@foreach (var post in Posts)
+else
+	switch (_displaying)
+	{
+		case DisplayType.Posts:
+			if (Posts is not null)
 			{
-				<div class="border border-dark m-0 p-3 bg-black text-white border-top-0">
-					<PostComponent Post="post" />
-				</div>
+				<PostsDisplayComponent Posts="Posts"/>
 			}
-		}
-	
-		break;
-	
-	case DisplayType.Comments:
-		// TODO display comments
 
-		break;
-		
-	case DisplayType.Pictures:
-		// TODO display pictures
+			break;
 
-		break;
-		
-	default:
-		break; 
-}
+		case DisplayType.Comments:
+			// TODO display comments
+
+			break;
+
+		case DisplayType.Pictures:
+			// TODO display pictures
+
+			break;
+
+		default:
+			throw new ArgumentOutOfRangeException();
+	}
 
 @code {
+
 	[Parameter]
 	public string? UserId { get; set; }
 
 	private UserModel? UserModel { get; set; }
-	private enum DisplayType { Posts, Comments, Pictures }
+
+	private enum DisplayType
+	{
+		Posts,
+		Comments,
+		Pictures
+	}
 
 	private DisplayType _displaying = DisplayType.Posts;
-	
-	private bool _loadingData = false;
+
+	private bool _loadingData;
 
 	public List<PostViewModel>? Posts { get; set; }
 
@@ -93,11 +96,11 @@ else switch (_displaying)
 	{
 		_loadingData = true;
 
-		UserModel = await userEndpoint.GetByUserId(int.Parse(UserId!));
-		var posts = await postEndpoint.GetByUserId(UserModel!.Id);
+		UserModel = await UserEndpoint.GetByUserId(int.Parse(UserId!));
+		List<PostModel> posts = await PostEndpoint.GetByUserId(UserModel!.Id);
 
 		Posts = new List<PostViewModel>();
-		foreach (var post in posts)
+		foreach (PostModel post in posts)
 		{
 			var postView = new PostViewModel
 			{
@@ -107,9 +110,9 @@ else switch (_displaying)
 				UserId = post.UserId
 			};
 
-			postView.Username = (await userEndpoint.GetByUserId(postView.UserId))?.Username;
-			var comments = await commentEndpoint.GetByPostId(postView.Id);
-			postView.Comments = new(comments.Select(x => new CommentViewModel() 
+			postView.Username = (await UserEndpoint.GetByUserId(postView.UserId))?.Username;
+			List<CommentModel> comments = await CommentEndpoint.GetByPostId(postView.Id);
+			postView.Comments = new List<CommentViewModel>(comments.Select(x => new CommentViewModel
 			{
 				Email = x.Email,
 				Id = x.Id,

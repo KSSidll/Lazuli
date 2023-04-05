@@ -1,9 +1,6 @@
-﻿namespace LazuliLibrary.API
-{
-    public interface IApiHelper
-    {
-        HttpClient? ApiClient { get; }
+﻿namespace LazuliLibrary.API;
 
-        void LoggOffUser();
-    }
+public interface IApiHelper
+{
+	HttpClient? ApiClient { get; }
 }

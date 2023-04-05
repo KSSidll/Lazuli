@@ -5,82 +5,81 @@
 
 @inject NavigationManager NavigationManager
 @inject IDbContextFactory<UserContext> UserDbFactory
-@inject AuthenticationStateProvider authStateProvider
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Login</PageTitle>
 
-<EditForm Model="@loginModel" OnValidSubmit="@HandleLogin">
-    <DataAnnotationsValidator />
+<EditForm Model="@_loginModel" OnValidSubmit="@HandleLogin">
+	<DataAnnotationsValidator/>
 
-    <div class="container">
-        <div class="row text-center text-white mb-4">
-            <h2>Log in</h2>
-        </div>
-        <div class="row justify-content-center m-3">
-            <InputText class="p-3 text-white" id="login" @bind-Value="loginModel.Login" placeholder=" Login"/>
-        </div>
-        <div class="row justify-content-center m-3">
-            <InputText class="p-3 text-white" type="password" id="password" @bind-Value="loginModel.Password" placeholder=" Password" />
-        </div>
-        <div class="row justify-content-center m-3 mt-5">
-            <button class="p-2 submit" type="submit">Log in</button>
-        </div>
-        <div class="row text-white mt-5">
-            <p>
-                Don't have an account?
-                <a class="nav-to-signup" href="" @onclick="NavigateToSignup" @onclick:preventDefault>Sign up</a>
-            </p>
-        </div>
-    </div>
+	<div class="container">
+		<div class="row text-center text-white mb-4">
+			<h2>Log in</h2>
+		</div>
+		<div class="row justify-content-center m-3">
+			<InputText class="p-3 text-white" id="login" @bind-Value="_loginModel.Login" placeholder=" Login"/>
+		</div>
+		<div class="row justify-content-center m-3">
+			<InputText class="p-3 text-white" type="password" id="password" @bind-Value="_loginModel.Password" placeholder=" Password"/>
+		</div>
+		<div class="row justify-content-center m-3 mt-5">
+			<button class="p-2 submit" type="submit">Log in</button>
+		</div>
+		<div class="row text-white mt-5">
+			<p>
+				Don't have an account?
+				<a class="nav-to-signup" href="" @onclick="NavigateToSignup" @onclick:preventDefault>Sign up</a>
+			</p>
+		</div>
+	</div>
 
 </EditForm>
 
 @code {
 
-    private string _mainPage = "/posts";
+	protected override async Task OnInitializedAsync()
+	{
+		_userContext = await UserDbFactory.CreateDbContextAsync();
 
-    protected override async Task OnInitializedAsync()
-    {
-        userContext = UserDbFactory.CreateDbContext();
+	// check if user is authenticated
+		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
 
-        // check if user is authenticated
-        var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
+		if (await userAuthStateProvider.IsAuthenticated())
+			NavigationManager.NavigateTo("/");
+	}
 
-        if (await userAuthStateProvider.IsAuthenticated())
-            NavigationManager.NavigateTo(_mainPage);
-    }
+	private readonly LoginModel _loginModel = new();
+	private UserContext? _userContext;
 
-    private LoginModel loginModel = new();
-    private UserContext? userContext;
+	private async void HandleLogin()
+	{
+		if (_loginModel.Login is null || _loginModel.Password is null)
+			throw new InvalidOperationException("HandleLogin was called without login form being filled, DataAnnotationsValidator failed");
 
-    private async void HandleLogin()
-    {
-        if (loginModel.Login is null || loginModel.Password is null)
-            throw new InvalidOperationException("HandleLogin was called without login form being filled, DataAnnotationsValidator failed");
+		if (_userContext is null)
+			throw new InvalidOperationException("userContext is null in HandleLogin method, which shouldn't be possible");
 
-        if (userContext is null)
-            throw new InvalidOperationException("userContext is null in HandleLogin method, which shouldn't be possible");
+		User? user = _userContext.GetUser(_loginModel.Login, _loginModel.Password);
 
-        var user = userContext.GetUser(loginModel.Login, loginModel.Password);
+	// TODO add message when there is no user that matches provided credentials in the database
+		if (user is null) return;
 
-        // TODO add message when there is no user that matches provided credentials in the database
-        if (user is null) return;
+	// update authentication status and navigate to index/controller page
+		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
 
-        // update authentication status and navigate to index/controller page
-        var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
+		await userAuthStateProvider.Login(user.BoundToUserId);
 
-        await userAuthStateProvider.Login(user.BoundToUserId);
+		NavigationManager.NavigateTo("/");
+	}
 
-        NavigationManager.NavigateTo(_mainPage);
-    }
+	private void NavigateToSignup()
+	{
+		NavigationManager.NavigateTo("/auth/signup");
+	}
 
-    private void NavigateToSignup()
-    {
-        NavigationManager.NavigateTo("/auth/signup");
-    }
+	public void Dispose()
+	{
+		_userContext?.Dispose();
+	}
 
-    public void Dispose()
-    {
-        userContext?.Dispose();
-    }
 }

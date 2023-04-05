@@ -1,52 +1,52 @@
 ﻿@page "/admin/endpoints/comment"
 @layout AdminLayout
 
-@inject ICommentEndpoint commentEndpoint
+@inject ICommentEndpoint CommentEndpoint
 
 <h3>Comment</h3>
 
-<br />
+<br/>
 
 <div>
 	<h4>All comments</h4>
 	<button class="btn btn-primary" @onclick="GetAllComments">Show All Comments</button>
 	@if (_comments is not null)
 	{
-		<ListComponent Models="@_comments" ModelType="@typeof(CommentModel)" />
+		<ListComponent Models="@_comments" ModelType="@typeof(CommentModel)"/>
 	}
 </div>
 
-<br />
+<br/>
 
 <div>
 	<h4>Filter Comments by CommentId</h4>
 	<div class="col-2">
-		<FilterComponent OnIdFilter="GetCommentByCommentId" />
+		<FilterComponent OnIdFilter="GetCommentByCommentId"/>
 	</div>
 
 	@if (_comment is not null)
 	{
-		<ListComponent Models="@(new List<object> { _comment })" ModelType="@typeof(CommentModel)" />
-	}	
+		<ListComponent Models="@(new List<object> {_comment})" ModelType="@typeof(CommentModel)"/>
+	}
 	else if (_searched)
 	{
 		<p class="text-danger">No matching result found</p>
 	}
 </div>
 
-<br />
+<br/>
 
 <div>
 	<h4>Filter Comments by UserId</h4>
 	<div class="col-2">
-		<FilterComponent OnIdFilter="GetCommentByPostId" />
+		<FilterComponent OnIdFilter="GetCommentByPostId"/>
 	</div>
 
 	@if (_filteredByPostId is not null)
 	{
 		@if (_filteredByPostId.Count > 0)
 		{
-			<ListComponent Models="@_filteredByPostId" ModelType="@typeof(CommentModel)" />
+			<ListComponent Models="@_filteredByPostId" ModelType="@typeof(CommentModel)"/>
 		}
 		else
 		{
@@ -61,21 +61,22 @@
 	private object? _comment;
 	private List<object>? _filteredByPostId;
 
-	private bool _searched = false;
+	private bool _searched;
 
 	private async Task GetAllComments()
 	{
-		_comments = (_comments is null) ? (await commentEndpoint.GetAll()).ToList<object>() : null;
+		_comments = _comments is null ? (await CommentEndpoint.GetAll()).ToList<object>() : null;
 	}
 
 	private async Task GetCommentByCommentId(int commentId)
 	{
-		_comment = (object?)(await commentEndpoint.GetByCommentId(commentId));
+		_comment = await CommentEndpoint.GetByCommentId(commentId);
 		_searched = true;
 	}
 
 	private async Task GetCommentByPostId(int postId)
 	{
-		_filteredByPostId = (await commentEndpoint.GetByPostId(postId)).ToList<object>();
+		_filteredByPostId = (await CommentEndpoint.GetByPostId(postId)).ToList<object>();
 	}
+
 }

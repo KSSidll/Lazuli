@@ -1,13 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\LazuliLibrary\LazuliLibrary.csproj" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.4" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\LazuliLibrary\LazuliLibrary.csproj"/>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.4"/>
+	</ItemGroup>
 </Project>

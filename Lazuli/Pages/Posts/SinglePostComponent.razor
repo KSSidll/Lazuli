@@ -1,0 +1,65 @@
+@inject NavigationManager NavigationManager
+
+@if (Post is not null)
+{
+	<div>
+		<div class="d-grid gap-2">
+			<div>
+				<a href="" @onclick="NavToProfile" @onclick:preventDefault>
+					<label class="fw-bold">@@@Post.Username</label>
+				</a>
+			</div>
+			<div class="fs-5">
+				<label class="fst-italic">@Post.Title</label>
+			</div>
+			<div class="p-sm-2 shadow-sm">
+				<label>@Post.Body</label>
+			</div>
+			<div>
+				@if (_showComments == false)
+				{
+					<button type="button" class="btn btn-dark" @onclick="ShowComments">
+						<span class="oi oi-comment-square me-2"></span>
+						<span class="bg-dark">
+							@Post.Comments?.Count
+						</span>
+					</button>
+				}
+				else
+				{
+					<button type="button" class="btn btn-secondary col-2" @onclick="ShowComments">
+						<span class="oi oi-x"></span>
+					</button>
+				}
+			</div>
+		</div>
+		@if (_showComments && Post.Comments is not null)
+		{
+			<div class="col-8">
+				@foreach (CommentViewModel? comment in Post.Comments)
+				{
+					<CommentComponent Comment="comment"/>
+				}
+			</div>
+		}
+	</div>
+}
+
+@code {
+
+	[Parameter]
+	public PostViewModel? Post { get; set; }
+
+	public void NavToProfile()
+	{
+		NavigationManager.NavigateTo($"/user/{Post!.UserId}");
+	}
+
+	private bool _showComments = false;
+
+	private void ShowComments()
+	{
+		_showComments ^= true;
+	}
+
+}
