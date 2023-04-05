@@ -1,8 +1,8 @@
 ﻿@inherits LayoutComponentBase
 
 @inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider authStateProvider
-@inject IUserEndpoint userEndpoint
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IUserEndpoint UserEndpoint
 
 <PageTitle>Lazuli</PageTitle>
 
@@ -28,11 +28,11 @@
 									Log Off
 								</div>
 							</div>
-						</div>	
+						</div>
 					</div>
 				</div>
 			</div>
-            
+
 			@Body
 		</div>
 	</div>
@@ -42,8 +42,8 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		// check if user is authenticated
-		var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
+	// check if user is authenticated
+		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
 
 		if (!await userAuthStateProvider.IsAuthenticated())
 		{
@@ -51,27 +51,27 @@
 		}
 		else
 		{
-			// set profile button text to first letter of user that currently logged in user is bound to
+	// set profile button text to first letter of user that currently logged in user is bound to
 			var boundToUserId = await userAuthStateProvider.GetBoundToUserId();
-			_firstLetterOfUser = (await userEndpoint.GetByUserId(boundToUserId))!.Name![0];
+			_firstLetterOfUser = (await UserEndpoint.GetByUserId(boundToUserId))!.Name![0];
 		}
 	}
 
-	private bool _isDropdownOpen = false;
-    
+	private bool _isDropdownOpen;
+
 	private void ToggleDropdown()
 	{
 		_isDropdownOpen = !_isDropdownOpen;
 	}
-    
+
 	private string DropdownClass => _isDropdownOpen ? "dropdown-menu show" : "dropdown-menu";
-	private char _firstLetterOfUser = ' '; 
-	
+	private char _firstLetterOfUser = ' ';
+
 	private async void Logout()
 	{
-		var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
+		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
 		await userAuthStateProvider.Logout();
-    
+
 		NavigationManager.NavigateTo("/");
 	}
 

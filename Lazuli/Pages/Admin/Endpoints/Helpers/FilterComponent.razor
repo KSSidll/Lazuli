@@ -1,20 +1,23 @@
-﻿
-@using System.ComponentModel.DataAnnotations
-
+﻿@using System.ComponentModel.DataAnnotations
 <EditForm Model="_idModel" OnValidSubmit="Submit">
 	<DataAnnotationsValidator/>
 
-	<InputNumber @bind-Value="_idModel.Id" class="form-control" />
+	<InputNumber @bind-Value="_idModel.Id" class="form-control"/>
 	<button class="btn btn-primary" type="submit">Search</button>
 </EditForm>
 
 @code {
+
 	[Parameter]
 	public EventCallback<int> OnIdFilter { get; set; }
 
-	private class IdModel { [Range(1, int.MaxValue)] public int Id { get; set; } }
+	private class IdModel
+	{
+		[Range(1, int.MaxValue)]
+		public int Id { get; set; }
+	}
 
-	private IdModel _idModel = new IdModel() { Id = 1 };
+	private IdModel _idModel = new() {Id = 1};
 
 	private async Task Submit()
 	{

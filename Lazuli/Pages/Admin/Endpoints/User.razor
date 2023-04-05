@@ -1,22 +1,22 @@
 ﻿@page "/admin/endpoints/user"
 @layout AdminLayout
 
-@inject IUserEndpoint userEndpoint
+@inject IUserEndpoint UserEndpoint
 
 <h3>User</h3>
 
-<br />
+<br/>
 
 <div>
 	<h4>All users</h4>
 	<button class="btn btn-primary" @onclick="GetAllUsers">Show All Users</button>
 	@if (_users is not null)
 	{
-		<ListComponent Models="@_users" ModelType="@typeof(UserModel)" />
+		<ListComponent Models="@_users" ModelType="@typeof(UserModel)"/>
 	}
 </div>
 
-<br />
+<br/>
 
 <div>
 	<h4>Filter Users by id</h4>
@@ -26,7 +26,7 @@
 
 	@if (_user is not null)
 	{
-		<ListComponent Models="@(new List<object> { _user })" ModelType="@typeof(UserModel)" />
+		<ListComponent Models="@(new List<object> {_user})" ModelType="@typeof(UserModel)"/>
 	}
 	else if (_searched)
 	{
@@ -36,21 +36,21 @@
 </div>
 
 
-
 @code {
 	private List<object>? _users;
 	private object? _user;
 
-	private bool _searched = false;
+	private bool _searched;
 
 	private async Task GetAllUsers()
 	{
-		_users = (_users is null) ? (await userEndpoint.GetAll()).ToList<object>() : null;
+		_users = _users is null ? (await UserEndpoint.GetAll()).ToList<object>() : null;
 	}
 
 	private async Task GetUser(int id)
 	{
-		_user = (object?) (await userEndpoint.GetByUserId(id));
+		_user = await UserEndpoint.GetByUserId(id);
 		_searched = true;
 	}
+
 }

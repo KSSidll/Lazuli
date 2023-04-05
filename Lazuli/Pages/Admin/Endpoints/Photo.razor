@@ -1,53 +1,53 @@
 ﻿@page "/admin/endpoints/photo"
 @layout AdminLayout
 
-@inject IPhotoEndpoint photoEndpoint
+@inject IPhotoEndpoint PhotoEndpoint
 
 <h3>Photo</h3>
 
-<br />
+<br/>
 
 <div>
 	<h4>All photos</h4>
 	<button class="btn btn-primary" @onclick="GetAllPhotos">Show All Photos</button>
 	@if (_photos is not null)
 	{
-		<ListComponent Models="@_photos" ModelType="@typeof(PhotoModel)" />
+		<ListComponent Models="@_photos" ModelType="@typeof(PhotoModel)"/>
 	}
 </div>
 
-<br />
+<br/>
 
 <div>
 	<h4>Filter Photos by PhotoId</h4>
 	<div class="col-2">
-		<FilterComponent OnIdFilter="GetPhotoByPhotoId" />
+		<FilterComponent OnIdFilter="GetPhotoByPhotoId"/>
 	</div>
 
 	@if (_photo is not null)
 	{
-		<ListComponent Models="@(new List<object> { _photo })" ModelType="@typeof(PhotoModel)" />
+		<ListComponent Models="@(new List<object> {_photo})" ModelType="@typeof(PhotoModel)"/>
 	}
 	else if (_searched)
 	{
 		<p class="text-danger">No matching result found</p>
 	}
-	
+
 </div>
 
-<br />
+<br/>
 
 <div>
 	<h4>Filter Photos by AlbumId</h4>
 	<div class="col-2">
-		<FilterComponent OnIdFilter="GetPhotoByAlbumId" />
+		<FilterComponent OnIdFilter="GetPhotoByAlbumId"/>
 	</div>
 
 	@if (_filteredByAlbumId is not null)
 	{
 		@if (_filteredByAlbumId.Count > 0)
 		{
-			<ListComponent Models="@_filteredByAlbumId" ModelType="@typeof(PhotoModel)" />
+			<ListComponent Models="@_filteredByAlbumId" ModelType="@typeof(PhotoModel)"/>
 		}
 		else
 		{
@@ -62,21 +62,22 @@
 	private object? _photo;
 	private List<object>? _filteredByAlbumId;
 
-	private bool _searched = false;
+	private bool _searched;
 
 	private async Task GetAllPhotos()
 	{
-		_photos = (_photos is null) ? (await photoEndpoint.GetAll()).ToList<object>() : null;
+		_photos = _photos is null ? (await PhotoEndpoint.GetAll()).ToList<object>() : null;
 	}
 
 	private async Task GetPhotoByPhotoId(int photoId)
 	{
-		_photo = (object?)(await photoEndpoint.GetByPhotoId(photoId));
+		_photo = await PhotoEndpoint.GetByPhotoId(photoId);
 		_searched = true;
 	}
 
 	private async Task GetPhotoByAlbumId(int albumId)
 	{
-		_filteredByAlbumId = (await photoEndpoint.GetByAlbumId(albumId)).ToList<object>();
+		_filteredByAlbumId = (await PhotoEndpoint.GetByAlbumId(albumId)).ToList<object>();
 	}
+
 }

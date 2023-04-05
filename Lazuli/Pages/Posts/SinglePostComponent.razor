@@ -1,7 +1,8 @@
 @inject NavigationManager NavigationManager
 
 @if (Post is not null)
-{	<div>
+{
+	<div>
 		<div class="d-grid gap-2">
 			<div>
 				<a href="" @onclick="NavToProfile" @onclick:preventDefault>
@@ -24,7 +25,7 @@
 						</span>
 					</button>
 				}
-				else 
+				else
 				{
 					<button type="button" class="btn btn-secondary col-2" @onclick="ShowComments">
 						<span class="oi oi-x"></span>
@@ -32,12 +33,12 @@
 				}
 			</div>
 		</div>
-		@if (_showComments && Post.Comments is not null) 
+		@if (_showComments && Post.Comments is not null)
 		{
 			<div class="col-8">
-				@foreach (var comment in Post.Comments)
+				@foreach (CommentViewModel? comment in Post.Comments)
 				{
-					<CommentComponent Comment="comment" />
+					<CommentComponent Comment="comment"/>
 				}
 			</div>
 		}
@@ -45,6 +46,7 @@
 }
 
 @code {
+
 	[Parameter]
 	public PostViewModel? Post { get; set; }
 
@@ -55,8 +57,9 @@
 
 	private bool _showComments = false;
 
-	private void ShowComments() 
+	private void ShowComments()
 	{
 		_showComments ^= true;
 	}
+
 }

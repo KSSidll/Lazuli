@@ -2,12 +2,12 @@
 
 @inherits MainLayout
 
-@inject IUserEndpoint userEndpoint
-@inject IPostEndpoint postEndpoint
-@inject ICommentEndpoint commentEndpoint
+@inject IUserEndpoint UserEndpoint
+@inject IPostEndpoint PostEndpoint
+@inject ICommentEndpoint CommentEndpoint
 
 <div class="mb-3">
-	@if (Posts is not null && _loadingInitialData == false) 
+	@if (Posts is not null && _loadingInitialData == false)
 	{
 		<FilterByComponent OnFilterEvent="FilterPosts" OnClearResults="Reset"/>
 
@@ -21,12 +21,12 @@
 			</div>
 		}
 
-		<PostsDisplayComponent Posts="Posts" />
+		<PostsDisplayComponent Posts="Posts"/>
 
 		<div class="container text-center">
 			@if (_loadingFilteredData == false)
 			{
-				if (_loadedAllContent == false && _displayFilteredPosts == false) 
+				if (_loadedAllContent == false && _displayFilteredPosts == false)
 				{
 					<button class="btn btn-outline-primary btn-lg mt-2" @onclick="LoadNextData">
 						Load More Content
@@ -51,10 +51,10 @@
 </div>
 
 @code {
-	private bool _loadingInitialData = false;
-	private bool _loadingFilteredData = false;
-	private bool _loadedAllContent = false;
-	private bool _displayFilteredPosts = false;
+	private bool _loadingInitialData;
+	private bool _loadingFilteredData;
+	private bool _loadedAllContent;
+	private bool _displayFilteredPosts;
 
 	public List<PostViewModel>? Posts { get; set; }
 
@@ -67,7 +67,7 @@
 	{
 		var output = new List<PostViewModel>();
 
-		foreach (var post in posts)
+		foreach (PostModel post in posts)
 		{
 			var postView = new PostViewModel
 			{
@@ -77,9 +77,9 @@
 				UserId = post.UserId
 			};
 
-			postView.Username = (await userEndpoint.GetByUserId(postView.UserId))?.Username;
-			var comments = await commentEndpoint.GetByPostId(postView.Id);
-			postView.Comments = new(comments.Select(x => new CommentViewModel() 
+			postView.Username = (await UserEndpoint.GetByUserId(postView.UserId))?.Username;
+			List<CommentModel> comments = await CommentEndpoint.GetByPostId(postView.Id);
+			postView.Comments = new List<CommentViewModel>(comments.Select(x => new CommentViewModel
 			{
 				Email = x.Email,
 				Id = x.Id,
@@ -89,54 +89,51 @@
 			output.Add(postView);
 		}
 
-		return output.OrderBy(x => Random.Shared.NextDouble()).ToList();
+		return output.OrderBy(_ => Random.Shared.NextDouble()).ToList();
 	}
 
 	private async Task LoadNextData()
 	{
-		if (Posts is null)
-		{
-			Posts = new();
-		}
+		Posts ??= new List<PostViewModel>();
 
-		var newPosts = await postEndpoint.GetPartially();
+		List<PostModel> newPosts = await PostEndpoint.GetPartially();
 
 		if (newPosts.Count == 0)
 		{
 			_loadedAllContent = true;
 		}
 
-		var converted = await ConvertToViewModel(newPosts);
+		List<PostViewModel> converted = await ConvertToViewModel(newPosts);
 
 		Posts.AddRange(converted);
 	}
 
-	private async Task FilterPosts(PostFilterModel postFilter) 
+	private async Task FilterPosts(PostFilterModel postFilter)
 	{
 		_loadingFilteredData = true;
 		_displayFilteredPosts = true;
 
-		Posts = new();
+		Posts = new List<PostViewModel>();
 
-		var posts = await postEndpoint.GetAll();
+		List<PostModel> posts = await PostEndpoint.GetAll();
 
-		// make sure there are no posts with null body
+	// make sure there are no posts with null body
 		posts = posts.Where(x => x.Body is not null).ToList();
 
-		// filter by a given phrase
-		if (String.IsNullOrEmpty(postFilter.Phrase) == false)
+	// filter by a given phrase
+		if (string.IsNullOrEmpty(postFilter.Phrase) == false)
 		{
 			posts = posts.Where(x => x.Body!.Contains(postFilter.Phrase)).ToList();
 		}
 
-		// filter by character count
-		// lower boundary
+	// filter by character count
+	// lower boundary
 		if (postFilter.MinCharCount is not null && postFilter.MinCharCount > 0)
 		{
 			posts = posts.Where(x => x.Body!.Length >= postFilter.MinCharCount).ToList();
 		}
 
-		// upper boundary
+	// upper boundary
 		if (postFilter.MaxCharCount is not null && postFilter.MaxCharCount > 0)
 		{
 			posts = posts.Where(x => x.Body!.Length <= postFilter.MaxCharCount).ToList();
@@ -151,10 +148,10 @@
 	{
 		_loadingInitialData = true;
 
-		postEndpoint.StartIndex = 1;
+		PostEndpoint.StartIndex = 1;
 		_displayFilteredPosts = false;
 
-		var posts = await postEndpoint.GetPartially();
+		List<PostModel> posts = await PostEndpoint.GetPartially();
 
 		if (posts.Count == 0)
 		{
@@ -165,4 +162,5 @@
 
 		_loadingInitialData = false;
 	}
+
 }

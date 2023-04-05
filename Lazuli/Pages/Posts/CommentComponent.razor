@@ -1,5 +1,4 @@
-﻿
-@if (Comment is not null)
+﻿@if (Comment is not null)
 {
 	<div class="d-grid gap-2 rounded rounded-3 p-sm-2 shadow-sm bg-secondary bg-opacity-25 m-2">
 		<div>
@@ -12,6 +11,8 @@
 }
 
 @code {
+
 	[Parameter]
 	public CommentViewModel? Comment { get; set; }
+
 }
