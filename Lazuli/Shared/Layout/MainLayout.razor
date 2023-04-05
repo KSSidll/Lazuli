@@ -7,10 +7,10 @@
 <PageTitle>Lazuli</PageTitle>
 
 <div class="page">
-	<div class="d-flex justify-content-center bg-dark">
+	<div class="d-flex justify-content-center bg-black">
 		<div class="container text-white p-0 m-0 min-vh-100">
 			@* top row *@
-			<div class="p-1 m-0 bg-dark sticky-top">
+			<div class="p-1 m-0 bg-black sticky-top border border-dark border-top-0">
 				@* search + profile circle button with first letter of boundtouserid name that opens up a menu with typical links on click *@
 				@* would require somehow injecting search data to Body *@
 				<div class="row justify-content-center m-3">
@@ -20,10 +20,10 @@
 					</div>
 					<div class="flex-column col-1 d-flex justify-content-center p-0 m-0">
 						<div class="dropdown">
-							<button class="align-self-center profile_menu_button text-center dropdown-toggle" id="profileDropdownMenuButton" @onclick="ToggleDropdown">
+							<button class="bg-dark align-self-center profile_menu_button text-center dropdown-toggle" id="profileDropdownMenuButton" @onclick="ToggleDropdown">
 								@_firstLetterOfUser
 							</button>
-							<div class="@DropdownClass  bg-black p-0 m-0" aria-labelledby="profileDropdownMenuButton">
+							<div class="@DropdownClass  bg-dark p-0 m-0" aria-labelledby="profileDropdownMenuButton">
 								<div class="dropdown-item text-white p-3" @onclick="Logout">
 									Log Off
 								</div>

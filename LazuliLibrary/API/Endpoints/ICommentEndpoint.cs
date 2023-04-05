@@ -6,6 +6,6 @@ namespace LazuliLibrary.API.Endpoints
     {
         Task<List<CommentModel>> GetAll();
         Task<CommentModel?> GetByCommentId(int commentId);
-        Task<List<CommentModel>> GetByUserId(int userId);
+        Task<List<CommentModel>> GetByPostId(int postId);
     }
 }

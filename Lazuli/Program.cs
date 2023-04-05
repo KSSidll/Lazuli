@@ -1,15 +1,15 @@
-using Microsoft.EntityFrameworkCore;
-using LazuliLibrary.API;
+using Lazuli.Authentication;
 using Lazuli.Data.Database;
 using Lazuli.Utils;
+using LazuliLibrary.API;
 using LazuliLibrary.API.Endpoints;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.Components.Authorization;
-using Lazuli.Authentication;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to theco ntainer.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 

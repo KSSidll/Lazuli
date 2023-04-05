@@ -39,14 +39,14 @@
 <div>
 	<h4>Filter Comments by UserId</h4>
 	<div class="col-2">
-		<FilterComponent OnIdFilter="GetCommentByUserId" />
+		<FilterComponent OnIdFilter="GetCommentByPostId" />
 	</div>
 
-	@if (_filteredByUserId is not null)
+	@if (_filteredByPostId is not null)
 	{
-		@if (_filteredByUserId.Count > 0)
+		@if (_filteredByPostId.Count > 0)
 		{
-			<ListComponent Models="@_filteredByUserId" ModelType="@typeof(CommentModel)" />
+			<ListComponent Models="@_filteredByPostId" ModelType="@typeof(CommentModel)" />
 		}
 		else
 		{
@@ -59,7 +59,7 @@
 @code {
 	private List<object>? _comments;
 	private object? _comment;
-	private List<object>? _filteredByUserId;
+	private List<object>? _filteredByPostId;
 
 	private bool _searched = false;
 
@@ -74,8 +74,8 @@
 		_searched = true;
 	}
 
-	private async Task GetCommentByUserId(int userId)
+	private async Task GetCommentByPostId(int postId)
 	{
-		_filteredByUserId = (await commentEndpoint.GetByUserId(userId)).ToList<object>();
+		_filteredByPostId = (await commentEndpoint.GetByPostId(postId)).ToList<object>();
 	}
 }

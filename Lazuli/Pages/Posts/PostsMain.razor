@@ -1,0 +1,63 @@
+﻿@page "/posts"
+@inherits MainLayout
+@inject IUserEndpoint userEndpoint
+@inject IPostEndpoint postEndpoint
+@inject ICommentEndpoint commentEndpoint
+
+@if (Posts is not null && _loadingData == false) 
+{
+	@foreach (var post in Posts)
+	{
+		<div class="border border-dark m-0 p-3 bg-black text-white border-top-0">
+			<PostComponent Post="post" />
+		</div>
+	}
+}
+else if (_loadingData)
+{
+	<div class="d-flex align-items-center">
+		<strong>Loading...</strong>
+		<div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+	</div>
+}
+
+@code {
+	private bool _loadingData = false;
+
+	public List<PostViewModel>? Posts { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		_loadingData = true;
+
+		var posts = await postEndpoint.GetAll();
+
+		Posts = new List<PostViewModel>();
+		foreach (var post in posts)
+		{
+			var postView = new PostViewModel
+			{
+				Id = post.Id,
+				Title = post.Title,
+				Body = post.Body,
+				UserId = post.UserId
+			};
+
+			postView.Username = (await userEndpoint.GetByUserId(postView.UserId))?.Username;
+			var comments = await commentEndpoint.GetByPostId(postView.Id);
+			postView.Comments = new(comments.Select(x => new CommentViewModel() 
+			{
+				Email = x.Email,
+				Id = x.Id,
+				Body = x.Body
+			}));
+
+			Posts.Add(postView);
+		}
+
+		Posts = Posts.OrderBy(x => Random.Shared.NextDouble()).ToList();
+
+		_loadingData = false;
+	}
+
+}

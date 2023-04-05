@@ -36,6 +36,9 @@
 </EditForm>
 
 @code {
+
+    private string _mainPage = "/posts";
+
     protected override async Task OnInitializedAsync()
     {
         userContext = UserDbFactory.CreateDbContext();
@@ -44,7 +47,7 @@
         var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
 
         if (await userAuthStateProvider.IsAuthenticated())
-            NavigationManager.NavigateTo("/");
+            NavigationManager.NavigateTo(_mainPage);
     }
 
     private LoginModel loginModel = new();
@@ -68,7 +71,7 @@
 
         await userAuthStateProvider.Login(user.BoundToUserId);
 
-        NavigationManager.NavigateTo("/");
+        NavigationManager.NavigateTo(_mainPage);
     }
 
     private void NavigateToSignup()

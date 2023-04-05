@@ -62,12 +62,12 @@ namespace LazuliLibrary.API.Endpoints
             }
         }
 
-        public async Task<List<CommentModel>> GetByUserId(int userId)
+        public async Task<List<CommentModel>> GetByPostId(int postId)
         {
             // checks if there are null values
             ApiHelper.ApiHelperValidator(_apiHelper);
 
-            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}?userId={userId}"))
+            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}?postId={postId}"))
             {
                 if (response.IsSuccessStatusCode)
                 {
