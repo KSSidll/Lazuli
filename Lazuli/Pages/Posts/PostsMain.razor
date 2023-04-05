@@ -7,6 +7,8 @@
 @inject ICommentEndpoint commentEndpoint
 
 <div class="mb-3">
+	<FilterByComponent />
+
 	@if (Posts is not null && _loadingData == false) 
 	{
 		@foreach (var post in Posts)
