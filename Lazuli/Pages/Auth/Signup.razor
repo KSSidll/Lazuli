@@ -5,101 +5,103 @@
 
 @inject ILogger<Signup> Logger
 @inject NavigationManager NavigationManager
-@inject IUserEndpoint userEndpoint
+@inject IUserEndpoint UserEndpoint
 @inject IDbContextFactory<UserContext> UserDbFactory
-@inject AuthenticationStateProvider authStateProvider
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Signup</PageTitle>
 
-<EditForm Model="@signupModel" OnValidSubmit="@HandleSignup">
-    <DataAnnotationsValidator />
+<EditForm Model="@_signupModel" OnValidSubmit="@HandleSignup">
+	<DataAnnotationsValidator/>
 
-    <div class="container">
-        <div class="row text-center text-white mb-4">
-            <h2>Sign up</h2>
-        </div>
-        <div class="row justify-content-center m-3">
-            <InputText class="p-3 text-white" id="login" @bind-Value="signupModel.Login" placeholder=" Login"/>
-        </div>
-        <div class="row justify-content-center m-3">
-            <InputText class="p-3 text-white" type="password" id="password" @bind-Value="signupModel.Password" placeholder=" Password" />
-        </div>
-        <div class="row justify-content-center m-3">
-            <InputSelect class="p-3  text-white" @bind-Value=@signupModel.BoundToUserId>
-                @foreach (var user in users!)
-                {
-                    <option value=@user.Id>@user.Name</option>
-                }
-            </InputSelect>
-        </div>
-        <div class="row justify-content-center m-3 mt-5">
-            <button class="p-2 submit" type="submit">Sign up</button>
-        </div>
-        <div class="row text-white mt-5">
-            <p>
-                Have an account already?
-                <a class="nav-to-login" href="" @onclick="NavigateToLogin" @onclick:preventDefault>Log in</a>
-            </p>
-        </div>
-    </div>
+	<div class="container">
+		<div class="row text-center text-white mb-4">
+			<h2>Sign up</h2>
+		</div>
+		<div class="row justify-content-center m-3">
+			<InputText class="p-3 text-white" id="login" @bind-Value="_signupModel.Login" placeholder=" Login"/>
+		</div>
+		<div class="row justify-content-center m-3">
+			<InputText class="p-3 text-white" type="password" id="password" @bind-Value="_signupModel.Password" placeholder=" Password"/>
+		</div>
+		<div class="row justify-content-center m-3">
+			<InputSelect class="p-3  text-white" @bind-Value="@_signupModel.BoundToUserId">
+				@foreach (UserModel user in _users!)
+				{
+					<option value=@user.Id>@user.Name</option>
+				}
+			</InputSelect>
+		</div>
+		<div class="row justify-content-center m-3 mt-5">
+			<button class="p-2 submit" type="submit">Sign up</button>
+		</div>
+		<div class="row text-white mt-5">
+			<p>
+				Have an account already?
+				<a class="nav-to-login" href="" @onclick="NavigateToLogin" @onclick:preventDefault>Log in</a>
+			</p>
+		</div>
+	</div>
 
 </EditForm>
 
 @code {
-    protected override async Task OnInitializedAsync()
-    {
-        userContext = UserDbFactory.CreateDbContext();
 
-        // check if user is authenticated
-        var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
+	protected override async Task OnInitializedAsync()
+	{
+		_userContext = await UserDbFactory.CreateDbContextAsync();
 
-        if (await userAuthStateProvider.IsAuthenticated())
-            NavigationManager.NavigateTo("/");
+	// check if user is authenticated
+		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
 
-        users = await userEndpoint.GetAll();
+		if (await userAuthStateProvider.IsAuthenticated())
+			NavigationManager.NavigateTo("/");
 
-        // don't know how to make placeholder look different from
-        // selected value in InputSelect, so we assign first found user
-        // as the selected one instead to not break color logic
-        signupModel.BoundToUserId = users[0].Id;
-    }
+		_users = await UserEndpoint.GetAll();
 
-    private SignupModel signupModel = new ();
-    private List<UserModel>? users = new ();
-    private UserContext? userContext;
+	// don't know how to make placeholder look different from
+	// selected value in InputSelect, so we assign first found user
+	// as the selected one instead to not break color logic
+		_signupModel.BoundToUserId = _users[0].Id;
+	}
 
-    private async void HandleSignup()
-    {
-        if (signupModel.Login is null || signupModel.Password is null || signupModel.BoundToUserId < 1)
-            throw new InvalidOperationException("HandleSignup was called without signup form being filled, DataAnnotationsValidator failed");
+	private readonly SignupModel _signupModel = new();
+	private List<UserModel>? _users = new();
+	private UserContext? _userContext;
 
-        if (userContext is null)
-            throw new InvalidOperationException("userContext is null in HandleSignup method, which shouldn't be possible");
+	private async void HandleSignup()
+	{
+		if (_signupModel.Login is null || _signupModel.Password is null || _signupModel.BoundToUserId < 1)
+			throw new InvalidOperationException("HandleSignup was called without signup form being filled, DataAnnotationsValidator failed");
 
-        userContext.Add<User>(new User(signupModel.Login, signupModel.Password, signupModel.BoundToUserId));
-        userContext.SaveChanges();
+		if (_userContext is null)
+			throw new InvalidOperationException("userContext is null in HandleSignup method, which shouldn't be possible");
 
-        var user = userContext.GetUser(signupModel.Login, signupModel.Password);
+		_userContext.Add(new User(_signupModel.Login, _signupModel.Password, _signupModel.BoundToUserId));
+		await _userContext.SaveChangesAsync();
 
-        if (user is null) throw new DbUpdateException("User wasn't found in the database after add operation");
+		User? user = _userContext.GetUser(_signupModel.Login, _signupModel.Password);
 
-        // update authentication status and navigate to index/controller page
-        // FIXME for some reason state doesn't change here even though the method that changes it is called, and it works normally in manual testing
-        var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
+		if (user is null) throw new DbUpdateException("User wasn't found in the database after add operation");
 
-        await userAuthStateProvider.Login(user.BoundToUserId);
+	// update authentication status and navigate to index/controller page
+	// FIXME for some reason state doesn't change here even though the method that changes it is called, and it works normally in manual testing
+		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
 
-        NavigationManager.NavigateTo("/");
-    }
+		await userAuthStateProvider.Login(user.BoundToUserId);
 
-    private void NavigateToLogin()
-    {
-        Logger.LogInformation("NavigateToLogin called in Signup");
-        NavigationManager.NavigateTo("/auth/login");
-    }
+		NavigationManager.NavigateTo("/");
+	}
 
-    public void Dispose()
-    {
-        userContext?.Dispose();
-    }
+	private void NavigateToLogin()
+	{
+		Logger.LogInformation("NavigateToLogin called in Signup");
+		NavigationManager.NavigateTo("/auth/login");
+	}
+
+	public void Dispose()
+	{
+		_userContext?.Dispose();
+	}
+
 }

@@ -1,0 +1,16 @@
+﻿@if (Posts is not null)
+{
+	@foreach (PostViewModel? post in Posts)
+	{
+		<div class="border border-top-0 border-dark p-2 bg-black text-white">
+			<SinglePostComponent Post="post"/>
+		</div>
+	}
+}
+
+@code {
+
+	[Parameter]
+	public List<PostViewModel>? Posts { get; set; }
+
+}

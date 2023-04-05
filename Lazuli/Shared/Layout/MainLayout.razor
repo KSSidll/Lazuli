@@ -1,16 +1,16 @@
 ﻿@inherits LayoutComponentBase
 
 @inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider authStateProvider
-@inject IUserEndpoint userEndpoint
+@inject AuthenticationStateProvider AuthStateProvider
+@inject IUserEndpoint UserEndpoint
 
 <PageTitle>Lazuli</PageTitle>
 
 <div class="page">
-	<div class="d-flex justify-content-center bg-dark">
+	<div class="d-flex justify-content-center bg-black">
 		<div class="container text-white p-0 m-0 min-vh-100">
 			@* top row *@
-			<div class="p-1 m-0 bg-dark sticky-top">
+			<div class="p-1 m-0 bg-black sticky-top border border-dark border-top-0">
 				@* search + profile circle button with first letter of boundtouserid name that opens up a menu with typical links on click *@
 				@* would require somehow injecting search data to Body *@
 				<div class="row justify-content-center m-3">
@@ -20,19 +20,19 @@
 					</div>
 					<div class="flex-column col-1 d-flex justify-content-center p-0 m-0">
 						<div class="dropdown">
-							<button class="align-self-center profile_menu_button text-center dropdown-toggle" id="profileDropdownMenuButton" @onclick="ToggleDropdown">
+							<button class="bg-dark align-self-center profile_menu_button text-center dropdown-toggle" id="profileDropdownMenuButton" @onclick="ToggleDropdown">
 								@_firstLetterOfUser
 							</button>
-							<div class="@DropdownClass  bg-black p-0 m-0" aria-labelledby="profileDropdownMenuButton">
+							<div class="@DropdownClass  bg-dark p-0 m-0" aria-labelledby="profileDropdownMenuButton">
 								<div class="dropdown-item text-white p-3" @onclick="Logout">
 									Log Off
 								</div>
 							</div>
-						</div>	
+						</div>
 					</div>
 				</div>
 			</div>
-            
+
 			@Body
 		</div>
 	</div>
@@ -42,8 +42,8 @@
 
 	protected override async Task OnInitializedAsync()
 	{
-		// check if user is authenticated
-		var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
+	// check if user is authenticated
+		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
 
 		if (!await userAuthStateProvider.IsAuthenticated())
 		{
@@ -51,27 +51,27 @@
 		}
 		else
 		{
-			// set profile button text to first letter of user that currently logged in user is bound to
+	// set profile button text to first letter of user that currently logged in user is bound to
 			var boundToUserId = await userAuthStateProvider.GetBoundToUserId();
-			_firstLetterOfUser = (await userEndpoint.GetByUserId(boundToUserId))!.Name![0];
+			_firstLetterOfUser = (await UserEndpoint.GetByUserId(boundToUserId))!.Name![0];
 		}
 	}
 
-	private bool _isDropdownOpen = false;
-    
+	private bool _isDropdownOpen;
+
 	private void ToggleDropdown()
 	{
 		_isDropdownOpen = !_isDropdownOpen;
 	}
-    
+
 	private string DropdownClass => _isDropdownOpen ? "dropdown-menu show" : "dropdown-menu";
-	private char _firstLetterOfUser = ' '; 
-	
+	private char _firstLetterOfUser = ' ';
+
 	private async void Logout()
 	{
-		var userAuthStateProvider = (IUserAuthenticationStateProvider)authStateProvider;
+		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
 		await userAuthStateProvider.Logout();
-    
+
 		NavigationManager.NavigateTo("/");
 	}
 

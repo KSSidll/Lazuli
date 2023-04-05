@@ -1,0 +1,25 @@
+﻿@if (UserModel is not null)
+{
+	<div class="card border-dark rounded-0 border-top-0">
+		<div class="card-body text-white bg-black">
+			<h5 class="card-title">@UserModel.Name</h5>
+			<p class="card-text">@UserModel.Username</p>
+		</div>
+		<ul class="list-group list-group-flush bg-black text-white">
+			<li class="list-group-item bg-black text-white">My address -> @UserModel.Address</li>
+			<li class="list-group-item bg-black text-white">I work at -> @UserModel.Company</li>
+			<li class="list-group-item bg-black text-white">My Number -> @UserModel.Phone</li>
+		</ul>
+		<div class="card-body bg-black text-white">
+			<a href="mailto: @UserModel.Email" class="card-link">@UserModel.Email</a>
+			<a href="http://@UserModel.Website" class="card-link">@UserModel.Website</a>
+		</div>
+	</div>
+}
+
+@code {
+
+	[Parameter]
+	public UserModel? UserModel { get; set; }
+
+}

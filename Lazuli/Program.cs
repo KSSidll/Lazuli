@@ -1,21 +1,21 @@
-using Microsoft.EntityFrameworkCore;
-using LazuliLibrary.API;
+using Lazuli.Authentication;
 using Lazuli.Data.Database;
 using Lazuli.Utils;
+using LazuliLibrary.API;
 using LazuliLibrary.API.Endpoints;
-using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.AspNetCore.Components.Authorization;
-using Lazuli.Authentication;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Add services to theco ntainer.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
 // Database Service
 builder.Services.AddDbContextFactory<UserContext>(
-    opt => opt.UseSqlite($"Data Source={nameof(UserContext.UserDb)}.db")
+	opt => opt.UseSqlite($"Data Source={nameof(UserContext.UserDb)}.db")
 );
 
 // API Endpoints
@@ -31,17 +31,14 @@ builder.Services.AddAuthenticationCore();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
-await using var scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();
+await using AsyncServiceScope scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();
 var options = scope.ServiceProvider.GetRequiredService<DbContextOptions<UserContext>>();
 await DatabaseUtility.EnsureUserDbCreatedAsync(options);
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Special/Error");
-}
+if (!app.Environment.IsDevelopment()) app.UseExceptionHandler("/Special/Error");
 
 app.UseStaticFiles();
 

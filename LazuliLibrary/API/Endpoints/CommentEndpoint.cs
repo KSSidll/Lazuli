@@ -1,85 +1,58 @@
 ﻿using LazuliLibrary.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace LazuliLibrary.API.Endpoints
+namespace LazuliLibrary.API.Endpoints;
+
+public class CommentEndpoint : ICommentEndpoint
 {
-    public class CommentEndpoint : ICommentEndpoint
-    {
-        private readonly IApiHelper _apiHelper;
-        private const string _page = "comments";
+	private const string Page = "comments";
+	private readonly IApiHelper _apiHelper;
 
-        public CommentEndpoint(IApiHelper apiHelper)
-        {
-            _apiHelper = apiHelper;
-        }
+	public CommentEndpoint(IApiHelper apiHelper)
+	{
+		_apiHelper = apiHelper;
+	}
 
-        public async Task<List<CommentModel>> GetAll()
-        {
-            // checks if there are null values
-            ApiHelper.ApiHelperValidator(_apiHelper);
+	public async Task<List<CommentModel>> GetAll()
+	{
+		// checks if there are null values
+		ApiHelper.ApiHelperValidator(_apiHelper);
 
-            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}"))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsAsync<List<CommentModel>>();
+		using HttpResponseMessage response = await _apiHelper.ApiClient!.GetAsync($"/{Page}");
 
-                    return result;
-                }
-                else
-                {
-                    throw new HttpRequestException(response.ReasonPhrase);
-                }
-            }
-        }
+		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
 
-        public async Task<CommentModel?> GetByCommentId(int commentId)
-        {
-            // checks if there are null values
-            ApiHelper.ApiHelperValidator(_apiHelper);
+		var result = await response.Content.ReadAsAsync<List<CommentModel>>();
 
-            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}?id={commentId}"))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsAsync<List<CommentModel>>();
+		return result;
+	}
 
-                    if (result.Count > 1)
-                    {
-                        throw new Exception("More than one matching object found.");
-                    }
+	public async Task<CommentModel?> GetByCommentId(int commentId)
+	{
+		// checks if there are null values
+		ApiHelper.ApiHelperValidator(_apiHelper);
 
-                    return result.FirstOrDefault(defaultValue: null);
-                }
-                else
-                {
-                    throw new HttpRequestException(response.ReasonPhrase);
-                }
-            }
-        }
+		using HttpResponseMessage response = await _apiHelper.ApiClient!.GetAsync($"/{Page}?id={commentId}");
 
-        public async Task<List<CommentModel>> GetByUserId(int userId)
-        {
-            // checks if there are null values
-            ApiHelper.ApiHelperValidator(_apiHelper);
+		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
 
-            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}?userId={userId}"))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsAsync<List<CommentModel>>();
+		var result = await response.Content.ReadAsAsync<List<CommentModel>>();
 
-                    return result;
-                }
-                else
-                {
-                    throw new HttpRequestException(response.ReasonPhrase);
-                }
-            }
-        }
-    }
+		if (result.Count > 1) throw new Exception("More than one matching object found.");
+
+		return result.FirstOrDefault(defaultValue: null);
+	}
+
+	public async Task<List<CommentModel>> GetByPostId(int postId)
+	{
+		// checks if there are null values
+		ApiHelper.ApiHelperValidator(_apiHelper);
+
+		using HttpResponseMessage response = await _apiHelper.ApiClient!.GetAsync($"/{Page}?postId={postId}");
+
+		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
+
+		var result = await response.Content.ReadAsAsync<List<CommentModel>>();
+
+		return result;
+	}
 }

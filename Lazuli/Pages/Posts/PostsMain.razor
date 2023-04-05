@@ -1,0 +1,166 @@
+﻿@page "/posts"
+
+@inherits MainLayout
+
+@inject IUserEndpoint UserEndpoint
+@inject IPostEndpoint PostEndpoint
+@inject ICommentEndpoint CommentEndpoint
+
+<div class="mb-3">
+	@if (Posts is not null && _loadingInitialData == false)
+	{
+		<FilterByComponent OnFilterEvent="FilterPosts" OnClearResults="Reset"/>
+
+		@if (_loadingFilteredData)
+		{
+			<div class="container text-center">
+				<button class="btn btn-warning" type="button" disabled>
+					<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+					Loading filtered results...
+				</button>
+			</div>
+		}
+
+		<PostsDisplayComponent Posts="Posts"/>
+
+		<div class="container text-center">
+			@if (_loadingFilteredData == false)
+			{
+				if (_loadedAllContent == false && _displayFilteredPosts == false)
+				{
+					<button class="btn btn-outline-primary btn-lg mt-2" @onclick="LoadNextData">
+						Load More Content
+					</button>
+				}
+				else
+				{
+					<button class="btn btn-outline-danger btn-lg mt-2" disabled>
+						No more content
+					</button>
+				}
+			}
+		</div>
+	}
+	else if (_loadingInitialData)
+	{
+		<div class="d-flex align-items-center">
+			<strong>Loading...</strong>
+			<div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+		</div>
+	}
+</div>
+
+@code {
+	private bool _loadingInitialData;
+	private bool _loadingFilteredData;
+	private bool _loadedAllContent;
+	private bool _displayFilteredPosts;
+
+	public List<PostViewModel>? Posts { get; set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		await Reset();
+	}
+
+	private async Task<List<PostViewModel>> ConvertToViewModel(List<PostModel> posts)
+	{
+		var output = new List<PostViewModel>();
+
+		foreach (PostModel post in posts)
+		{
+			var postView = new PostViewModel
+			{
+				Id = post.Id,
+				Title = post.Title,
+				Body = post.Body,
+				UserId = post.UserId
+			};
+
+			postView.Username = (await UserEndpoint.GetByUserId(postView.UserId))?.Username;
+			List<CommentModel> comments = await CommentEndpoint.GetByPostId(postView.Id);
+			postView.Comments = new List<CommentViewModel>(comments.Select(x => new CommentViewModel
+			{
+				Email = x.Email,
+				Id = x.Id,
+				Body = x.Body
+			}));
+
+			output.Add(postView);
+		}
+
+		return output.OrderBy(_ => Random.Shared.NextDouble()).ToList();
+	}
+
+	private async Task LoadNextData()
+	{
+		Posts ??= new List<PostViewModel>();
+
+		List<PostModel> newPosts = await PostEndpoint.GetPartially();
+
+		if (newPosts.Count == 0)
+		{
+			_loadedAllContent = true;
+		}
+
+		List<PostViewModel> converted = await ConvertToViewModel(newPosts);
+
+		Posts.AddRange(converted);
+	}
+
+	private async Task FilterPosts(PostFilterModel postFilter)
+	{
+		_loadingFilteredData = true;
+		_displayFilteredPosts = true;
+
+		Posts = new List<PostViewModel>();
+
+		List<PostModel> posts = await PostEndpoint.GetAll();
+
+	// make sure there are no posts with null body
+		posts = posts.Where(x => x.Body is not null).ToList();
+
+	// filter by a given phrase
+		if (string.IsNullOrEmpty(postFilter.Phrase) == false)
+		{
+			posts = posts.Where(x => x.Body!.Contains(postFilter.Phrase)).ToList();
+		}
+
+	// filter by character count
+	// lower boundary
+		if (postFilter.MinCharCount is not null && postFilter.MinCharCount > 0)
+		{
+			posts = posts.Where(x => x.Body!.Length >= postFilter.MinCharCount).ToList();
+		}
+
+	// upper boundary
+		if (postFilter.MaxCharCount is not null && postFilter.MaxCharCount > 0)
+		{
+			posts = posts.Where(x => x.Body!.Length <= postFilter.MaxCharCount).ToList();
+		}
+
+		Posts = await ConvertToViewModel(posts);
+
+		_loadingFilteredData = false;
+	}
+
+	private async Task Reset()
+	{
+		_loadingInitialData = true;
+
+		PostEndpoint.StartIndex = 1;
+		_displayFilteredPosts = false;
+
+		List<PostModel> posts = await PostEndpoint.GetPartially();
+
+		if (posts.Count == 0)
+		{
+			_loadedAllContent = true;
+		}
+
+		Posts = await ConvertToViewModel(posts);
+
+		_loadingInitialData = false;
+	}
+
+}
