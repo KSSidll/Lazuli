@@ -7,34 +7,42 @@
 @inject ICommentEndpoint commentEndpoint
 
 <div class="mb-3">
-	<FilterByComponent />
-
-	@if (Posts is not null && _loadingData == false) 
+	@if (Posts is not null && _loadingInitialData == false) 
 	{
-		@foreach (var post in Posts)
+		<FilterByComponent OnFilterEvent="FilterPosts" OnClearResults="Reset"/>
+
+		@if (_loadingFilteredData)
 		{
-			<div class="border rounded rounded-3 p-2 m-2 bg-light text-dark">
-				<PostComponent Post="post" />
+			<div class="container text-center">
+				<button class="btn btn-warning" type="button" disabled>
+					<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+					Loading filtered results...
+				</button>
 			</div>
 		}
 
+		<PostsDisplayComponent Posts="Posts" />
+
 		<div class="container text-center">
-			@if (_loadedAllContent == false)
+			@if (_loadingFilteredData == false)
 			{
-				<button class="btn btn-outline-primary btn-lg" @onclick="LoadNextData">
-					Load More Content
-				</button>
-			}
-			else
-			{
-				<button class="btn btn-outline-danger btn-lg" disabled>
-					No more content
-				</button>
+				if (_loadedAllContent == false && _displayFilteredPosts == false) 
+				{
+					<button class="btn btn-outline-primary btn-lg" @onclick="LoadNextData">
+						Load More Content
+					</button>
+				}
+				else
+				{
+					<button class="btn btn-outline-danger btn-lg" disabled>
+						No more content
+					</button>
+				}
 			}
 		</div>
 
 	}
-	else if (_loadingData)
+	else if (_loadingInitialData)
 	{
 		<div class="d-flex align-items-center">
 			<strong>Loading...</strong>
@@ -44,25 +52,16 @@
 </div>
 
 @code {
-	private bool _loadingData = false;
+	private bool _loadingInitialData = false;
+	private bool _loadingFilteredData = false;
 	private bool _loadedAllContent = false;
+	private bool _displayFilteredPosts = false;
 
 	public List<PostViewModel>? Posts { get; set; }
 
 	protected async override Task OnInitializedAsync()
 	{
-		_loadingData = true;
-
-		var posts = await postEndpoint.GetPartially();
-
-		if (posts.Count == 0)
-		{
-			_loadedAllContent = true;
-		}
-
-		Posts = await ConvertToViewModel(posts);
-
-		_loadingData = false;
+		await Reset();
 	}
 
 	private async Task<List<PostViewModel>> ConvertToViewModel(List<PostModel> posts)
@@ -109,8 +108,62 @@
 		}
 
 		var converted = await ConvertToViewModel(newPosts);
-		
+
 		Posts.AddRange(converted);
 	}
 
+	private async Task FilterPosts(PostFilterModel postFilter) 
+	{
+		_loadingFilteredData = true;
+		_displayFilteredPosts = true;
+
+		Posts = new();
+
+		var posts = await postEndpoint.GetAll();
+
+		// make sure there are no posts with null body
+		posts = posts.Where(x => x.Body is not null).ToList();
+
+		// filter by a given phrase
+		if (String.IsNullOrEmpty(postFilter.Phrase) == false)
+		{
+			posts = posts.Where(x => x.Body!.Contains(postFilter.Phrase)).ToList();
+		}
+
+		// filter by character count
+		// lower boundary
+		if (postFilter.MinCharCount is not null && postFilter.MinCharCount > 0)
+		{
+			posts = posts.Where(x => x.Body!.Length >= postFilter.MinCharCount).ToList();
+		}
+
+		// upper boundary
+		if (postFilter.MaxCharCount is not null && postFilter.MaxCharCount > 0)
+		{
+			posts = posts.Where(x => x.Body!.Length <= postFilter.MaxCharCount).ToList();
+		}
+
+		Posts = await ConvertToViewModel(posts);
+
+		_loadingFilteredData = false;
+	}
+
+	private async Task Reset()
+	{
+		_loadingInitialData = true;
+
+		postEndpoint.StartIndex = 1;
+		_displayFilteredPosts = false;
+
+		var posts = await postEndpoint.GetPartially();
+
+		if (posts.Count == 0)
+		{
+			_loadedAllContent = true;
+		}
+
+		Posts = await ConvertToViewModel(posts);
+
+		_loadingInitialData = false;
+	}
 }
