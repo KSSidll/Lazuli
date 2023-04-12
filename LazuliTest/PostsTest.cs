@@ -10,7 +10,7 @@ namespace LazuliTest;
 public class PostsTest
 {
 	[Fact]
-	public void TestLoginPageRender()
+	public void TestPostCount()
 	{
 		using var context = new TestContext();
 
