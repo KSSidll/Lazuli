@@ -18,7 +18,7 @@
 			<div>
 				@if (_showComments == false)
 				{
-					<button type="button" class="btn btn-dark" @onclick="ShowComments">
+					<button type="button" class="show-comments btn btn-dark" @onclick="ShowComments">
 						<span class="oi oi-comment-square me-2"></span>
 						<span class="bg-dark">
 							@Post.Comments?.Count
@@ -27,7 +27,7 @@
 				}
 				else
 				{
-					<button type="button" class="btn btn-secondary col-2" @onclick="ShowComments">
+					<button type="button" class="hide-comments btn btn-secondary col-2" @onclick="ShowComments">
 						<span class="oi oi-x"></span>
 					</button>
 				}
