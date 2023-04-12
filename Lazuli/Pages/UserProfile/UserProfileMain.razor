@@ -40,7 +40,7 @@
 </div>
 
 
-@if (_loadingData)
+@if (LoadingData)
 {
 	<div class="d-flex align-items-center">
 		<strong>Loading...</strong>
@@ -78,23 +78,25 @@ else
 	public string? UserId { get; set; }
 
 	private UserModel? UserModel { get; set; }
+	public bool LoadingData { get; private set; }
+	public List<PostViewModel>? Posts { get; set; }
+	private DisplayType _displaying = DisplayType.Posts;
 
-	private enum DisplayType
+	public enum DisplayType
 	{
 		Posts,
 		Comments,
 		Pictures
 	}
 
-	private DisplayType _displaying = DisplayType.Posts;
-
-	private bool _loadingData;
-
-	public List<PostViewModel>? Posts { get; set; }
+	public void SetDisplayType(DisplayType type)
+	{
+		_displaying = type;
+	}
 
 	protected override async Task OnInitializedAsync()
 	{
-		_loadingData = true;
+		LoadingData = true;
 
 		UserModel = await UserEndpoint.GetByUserId(int.Parse(UserId!));
 		List<PostModel> posts = await PostEndpoint.GetByUserId(UserModel!.Id);
@@ -122,7 +124,7 @@ else
 			Posts.Add(postView);
 		}
 
-		_loadingData = false;
+		LoadingData = false;
 	}
 
 }
