@@ -7,11 +7,11 @@
 @inject ICommentEndpoint CommentEndpoint
 
 <div class="mb-3">
-	@if (Posts is not null && _loadingInitialData == false)
+	@if (Posts is not null && IsLoadingInitial == false)
 	{
 		<FilterByComponent OnFilterEvent="FilterPosts" OnClearResults="Reset"/>
 
-		@if (_loadingFilteredData)
+		@if (LoadingFilteredData)
 		{
 			<div class="container text-center">
 				<button class="btn btn-warning" type="button" disabled>
@@ -24,11 +24,11 @@
 		<PostsDisplayComponent Posts="Posts"/>
 
 		<div class="container text-center">
-			@if (_loadingFilteredData == false)
+			@if (LoadingFilteredData == false)
 			{
-				if (_loadedAllContent == false && _displayFilteredPosts == false)
+				if (LoadedAllContent == false && _displayFilteredPosts == false)
 				{
-					<button class="btn btn-outline-primary btn-lg mt-2" @onclick="LoadNextData">
+					<button class="load-more-button btn btn-outline-primary btn-lg mt-2" @onclick="LoadNextData">
 						Load More Content
 					</button>
 				}
@@ -41,7 +41,7 @@
 			}
 		</div>
 	}
-	else if (_loadingInitialData)
+	else if (IsLoadingInitial)
 	{
 		<div class="d-flex align-items-center">
 			<strong>Loading...</strong>
@@ -51,10 +51,12 @@
 </div>
 
 @code {
-	private bool _loadingInitialData;
-	private bool _loadingFilteredData;
-	private bool _loadedAllContent;
 	private bool _displayFilteredPosts;
+
+	public bool IsLoadingInitial { get; private set; }
+	public bool LoadedAllContent { get; private set; }
+	public bool LoadingFilteredData { get; private set; }
+	public bool LoadingMoreData { get; private set; }
 
 	public List<PostViewModel>? Posts { get; set; }
 
@@ -62,8 +64,6 @@
 	{
 		await Reset();
 	}
-
-	public bool IsLoadingInitial => _loadingInitialData;
 
 	private async Task<List<PostViewModel>> ConvertToViewModel(List<PostModel> posts)
 	{
@@ -96,23 +96,25 @@
 
 	private async Task LoadNextData()
 	{
+		LoadingMoreData = true;
 		Posts ??= new List<PostViewModel>();
 
 		List<PostModel> newPosts = await PostEndpoint.GetPartially();
 
 		if (newPosts.Count == 0)
 		{
-			_loadedAllContent = true;
+			LoadedAllContent = true;
 		}
 
 		List<PostViewModel> converted = await ConvertToViewModel(newPosts);
 
 		Posts.AddRange(converted);
+		LoadingMoreData = false;
 	}
 
 	private async Task FilterPosts(PostFilterModel postFilter)
 	{
-		_loadingFilteredData = true;
+		LoadingFilteredData = true;
 		_displayFilteredPosts = true;
 
 		Posts = new List<PostViewModel>();
@@ -143,12 +145,12 @@
 
 		Posts = await ConvertToViewModel(posts);
 
-		_loadingFilteredData = false;
+		LoadingFilteredData = false;
 	}
 
 	private async Task Reset()
 	{
-		_loadingInitialData = true;
+		IsLoadingInitial = true;
 
 		PostEndpoint.StartIndex = 1;
 		_displayFilteredPosts = false;
@@ -157,12 +159,12 @@
 
 		if (posts.Count == 0)
 		{
-			_loadedAllContent = true;
+			LoadedAllContent = true;
 		}
 
 		Posts = await ConvertToViewModel(posts);
 
-		_loadingInitialData = false;
+		IsLoadingInitial = false;
 	}
 
 }

@@ -32,6 +32,14 @@ public class PostsTest
 		component.WaitForState(() => component.Instance.IsLoadingInitial == false);
 
 		// check if the amount of posts in rendered container is correct
-		Assert.Equal(1, component.FindAll(".post").Count);
+		Assert.Equal(2, component.FindAll(".post").Count);
+
+		// load more posts
+		component.Find(".load-more-button").Click();
+
+		component.WaitForState(() => component.Instance.LoadingMoreData == false);
+
+		// check if the amount of posts in rendered container is correct after loading more posts
+		Assert.Equal(4, component.FindAll(".post").Count);
 	}
 }

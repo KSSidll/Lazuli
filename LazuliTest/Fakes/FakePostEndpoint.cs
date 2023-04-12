@@ -6,7 +6,7 @@ namespace LazuliTest.Fakes;
 
 public class FakePostEndpoint : IPostEndpoint
 {
-	public int RecordLimit { get; set; } = 1;
+	public int RecordLimit { get; set; } = 2;
 	public int StartIndex { get; set; } = 1;
 
 	public async Task<List<PostModel>> GetAll()
