@@ -18,10 +18,10 @@ public class FakeAlbumEndpoint : IAlbumEndpoint
 
 	public async Task<List<AlbumModel>> GetByUserId(int userId)
 	{
-		return (List<AlbumModel>) await Task.Run(() =>
+		return await Task.Run(() =>
 		{
-			return TestDataHelper.GetFakeAlbumModelList()
-								 .Where(x => x.UserId == userId);
+			return TestDataHelper.GetFakeAlbumModelList().Where(x => x.UserId == userId) as List<AlbumModel> ??
+				   new List<AlbumModel>();
 		});
 	}
 }

@@ -18,10 +18,10 @@ public class FakeCommentEndpoint : ICommentEndpoint
 
 	public async Task<List<CommentModel>> GetByPostId(int postId)
 	{
-		return (List<CommentModel>) await Task.Run(() =>
+		return await Task.Run(() =>
 		{
-			return TestDataHelper.GetFakeCommentModelList()
-								 .Where(x => x.PostId == postId);
+			return TestDataHelper.GetFakeCommentModelList().Where(x => x.PostId == postId) as List<CommentModel> ??
+				   new List<CommentModel>();
 		});
 	}
 }

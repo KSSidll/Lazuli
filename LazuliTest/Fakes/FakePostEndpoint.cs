@@ -6,7 +6,7 @@ namespace LazuliTest.Fakes;
 
 public class FakePostEndpoint : IPostEndpoint
 {
-	public int RecordLimit { get; set; } = 5;
+	public int RecordLimit { get; set; } = 1;
 	public int StartIndex { get; set; } = 1;
 
 	public async Task<List<PostModel>> GetAll()
@@ -21,10 +21,10 @@ public class FakePostEndpoint : IPostEndpoint
 
 	public async Task<List<PostModel>> GetByUserId(int userId)
 	{
-		return (List<PostModel>) await Task.Run(() =>
+		return await Task.Run(() =>
 		{
-			return TestDataHelper.GetFakePostModelList()
-								 .Where(x => x.UserId == userId);
+			return TestDataHelper.GetFakePostModelList().Where(x => x.UserId == userId) as List<PostModel> ??
+				   new List<PostModel>();
 		});
 	}
 

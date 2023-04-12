@@ -18,10 +18,10 @@ public class FakePhotoEndpoint : IPhotoEndpoint
 
 	public async Task<List<PhotoModel>> GetByAlbumId(int albumId)
 	{
-		return (List<PhotoModel>) await Task.Run(() =>
+		return await Task.Run(() =>
 		{
-			return TestDataHelper.GetFakePhotoModelList()
-								 .Where(x => x.Id == albumId);
+			return TestDataHelper.GetFakePhotoModelList().Where(x => x.AlbumId == albumId) as List<PhotoModel> ??
+				   new List<PhotoModel>();
 		});
 	}
 }

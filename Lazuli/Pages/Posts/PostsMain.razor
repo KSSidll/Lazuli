@@ -63,6 +63,8 @@
 		await Reset();
 	}
 
+	public bool IsLoadingInitial => _loadingInitialData;
+
 	private async Task<List<PostViewModel>> ConvertToViewModel(List<PostModel> posts)
 	{
 		var output = new List<PostViewModel>();
