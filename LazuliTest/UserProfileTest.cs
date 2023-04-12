@@ -31,7 +31,7 @@ public class UserProfileTest
 			.Add(p => p.UserId, "1")
 		);
 
-		component.WaitForState(() => component.Instance.LoadingData == false);
+		component.WaitForState(() => component.Instance.LoadingAnyData() == false);
 
 		// check if the amount of posts in rendered container is correct
 		Assert.Equal(2, component.FindAll(".post").Count);
@@ -59,7 +59,7 @@ public class UserProfileTest
 			.Add(p => p.UserId, "1")
 		);
 
-		component.WaitForState(() => component.Instance.LoadingData == false);
+		component.WaitForState(() => component.Instance.LoadingAnyData() == false);
 
 		component.Find(".show-comments").Click();
 
