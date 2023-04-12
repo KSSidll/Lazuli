@@ -2,6 +2,7 @@
 
 @inject IUserEndpoint UserEndpoint
 @inject IPostEndpoint PostEndpoint
+@inject IAlbumEndpoint AlbumEndpoint
 @inject ICommentEndpoint CommentEndpoint
 
 <UserProfileComponent UserModel="UserModel"/>
@@ -16,14 +17,14 @@
 	<div class="d-flex">
 
 		<div class="col m-0 p-0">
-			<input class="btn-check" type="radio" checked="@(_displaying == DisplayType.Posts)"
+			<input class="btn-check display-posts" type="radio" checked="@(_displaying == DisplayType.Posts)"
 				   name="Displaying" @onchange="@(() => _displaying = DisplayType.Posts)"
 				   id="displaying-posts"/>
 			<label class="w-100 p-3 text-white btn btn-outline-dark rounded-0 border-0" for="displaying-posts">Posts</label>
 		</div>
 
 		<div class="col m-0 p-0">
-			<input class="btn-check" type="radio" checked="@(_displaying == DisplayType.Albums)"
+			<input class="btn-check display-albums" type="radio" checked="@(_displaying == DisplayType.Albums)"
 				   name="Displaying" @onchange="@(() => _displaying = DisplayType.Albums)"
 				   id="displaying-albums"/>
 			<label class="w-100 p-3 text-white btn btn-outline-dark rounded-0 border-0" for="displaying-albums">Albums</label>
@@ -52,7 +53,10 @@ else
 			break;
 
 		case DisplayType.Albums:
-			// TODO display pictures
+			if (Albums is not null)
+			{
+				<AlbumsDisplayComponent Albums="Albums"/>
+			}
 
 			break;
 
@@ -68,7 +72,8 @@ else
 	private UserModel? UserModel { get; set; }
 	public bool LoadingPosts { get; private set; }
 	public bool LoadingAlbums { get; private set; }
-	public List<PostViewModel>? Posts { get; set; }
+	public List<PostViewModel>? Posts { get; private set; }
+	public List<AlbumModel>? Albums { get; private set; }
 	private DisplayType _displaying = DisplayType.Posts;
 
 	public bool LoadingCurrentDisplay()
@@ -130,7 +135,21 @@ else
 			Posts.Add(postView);
 		}
 
+	// delegating loading albums to another thread and not awaiting it is intended behaviour
+#pragma warning disable CS4014
+		LoadAlbums();
+#pragma warning restore CS4014
+
 		LoadingPosts = false;
+	}
+
+	protected async Task LoadAlbums()
+	{
+		LoadingAlbums = true;
+
+		Albums = await AlbumEndpoint.GetByUserId(UserModel!.Id);
+
+		LoadingAlbums = false;
 	}
 
 }
