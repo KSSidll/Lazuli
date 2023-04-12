@@ -1,0 +1,43 @@
+﻿@inject IPhotoEndpoint PhotoEndpoint
+
+@if (LoadingPhotos)
+{
+	<div class="d-flex align-items-center">
+		<strong>Loading...</strong>
+		<div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+	</div>
+}
+else
+{
+	<div class="d-flex justify-content-center fw-bold">@Album!.Title</div>
+	<div class="justify-content-center d-flex flex-wrap">
+		@if (Photos is not null)
+		{
+			foreach (PhotoModel photo in Photos)
+			{
+				<a href="@photo.Url">
+					<img class="photo rounded m-1" src="@photo.ThumbnailUrl" alt="@photo.Title"/>
+				</a>
+			}
+		}
+	</div>
+}
+
+@code {
+
+	[Parameter]
+	public AlbumModel? Album { get; set; }
+
+	public bool LoadingPhotos { get; set; }
+	public List<PhotoModel>? Photos { get; private set; }
+
+	protected override async Task OnInitializedAsync()
+	{
+		LoadingPhotos = true;
+
+		Photos = await PhotoEndpoint.GetByAlbumId(Album!.Id);
+
+		LoadingPhotos = false;
+	}
+
+}
