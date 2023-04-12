@@ -20,8 +20,8 @@ public class FakePhotoEndpoint : IPhotoEndpoint
 	{
 		return await Task.Run(() =>
 		{
-			return TestDataHelper.GetFakePhotoModelList().Where(x => x.AlbumId == albumId) as List<PhotoModel> ??
-				   new List<PhotoModel>();
+			return TestDataHelper.GetFakePhotoModelList().Where(x => x.AlbumId == albumId)
+								 .ToList();
 		});
 	}
 }

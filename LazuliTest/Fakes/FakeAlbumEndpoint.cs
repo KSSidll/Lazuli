@@ -20,8 +20,7 @@ public class FakeAlbumEndpoint : IAlbumEndpoint
 	{
 		return await Task.Run(() =>
 		{
-			return TestDataHelper.GetFakeAlbumModelList().Where(x => x.UserId == userId) as List<AlbumModel> ??
-				   new List<AlbumModel>();
+			return TestDataHelper.GetFakeAlbumModelList().Where(x => x.UserId == userId).ToList();
 		});
 	}
 }

@@ -23,8 +23,7 @@ public class FakePostEndpoint : IPostEndpoint
 	{
 		return await Task.Run(() =>
 		{
-			return TestDataHelper.GetFakePostModelList().Where(x => x.UserId == userId) as List<PostModel> ??
-				   new List<PostModel>();
+			return TestDataHelper.GetFakePostModelList().Where(x => x.UserId == userId).ToList();
 		});
 	}
 
