@@ -37,6 +37,6 @@ public class AlbumTest
 		component.WaitForState(() => component.Instance.LoadingPhotos == false, TimeSpan.FromSeconds(10));
 
 		// check if number of photos in album 1 is correct
-		Assert.Equal(1, component.FindAll(".photo").Count);
+		component.WaitForAssertion(() => Assert.Equal(1, component.FindAll(".photo").Count), TimeSpan.FromSeconds(10));
 	}
 }
