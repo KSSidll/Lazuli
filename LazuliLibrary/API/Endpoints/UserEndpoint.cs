@@ -46,7 +46,7 @@ public class UserEndpoint : IUserEndpoint
 		// checks if there are null values
 		ApiHelper.ApiHelperValidator(_apiHelper);
 
-		using HttpResponseMessage response = await _apiHelper.ApiClient!.GetAsync("/users?username_like={username}");
+		using HttpResponseMessage response = await _apiHelper.ApiClient!.GetAsync($"/users?username_like={username}");
 
 		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
 
