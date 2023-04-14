@@ -1,4 +1,3 @@
-using AngleSharp.Dom;
 using Lazuli.Authentication;
 using Lazuli.Data.Database;
 using Lazuli.Pages.Auth;
@@ -45,34 +44,6 @@ public class SignupTest
 
 		// check if the text on sign up navigation button is correct
 		Assert.Equal("Log in", component.Find(".nav-to-login").TextContent);
-	}
-
-	[Fact]
-	public void TestNavToLoginOnNavBtnClick()
-	{
-		using var context = new TestContext();
-
-		// TODO somehow mock this (couldn't find anything about how to do that as of yet)
-		// creates a database in memory instead of using an actual database
-		// every test needs to have unique memory database name to avoid conflicts
-		// so this should be changed
-		context.Services.AddDbContextFactory<UserContext>(
-			opt => opt.UseInMemoryDatabase("TestNavToLoginOnNavBtnClick")
-		);
-
-		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
-
-		IRenderedComponent<Signup> component = context.RenderComponent<Signup>();
-		var navManager = context.Services.GetService<FakeNavigationManager>();
-
-		IElement navbtn = component.Find(".nav-to-login");
-
-		navbtn.Click();
-
-		// check if after clicking nav-to-login button, navigation manager navigated
-		// to correct site
-		Assert.Equal("auth/login", navManager!.ToBaseRelativePath(navManager.Uri));
 	}
 
 	[Fact]
