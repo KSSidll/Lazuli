@@ -40,4 +40,18 @@ public class UserEndpoint : IUserEndpoint
 
 		return result.FirstOrDefault(defaultValue: null);
 	}
+
+	public async Task<List<UserModel>> GetByUsernameFuzzy(string username)
+	{
+		// checks if there are null values
+		ApiHelper.ApiHelperValidator(_apiHelper);
+
+		using HttpResponseMessage response = await _apiHelper.ApiClient!.GetAsync("/users?username_like={username}");
+
+		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
+
+		var result = await response.Content.ReadAsAsync<List<UserModel>>();
+
+		return result;
+	}
 }

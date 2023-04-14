@@ -10,4 +10,5 @@ public interface IPostEndpoint
 	Task<PostModel?> GetByPostId(int postId);
 	Task<List<PostModel>> GetByUserId(int userId);
 	Task<List<PostModel>> GetPartially();
+	Task<List<PostModel>> GetByBodyFuzzy(string body);
 }

@@ -6,4 +6,5 @@ public interface IUserEndpoint
 {
 	Task<List<UserModel>> GetAll();
 	Task<UserModel?> GetByUserId(int userId);
+	Task<List<UserModel>> GetByUsernameFuzzy(string username);
 }

@@ -55,4 +55,18 @@ public class CommentEndpoint : ICommentEndpoint
 
 		return result;
 	}
+
+	public async Task<List<CommentModel>> GetByBodyFuzzy(string body)
+	{
+		// checks if there are null values
+		ApiHelper.ApiHelperValidator(_apiHelper);
+
+		using HttpResponseMessage response = await _apiHelper.ApiClient!.GetAsync($"/{Page}?body_like={body}");
+
+		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
+
+		var result = await response.Content.ReadAsAsync<List<CommentModel>>();
+
+		return result;
+	}
 }
