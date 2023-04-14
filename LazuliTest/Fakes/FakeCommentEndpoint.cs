@@ -24,4 +24,13 @@ public class FakeCommentEndpoint : ICommentEndpoint
 								 .ToList();
 		});
 	}
+
+	public async Task<List<CommentModel>> GetByBodyFuzzy(string body)
+	{
+		return await Task.Run(() =>
+		{
+			return TestDataHelper.GetFakeCommentModelList().Where(x => x.Body!.Contains(body))
+								 .ToList();
+		});
+	}
 }

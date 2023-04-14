@@ -38,4 +38,13 @@ public class FakePostEndpoint : IPostEndpoint
 			return result;
 		});
 	}
+
+	public async Task<List<PostModel>> GetByBodyFuzzy(string body)
+	{
+		return await Task.Run(() =>
+		{
+			return TestDataHelper.GetFakePostModelList().Where(x => x.Body!.Contains(body))
+								 .ToList();
+		});
+	}
 }

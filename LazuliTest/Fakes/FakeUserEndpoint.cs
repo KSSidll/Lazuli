@@ -23,4 +23,13 @@ public class FakeUserEndpoint : IUserEndpoint
 			return data;
 		});
 	}
+
+	public async Task<List<UserModel>> GetByUsernameFuzzy(string username)
+	{
+		return await Task.Run(() =>
+		{
+			return TestDataHelper.GetFakeUserModelList().Where(x => x.Username!.Contains(username))
+								 .ToList();
+		});
+	}
 }
