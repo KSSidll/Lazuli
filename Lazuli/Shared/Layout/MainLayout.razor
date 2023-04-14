@@ -11,12 +11,17 @@
 		<div class="container text-white p-0 m-0 min-vh-100">
 			@* top row *@
 			<div class="p-1 m-0 bg-black sticky-top border border-dark border-top-0">
-				@* search + profile circle button with first letter of boundtouserid name that opens up a menu with typical links on click *@
-				@* would require somehow injecting search data to Body *@
 				<div class="row justify-content-center m-3">
 					<div class="col-1"></div>
 					<div class="flex-column col-8 d-flex">
-						<input class="p-3 text-white" placeholder=" Search"/>
+						<form @onsubmit="Search">
+							<div class="input-group">
+								<input type="search" @bind="_searchValue" @oninput="@((e) => { _searchValue = e.Value as string; })" class="form-control rounded p-3 text-white bg-black" placeholder="Search" aria-label="Search" aria-describedby="search-addon"/>
+								<span class="input-group-text border-0 bg-black" id="search-addon" @onclick="Search">
+									<span class="oi oi-magnifying-glass text-white"></span>
+								</span>
+							</div>
+						</form>
 					</div>
 					<div class="flex-column col-1 d-flex justify-content-center p-0 m-0">
 						<div class="dropdown">
@@ -73,6 +78,18 @@
 		await userAuthStateProvider.Logout();
 
 		NavigationManager.NavigateTo("/");
+	}
+
+	private string? _searchValue;
+
+	private void Search()
+	{
+		if (_searchValue is null) return;
+
+		if (_searchValue == string.Empty)
+			NavigationManager.NavigateTo("/");
+		else
+			NavigationManager.NavigateTo("/search/" + _searchValue);
 	}
 
 }

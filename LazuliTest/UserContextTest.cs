@@ -12,9 +12,8 @@ public class UserContextTest
 	{
 		using var context = new TestContext();
 
-		// TODO somehow mock this (couldn't find anything about how to do that as of yet)
 		// creates a database in memory instead of using an actual database
-		// might create unexpected behaviour when done in several tests, especially if run asynchronously
+		// every test needs to have unique memory database name to avoid conflicts
 		context.Services.AddDbContextFactory<UserContext>(
 			opt => opt.UseInMemoryDatabase("TestGetUser")
 		);

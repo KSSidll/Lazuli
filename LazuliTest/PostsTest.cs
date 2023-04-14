@@ -32,15 +32,16 @@ public class PostsTest
 		component.WaitForState(() => component.Instance.IsLoadingInitial == false);
 
 		// check if the amount of posts in rendered container is correct
-		Assert.Equal(2, component.FindAll(".post").Count);
+		component.WaitForAssertion(() => Assert.Equal(2, component.FindAll(".post").Count), TimeSpan.FromSeconds(10));
 
 		// load more posts
+		component.WaitForElement(".load-more-button", TimeSpan.FromSeconds(10));
 		component.Find(".load-more-button").Click();
 
 		component.WaitForState(() => component.Instance.LoadingMoreData == false);
 
 		// check if the amount of posts in rendered container is correct after loading more posts
-		Assert.Equal(4, component.FindAll(".post").Count);
+		component.WaitForAssertion(() => Assert.Equal(4, component.FindAll(".post").Count), TimeSpan.FromSeconds(10));
 	}
 
 	[Fact]
@@ -65,9 +66,11 @@ public class PostsTest
 
 		component.WaitForState(() => component.Instance.IsLoadingInitial == false);
 
+		component.WaitForElement(".show-comments", TimeSpan.FromSeconds(10));
 		component.Find(".show-comments").Click();
 
 		// check if number of comments under 1st post of user 1 is correct
-		Assert.Equal(5, component.FindAll(".comment").Count);
+		component.WaitForAssertion(() => Assert.Equal(5, component.FindAll(".comment").Count),
+								   TimeSpan.FromSeconds(10));
 	}
 }

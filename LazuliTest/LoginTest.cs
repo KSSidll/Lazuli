@@ -16,10 +16,8 @@ public class LoginTest
 	{
 		using var context = new TestContext();
 
-		// TODO somehow mock this (couldn't find anything about how to do that as of yet)
 		// creates a database in memory instead of using an actual database
 		// every test needs to have unique memory database name to avoid conflicts
-		// so this should be changed
 		context.Services.AddDbContextFactory<UserContext>(
 			opt => opt.UseInMemoryDatabase("TestLoginPageRender")
 		);
@@ -29,15 +27,18 @@ public class LoginTest
 		IRenderedComponent<Login> component = context.RenderComponent<Login>();
 
 		// check if the amount of children in rendered container is correct
-		Assert.Equal(5, component.Find(".container").ChildElementCount);
+		component.WaitForAssertion(() => Assert.Equal(5, component.Find(".container").ChildElementCount),
+								   TimeSpan.FromSeconds(10));
 
 		// check if the amount of input forms in rendered container is correct
-		Assert.Equal(2, component.FindAll("input").Count);
+		component.WaitForAssertion(() => Assert.Equal(2, component.FindAll("input").Count), TimeSpan.FromSeconds(10));
 
 		// check if the text on submit button is correct
+		component.WaitForElement(".submit", TimeSpan.FromSeconds(10));
 		Assert.Equal("Log in", component.Find(".submit").TextContent);
 
 		// check if the text on sign up navigation button is correct
+		component.WaitForElement(".nav-to-signup", TimeSpan.FromSeconds(10));
 		Assert.Equal("Sign up", component.Find(".nav-to-signup").TextContent);
 	}
 
@@ -46,10 +47,8 @@ public class LoginTest
 	{
 		using var context = new TestContext();
 
-		// TODO somehow mock this (couldn't find anything about how to do that as of yet)
 		// creates a database in memory instead of using an actual database
 		// every test needs to have unique memory database name to avoid conflicts
-		// so this should be changed
 		context.Services.AddDbContextFactory<UserContext>(
 			opt => opt.UseInMemoryDatabase("TestCorrectLoginSuccess")
 		);
@@ -85,6 +84,8 @@ public class LoginTest
 		Assert.Equal(1, userContext.Users?.Count());
 
 		// set data in login form, then submit
+		component.WaitForElement("input", TimeSpan.FromSeconds(10));
+		component.WaitForElement(".submit", TimeSpan.FromSeconds(10));
 		component.FindAll("input")[0].Change(username);
 		component.FindAll("input")[1].Change(password);
 		component.Find(".submit").Click();
@@ -100,10 +101,8 @@ public class LoginTest
 	{
 		using var context = new TestContext();
 
-		// TODO somehow mock this (couldn't find anything about how to do that as of yet)
 		// creates a database in memory instead of using an actual database
 		// every test needs to have unique memory database name to avoid conflicts
-		// so this should be changed
 		context.Services.AddDbContextFactory<UserContext>(
 			opt => opt.UseInMemoryDatabase("TestWrongLoginLoginFailure")
 		);
@@ -142,6 +141,8 @@ public class LoginTest
 		Assert.Equal(1, userContext.Users?.Count());
 
 		// set data in login form, then submit
+		component.WaitForElement("input", TimeSpan.FromSeconds(10));
+		component.WaitForElement(".submit", TimeSpan.FromSeconds(10));
 		component.FindAll("input")[0].Change($"{username}a");
 		component.FindAll("input")[1].Change(password);
 		component.Find(".submit").Click();
@@ -157,10 +158,8 @@ public class LoginTest
 	{
 		using var context = new TestContext();
 
-		// TODO somehow mock this (couldn't find anything about how to do that as of yet)
 		// creates a database in memory instead of using an actual database
 		// every test needs to have unique memory database name to avoid conflicts
-		// so this should be changed
 		context.Services.AddDbContextFactory<UserContext>(
 			opt => opt.UseInMemoryDatabase("TestWrongPasswordLoginFailure")
 		);
@@ -196,6 +195,8 @@ public class LoginTest
 		Assert.Equal(1, userContext.Users?.Count());
 
 		// set data in login form, then submit
+		component.WaitForElement("input", TimeSpan.FromSeconds(10));
+		component.WaitForElement(".submit", TimeSpan.FromSeconds(10));
 		component.FindAll("input")[0].Change(username);
 		component.FindAll("input")[1].Change($"{password}a");
 		component.Find(".submit").Click();
@@ -211,10 +212,8 @@ public class LoginTest
 	{
 		using var context = new TestContext();
 
-		// TODO somehow mock this (couldn't find anything about how to do that as of yet)
 		// creates a database in memory instead of using an actual database
 		// every test needs to have unique memory database name to avoid conflicts
-		// so this should be changed
 		context.Services.AddDbContextFactory<UserContext>(
 			opt => opt.UseInMemoryDatabase("TestNoLoginLoginFailure")
 		);
@@ -250,6 +249,8 @@ public class LoginTest
 		Assert.Equal(1, userContext.Users?.Count());
 
 		// set data in login form, then submit
+		component.WaitForElement("input", TimeSpan.FromSeconds(10));
+		component.WaitForElement(".submit", TimeSpan.FromSeconds(10));
 		component.FindAll("input")[0].Change("");
 		component.FindAll("input")[1].Change(password);
 		component.Find(".submit").Click();
@@ -265,10 +266,8 @@ public class LoginTest
 	{
 		using var context = new TestContext();
 
-		// TODO somehow mock this (couldn't find anything about how to do that as of yet)
 		// creates a database in memory instead of using an actual database
 		// every test needs to have unique memory database name to avoid conflicts
-		// so this should be changed
 		context.Services.AddDbContextFactory<UserContext>(
 			opt => opt.UseInMemoryDatabase("TestNoPasswordLoginFailure")
 		);
@@ -304,6 +303,8 @@ public class LoginTest
 		Assert.Equal(1, userContext.Users?.Count());
 
 		// set data in login form, then submit
+		component.WaitForElement("input", TimeSpan.FromSeconds(10));
+		component.WaitForElement(".submit", TimeSpan.FromSeconds(10));
 		component.FindAll("input")[0].Change(username);
 		component.FindAll("input")[1].Change("");
 		component.Find(".submit").Click();

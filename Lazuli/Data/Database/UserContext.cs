@@ -29,7 +29,6 @@ public class UserContext : DbContext
 	/// </summary>
 	public DbSet<User>? Users { get; set; }
 
-	// TODO abstract this as function that gets login and password, checks if they exist in database and if yes, return auth token
 	public User? GetUser(string username, string password)
 	{
 		var hashedPassword = CipherUtility.Encrypt(password, username);

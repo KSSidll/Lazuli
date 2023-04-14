@@ -1,0 +1,159 @@
+﻿@page "/search/{SearchWord}"
+
+@inject IUserEndpoint UserEndpoint
+@inject IPostEndpoint PostEndpoint
+@inject ICommentEndpoint CommentEndpoint
+
+@if (LoadingUsers)
+{
+	<div class="d-flex align-items-center">
+		<strong>Searching for Users...</strong>
+		<div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+	</div>
+}
+else
+{
+	if (Users is not null && Users.Count != 0)
+	{
+		<div class="d-flex justify-content-center border border-dark border-top-0 pt-2">
+			<h5>Users</h5>
+		</div>
+		foreach (UserModel? user in Users)
+		{
+			<UserProfileComponent UserModel="user"/>
+		}
+	}
+}
+
+@if (LoadingPosts)
+{
+	<div class="d-flex align-items-center mt-2">
+		<strong>Searching for Posts...</strong>
+		<div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+	</div>
+}
+else
+{
+	if (Posts is not null && Posts.Count != 0)
+	{
+		<div class="d-flex justify-content-center border border-dark border-top-0 pt-2">
+			<h5>Posts</h5>
+		</div>
+		<PostsDisplayComponent Posts="Posts"/>
+	}
+}
+
+@if (LoadingComments)
+{
+	<div class="d-flex align-items-center mt-2">
+		<strong>Searching for Comments...</strong>
+		<div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+	</div>
+}
+else
+{
+	if (Posts is not null && Posts.Count != 0)
+	{
+		<div class="d-flex justify-content-center border border-dark border-top-0 pt-2">
+			<h5>Comments</h5>
+		</div>
+		<CommentsDisplayComponent Comments="Comments"/>
+	}
+}
+
+@if (Users is not null && Users.Count == 0 && Posts is not null && Posts.Count == 0 && Posts is not null && Posts.Count == 0)
+{
+	<div class="d-flex justify-content-center border border-dark border-top-0 pt-2">
+		<h5>Couldn't find any data for keyword ` @SearchWord `</h5>
+	</div>
+}
+
+@code {
+
+	[Parameter]
+	public string? SearchWord { get; set; }
+
+	public bool LoadingUsers { get; private set; }
+	public bool LoadingPosts { get; private set; }
+	public bool LoadingComments { get; private set; }
+	public List<UserModel>? Users { get; private set; }
+	public List<PostViewModel>? Posts { get; private set; }
+	public List<CommentModel>? Comments { get; private set; }
+
+	public bool LoadingAnyData()
+	{
+		return LoadingUsers || LoadingPosts || LoadingComments;
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		await LoadData();
+	}
+
+	protected override async Task OnParametersSetAsync()
+	{
+		await LoadData();
+	}
+
+	protected async Task LoadData()
+	{
+		LoadingUsers = true;
+		LoadingPosts = true;
+		LoadingComments = true;
+
+		await LoadUsers();
+		await LoadPosts();
+		await LoadComments();
+	}
+
+	protected async Task LoadUsers()
+	{
+		LoadingUsers = true;
+
+		Users = await UserEndpoint.GetByUsernameFuzzy(SearchWord!);
+
+		LoadingUsers = false;
+	}
+
+	protected async Task LoadPosts()
+	{
+		LoadingPosts = true;
+
+		List<PostModel> posts = await PostEndpoint.GetByBodyFuzzy(SearchWord!);
+
+		Posts = new List<PostViewModel>();
+		foreach (PostModel post in posts)
+		{
+			var postView = new PostViewModel
+			{
+				Id = post.Id,
+				Title = post.Title,
+				Body = post.Body,
+				UserId = post.UserId
+			};
+
+			postView.Username = (await UserEndpoint.GetByUserId(postView.UserId))?.Username;
+			List<CommentModel> comments = await CommentEndpoint.GetByPostId(postView.Id);
+			postView.Comments = new List<CommentViewModel>(comments.Select(x => new CommentViewModel
+			{
+				Email = x.Email,
+				Id = x.Id,
+				Body = x.Body
+			}));
+
+			Posts.Add(postView);
+		}
+
+		LoadingPosts = false;
+	}
+
+	protected async Task LoadComments()
+	{
+		LoadingComments = true;
+
+		Comments = await CommentEndpoint.GetByBodyFuzzy(SearchWord!);
+
+		LoadingComments = false;
+	}
+
+}
