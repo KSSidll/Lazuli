@@ -1,0 +1,16 @@
+﻿@if (Comments is not null)
+{
+	@foreach (CommentModel comment in Comments)
+	{
+		<div class="border border-top-0 border-dark p-2 bg-black text-white">
+			<SingleCommentComponent Comment="comment"/>
+		</div>
+	}
+}
+
+@code {
+
+	[Parameter]
+	public List<CommentModel>? Comments { get; set; }
+
+}
