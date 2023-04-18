@@ -1,32 +1,32 @@
 ﻿@page "/admin/endpoints/post"
 @layout AdminLayout
 
-@inject IPostEndpoint postEndpoint
+@inject IPostEndpoint PostEndpoint
 
 <h3>Post</h3>
 
-<br />
+<br/>
 
 <div>
 	<h4>All posts</h4>
 	<button class="btn btn-primary" @onclick="GetAllPosts">Show All Posts</button>
 	@if (_posts is not null)
 	{
-		<ListComponent Models="@_posts" ModelType="@typeof(PostModel)" />
+		<ListComponent Models="@_posts" ModelType="@typeof(PostModel)"/>
 	}
 </div>
 
-<br />
+<br/>
 
 <div>
 	<h4>Filter Posts by PostId</h4>
 	<div class="col-2">
-		<FilterComponent OnIdFilter="GetPostByPostId" />
+		<FilterComponent OnIdFilter="GetPostByPostId"/>
 	</div>
 
 	@if (_post is not null)
 	{
-		<ListComponent Models="@(new List<object> { _post })" ModelType="@typeof(PostModel)" />
+		<ListComponent Models="@(new List<object> {_post})" ModelType="@typeof(PostModel)"/>
 	}
 	else if (_searched)
 	{
@@ -35,19 +35,19 @@
 
 </div>
 
-<br />
+<br/>
 
 <div>
 	<h4>Filter Posts by UserId</h4>
 	<div class="col-2">
-		<FilterComponent OnIdFilter="GetPostByUserId" />
+		<FilterComponent OnIdFilter="GetPostByUserId"/>
 	</div>
 
 	@if (_filteredByUserId is not null)
 	{
 		@if (_filteredByUserId.Count > 0)
 		{
-			<ListComponent Models="@_filteredByUserId" ModelType="@typeof(PostModel)" />
+			<ListComponent Models="@_filteredByUserId" ModelType="@typeof(PostModel)"/>
 		}
 		else
 		{
@@ -62,21 +62,22 @@
 	private object? _post;
 	private List<object>? _filteredByUserId;
 
-	private bool _searched = false;
+	private bool _searched;
 
 	private async Task GetAllPosts()
 	{
-		_posts = (_posts is null) ? (await postEndpoint.GetAll()).ToList<object>() : null;
+		_posts = _posts is null ? (await PostEndpoint.GetAll()).ToList<object>() : null;
 	}
 
 	private async Task GetPostByPostId(int postId)
 	{
-		_post = (object?)(await postEndpoint.GetByPostId(postId));
+		_post = await PostEndpoint.GetByPostId(postId);
 		_searched = true;
 	}
 
 	private async Task GetPostByUserId(int userId)
 	{
-		_filteredByUserId = (await postEndpoint.GetByUserId(userId)).ToList<object>();
+		_filteredByUserId = (await PostEndpoint.GetByUserId(userId)).ToList<object>();
 	}
+
 }

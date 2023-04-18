@@ -1,0 +1,16 @@
+﻿@if (Albums is not null)
+{
+	foreach (AlbumModel album in Albums)
+	{
+		<div class="album border border-top-0 border-dark p-2 bg-black text-white">
+			<AlbumComponent Album="album"/>
+		</div>
+	}
+}
+
+@code {
+
+	[Parameter]
+	public List<AlbumModel>? Albums { get; set; }
+
+}

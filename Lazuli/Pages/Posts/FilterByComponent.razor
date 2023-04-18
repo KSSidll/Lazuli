@@ -1,0 +1,93 @@
+<style>
+
+.btn:focus,.btn:active {
+	box-shadow: none;
+}
+    
+input:focus {
+    box-shadow: none !important;
+    border-color: #1d9bf0 !important;
+}
+
+</style>
+
+<div class="border border-top-0 border-dark">
+	<div class="btn-toolbar justify-content-between">
+		<button class="btn btn-outline-dark text-white col-3 rounded-0 border-top-0 border-start-0" type="button" @onclick="Collapse">
+			@if (_collapse)
+			{
+				<span>Filter options <span class="oi oi-caret-bottom ms-1"></span></span>
+			}
+			else
+			{
+				<span>Filter options <span class="oi oi-caret-top ms-1"></span></span>
+			}
+		</button>
+	</div>
+
+
+	@if (_collapse == false)
+	{
+		<EditForm Model="_filterModel" OnValidSubmit="HandleOnFilterEvent">
+			<div class="m-3 p-sm-2">
+				<div class="mb-3 input-group">
+					<label for="phraseInput">
+						<span class="input-group-text bg-black text-white border-0">Phrase in post</span>
+					</label>
+					<InputText class="form-control ms-2 bg-black text-white border-dark" id="phraseInput" @bind-Value="_filterModel.Phrase"/>
+				</div>
+				<div class="input-group">
+					<label for="characterCountInput">
+						<span class="input-group-text bg-black text-white border-top-0 border-start-0 border-bottom-0 rounded-0 border-dark me-1">Character Count</span>
+					</label>
+					<label for="characterCountInput">
+						<span class="input-group-text bg-black text-white border-0">from</span>
+					</label>
+					<InputNumber class="form-control mx-2 bg-black text-white border-dark" id="characterCountInput" @bind-Value="_filterModel.MinCharCount"/>
+					<label for="characterUpperLimit">
+						<span class="input-group-text bg-black text-white border-0">to</span>
+					</label>
+					<InputNumber class="form-control ms-2 bg-black text-white border-dark" id="characterUpperLimit" @bind-Value="_filterModel.MaxCharCount"/>
+				</div>
+				<div class="d-grid gap-2 d-md-flex justify-content-md-end mt-2">
+					@if (_canClear)
+					{
+						<button type="button" class="btn btn-danger" @onclick="HandleOnClearResults">Clear Results</button>
+					}
+					<button type="submit" class="btn btn-dark">Filter</button>
+				</div>
+			</div>
+		</EditForm>
+	}
+
+</div>
+
+@code {
+	private bool _collapse = true;
+	private bool _canClear = false;
+	private PostFilterModel _filterModel = new();
+
+	[Parameter]
+	public EventCallback<PostFilterModel> OnFilterEvent { get; set; }
+
+	[Parameter]
+	public EventCallback OnClearResults { get; set; }
+
+	private void Collapse()
+	{
+		_collapse ^= true;
+	}
+
+	private async Task HandleOnClearResults()
+	{
+		await OnClearResults.InvokeAsync();
+		_canClear = false;
+	}
+
+	private async Task HandleOnFilterEvent()
+	{
+		await OnFilterEvent.InvokeAsync(_filterModel);
+		_canClear = true;
+	}
+
+}

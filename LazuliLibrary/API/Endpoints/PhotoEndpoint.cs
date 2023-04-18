@@ -1,85 +1,58 @@
 ﻿using LazuliLibrary.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace LazuliLibrary.API.Endpoints
+namespace LazuliLibrary.API.Endpoints;
+
+public class PhotoEndpoint : IPhotoEndpoint
 {
-    public class PhotoEndpoint : IPhotoEndpoint
-    {
-        private readonly IApiHelper _apiHelper;
-        private const string _page = "photos";
+	private const string Page = "photos";
+	private readonly IApiHelper _apiHelper;
 
-        public PhotoEndpoint(IApiHelper apiHelper)
-        {
-            _apiHelper = apiHelper;
-        }
+	public PhotoEndpoint(IApiHelper apiHelper)
+	{
+		_apiHelper = apiHelper;
+	}
 
-        public async Task<List<PhotoModel>> GetAll()
-        {
-            // checks if there are null values
-            ApiHelper.ApiHelperValidator(_apiHelper);
+	public async Task<List<PhotoModel>> GetAll()
+	{
+		// checks if there are null values
+		ApiHelper.ApiHelperValidator(_apiHelper);
 
-            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}"))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsAsync<List<PhotoModel>>();
+		using HttpResponseMessage response = await _apiHelper.ApiClient!.GetAsync($"/{Page}");
 
-                    return result;
-                }
-                else
-                {
-                    throw new HttpRequestException(response.ReasonPhrase);
-                }
-            }
-        }
+		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
 
-        public async Task<PhotoModel?> GetByPhotoId(int photoId)
-        {
-            // checks if there are null values
-            ApiHelper.ApiHelperValidator(_apiHelper);
+		var result = await response.Content.ReadAsAsync<List<PhotoModel>>();
 
-            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}?id={photoId}"))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsAsync<List<PhotoModel>>();
+		return result;
+	}
 
-                    if (result.Count > 1)
-                    {
-                        throw new Exception("More than one matching object found.");
-                    }
+	public async Task<PhotoModel?> GetByPhotoId(int photoId)
+	{
+		// checks if there are null values
+		ApiHelper.ApiHelperValidator(_apiHelper);
 
-                    return result.FirstOrDefault(defaultValue: null);
-                }
-                else
-                {
-                    throw new HttpRequestException(response.ReasonPhrase);
-                }
-            }
-        }
+		using HttpResponseMessage response = await _apiHelper.ApiClient!.GetAsync($"/{Page}?id={photoId}");
 
-        public async Task<List<PhotoModel>> GetByAlbumId(int albumId)
-        {
-            // checks if there are null values
-            ApiHelper.ApiHelperValidator(_apiHelper);
+		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
 
-            using (HttpResponseMessage response = await _apiHelper!.ApiClient!.GetAsync($"/{_page}?albumId={albumId}"))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    var result = await response.Content.ReadAsAsync<List<PhotoModel>>();
+		var result = await response.Content.ReadAsAsync<List<PhotoModel>>();
 
-                    return result;
-                }
-                else
-                {
-                    throw new HttpRequestException(response.ReasonPhrase);
-                }
-            }
-        }
-    }
+		if (result.Count > 1) throw new Exception("More than one matching object found.");
+
+		return result.FirstOrDefault(defaultValue: null);
+	}
+
+	public async Task<List<PhotoModel>> GetByAlbumId(int albumId)
+	{
+		// checks if there are null values
+		ApiHelper.ApiHelperValidator(_apiHelper);
+
+		using HttpResponseMessage response = await _apiHelper.ApiClient!.GetAsync($"/{Page}?albumId={albumId}");
+
+		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
+
+		var result = await response.Content.ReadAsAsync<List<PhotoModel>>();
+
+		return result;
+	}
 }

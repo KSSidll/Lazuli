@@ -1,34 +1,33 @@
 using System.ComponentModel.DataAnnotations;
 using LazuliLibrary.Utils;
 
-
 namespace Lazuli.Data.Database;
 
 public class User
 {
-    public int Id { get; set; }
+	public User()
+	{
+	}
 
-    [Required]
-    public string? Login { get; set; }
+	/// <summary>
+	/// User constructor, takes in non-encrypted password, takes care of the encryption
+	/// </summary>
+	public User(string login, string password, int boundToUserId)
+	{
+		Login = login;
+		Password = CipherUtility.Encrypt(password, login);
+		BoundToUserId = boundToUserId;
+	}
 
-    [Required]
-    public byte[]? Password { get; set; }
+	public int Id { get; set; }
 
-    /// <summary>
-    /// Which user id from jsonplaceholder api to bind this user to
-    /// </summary>
-    [Required]
-    public int BoundToUserId { get; set; }
+	[Required] public string? Login { get; set; }
 
-    public User() { }
+	[Required] public byte[]? Password { get; set; }
 
-    /// <summary>
-    /// User constructor, takes in non-encrypted password, takes care of the encryption
-    /// </summary>
-    public User(string login, string password, int boundToUserId)
-    {
-        Login = login;
-        Password = CipherUtility.Encrypt(password, login);
-        BoundToUserId = boundToUserId;
-    }
+	/// <summary>
+	/// Which user id from jsonplaceholder api to bind this user to
+	/// </summary>
+	[Required]
+	public int BoundToUserId { get; set; }
 }

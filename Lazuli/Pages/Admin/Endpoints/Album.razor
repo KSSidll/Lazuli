@@ -1,53 +1,53 @@
 ﻿@page "/admin/endpoints/album"
 @layout AdminLayout
 
-@inject IAlbumEndpoint albumEndpoint
+@inject IAlbumEndpoint AlbumEndpoint
 
 <h3>Album</h3>
 
-<br />
+<br/>
 
 <div>
 	<h4>All albums</h4>
 	<button class="btn btn-primary" @onclick="GetAllAlbums">Show All Albums</button>
 	@if (_albums is not null)
 	{
-		<ListComponent Models="@_albums" ModelType="@typeof(AlbumModel)" />
+		<ListComponent Models="@_albums" ModelType="@typeof(AlbumModel)"/>
 	}
 </div>
 
-<br />
+<br/>
 
 <div>
 	<h4>Filter Albums by AlbumId</h4>
 	<div class="col-2">
-		<FilterComponent OnIdFilter="GetAlbumByAlbumId" />
+		<FilterComponent OnIdFilter="GetAlbumByAlbumId"/>
 	</div>
 
 	@if (_album is not null)
 	{
-		<ListComponent Models="@(new List<object> { _album })" ModelType="@typeof(AlbumModel)" />
+		<ListComponent Models="@(new List<object> {_album})" ModelType="@typeof(AlbumModel)"/>
 	}
 	else if (_searched)
 	{
 		<p class="text-danger">No matching result found</p>
 	}
-	
+
 </div>
 
-<br />
+<br/>
 
 <div>
 	<h4>Filter Albums by UserId</h4>
 	<div class="col-2">
-		<FilterComponent OnIdFilter="GetAlbumByUserId" />
+		<FilterComponent OnIdFilter="GetAlbumByUserId"/>
 	</div>
 
 	@if (_filteredByUserId is not null)
 	{
 		@if (_filteredByUserId.Count > 0)
 		{
-			<ListComponent Models="@_filteredByUserId" ModelType="@typeof(AlbumModel)" />
+			<ListComponent Models="@_filteredByUserId" ModelType="@typeof(AlbumModel)"/>
 		}
 		else
 		{
@@ -62,21 +62,22 @@
 	private object? _album;
 	private List<object>? _filteredByUserId;
 
-	private bool _searched = false;
+	private bool _searched;
 
 	private async Task GetAllAlbums()
 	{
-		_albums = (_albums is null) ? (await albumEndpoint.GetAll()).ToList<object>() : null;
+		_albums = _albums is null ? (await AlbumEndpoint.GetAll()).ToList<object>() : null;
 	}
 
 	private async Task GetAlbumByAlbumId(int albumId)
 	{
-		_album = (object?) (await albumEndpoint.GetByAlbumId(albumId));
+		_album = await AlbumEndpoint.GetByAlbumId(albumId);
 		_searched = true;
 	}
 
 	private async Task GetAlbumByUserId(int userId)
 	{
-		_filteredByUserId = (await albumEndpoint.GetByUserId(userId)).ToList<object>();
+		_filteredByUserId = (await AlbumEndpoint.GetByUserId(userId)).ToList<object>();
 	}
+
 }

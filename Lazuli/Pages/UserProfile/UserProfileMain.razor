@@ -1,0 +1,152 @@
+﻿@page "/user/{userId}"
+
+@inject IUserEndpoint UserEndpoint
+@inject IPostEndpoint PostEndpoint
+@inject IAlbumEndpoint AlbumEndpoint
+@inject ICommentEndpoint CommentEndpoint
+
+<UserProfileComponent UserModel="UserModel"/>
+
+<style>
+.btn-outline-dark:hover {
+    background-color: #101010 !important;
+}
+</style>
+
+<div class="border border-dark border-top-0">
+	<div class="d-flex">
+
+		<div class="col m-0 p-0">
+			<input class="btn-check display-posts" type="radio" checked="@(_displaying == DisplayType.Posts)"
+				   name="Displaying" @onchange="@(() => _displaying = DisplayType.Posts)"
+				   id="displaying-posts"/>
+			<label class="w-100 p-3 text-white btn btn-outline-dark rounded-0 border-0" for="displaying-posts">Posts</label>
+		</div>
+
+		<div class="col m-0 p-0">
+			<input class="btn-check display-albums" type="radio" checked="@(_displaying == DisplayType.Albums)"
+				   name="Displaying" @onchange="@(() => _displaying = DisplayType.Albums)"
+				   id="displaying-albums"/>
+			<label class="w-100 p-3 text-white btn btn-outline-dark rounded-0 border-0" for="displaying-albums">Albums</label>
+		</div>
+
+	</div>
+</div>
+
+
+@if (LoadingCurrentDisplay())
+{
+	<div class="d-flex align-items-center">
+		<strong>Loading...</strong>
+		<div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+	</div>
+}
+else
+	switch (_displaying)
+	{
+		case DisplayType.Posts:
+			if (Posts is not null)
+			{
+				<PostsDisplayComponent Posts="Posts"/>
+			}
+
+			break;
+
+		case DisplayType.Albums:
+			if (Albums is not null)
+			{
+				<AlbumsDisplayComponent Albums="Albums"/>
+			}
+
+			break;
+
+		default:
+			throw new ArgumentOutOfRangeException(_displaying.ToString(), "Impossible display state in UserProfile");
+	}
+
+@code {
+
+	[Parameter]
+	public string? UserId { get; set; }
+
+	private UserModel? UserModel { get; set; }
+	public bool LoadingPosts { get; private set; }
+	public bool LoadingAlbums { get; private set; }
+	public List<PostViewModel>? Posts { get; private set; }
+	public List<AlbumModel>? Albums { get; private set; }
+	private DisplayType _displaying = DisplayType.Posts;
+
+	public bool LoadingCurrentDisplay()
+	{
+		switch (_displaying)
+		{
+			case DisplayType.Posts:
+				return LoadingPosts;
+			case DisplayType.Albums:
+				return LoadingAlbums;
+		}
+
+		throw new ArgumentOutOfRangeException(_displaying.ToString(), "Impossible display state in UserProfile");
+	}
+
+	public bool LoadingAnyData()
+	{
+		return LoadingPosts || LoadingAlbums;
+	}
+
+	public enum DisplayType
+	{
+		Posts,
+		Albums
+	}
+
+	public void SetDisplayType(DisplayType type)
+	{
+		_displaying = type;
+	}
+
+	protected override async Task OnInitializedAsync()
+	{
+		LoadingPosts = true;
+
+		UserModel = await UserEndpoint.GetByUserId(int.Parse(UserId!));
+		List<PostModel> posts = await PostEndpoint.GetByUserId(UserModel!.Id);
+
+		Posts = new List<PostViewModel>();
+		foreach (PostModel post in posts)
+		{
+			var postView = new PostViewModel
+			{
+				Id = post.Id,
+				Title = post.Title,
+				Body = post.Body,
+				UserId = post.UserId
+			};
+
+			postView.Username = (await UserEndpoint.GetByUserId(postView.UserId))?.Username;
+			List<CommentModel> comments = await CommentEndpoint.GetByPostId(postView.Id);
+			postView.Comments = new List<CommentViewModel>(comments.Select(x => new CommentViewModel
+			{
+				Email = x.Email,
+				Id = x.Id,
+				Body = x.Body
+			}));
+
+			Posts.Add(postView);
+		}
+
+		LoadingPosts = false;
+
+		await LoadAlbums();
+	}
+
+	protected async Task LoadAlbums()
+	{
+		LoadingAlbums = true;
+
+		Albums = await AlbumEndpoint.GetByUserId(UserModel!.Id);
+
+		LoadingAlbums = false;
+	}
+
+}
