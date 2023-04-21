@@ -69,4 +69,16 @@ public class CommentEndpoint : ICommentEndpoint
 
 		return result;
 	}
+
+    public async Task DeleteByCommentId(int commentId)
+    {
+        // todo check if user owns this comment
+
+        // checks if there are null values
+        ApiHelper.ApiHelperValidator(_apiHelper);
+
+        using HttpResponseMessage response = await _apiHelper.ApiClient!.DeleteAsync($"/{Page}/{commentId}");
+
+        if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
+    }
 }
