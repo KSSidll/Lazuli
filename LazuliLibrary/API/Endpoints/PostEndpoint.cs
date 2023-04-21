@@ -98,4 +98,16 @@ public class PostEndpoint : IPostEndpoint
 
 		return result;
 	}
+
+	public async Task DeleteByPostId(int postId)
+	{
+		// todo check if user own this post
+
+        // checks if there are null values
+        ApiHelper.ApiHelperValidator(_apiHelper);
+
+        using HttpResponseMessage response = await _apiHelper.ApiClient!.DeleteAsync($"/{Page}/{postId}");
+
+        if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
+    }
 }
