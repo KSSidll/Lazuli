@@ -21,7 +21,7 @@
 			</div>
 		}
 
-		<PostsDisplayComponent Posts="Posts"/>
+		<PostsDisplayComponent Posts="Posts" OnPostDelete="DeletePost"/>
 
 		<div class="container text-center">
 			@if (LoadingFilteredData == false)
@@ -122,23 +122,23 @@
 
 		List<PostModel> posts = await PostEndpoint.GetAll();
 
-	// make sure there are no posts with null body
+		// make sure there are no posts with null body
 		posts = posts.Where(x => x.Body is not null).ToList();
 
-	// filter by a given phrase
+		// filter by a given phrase
 		if (string.IsNullOrEmpty(postFilter.Phrase) == false)
 		{
 			posts = posts.Where(x => x.Body!.Contains(postFilter.Phrase)).ToList();
 		}
 
-	// filter by character count
-	// lower boundary
+		// filter by character count
+		// lower boundary
 		if (postFilter.MinCharCount is not null && postFilter.MinCharCount > 0)
 		{
 			posts = posts.Where(x => x.Body!.Length >= postFilter.MinCharCount).ToList();
 		}
 
-	// upper boundary
+		// upper boundary
 		if (postFilter.MaxCharCount is not null && postFilter.MaxCharCount > 0)
 		{
 			posts = posts.Where(x => x.Body!.Length <= postFilter.MaxCharCount).ToList();
@@ -166,6 +166,13 @@
 		Posts = await ConvertToViewModel(posts);
 
 		IsLoadingInitial = false;
+	}
+
+	private async Task DeletePost(int postId)
+	{
+		await PostEndpoint.DeleteByPostId(postId);
+
+		Posts?.Remove(Posts.First(x => x.Id == postId));
 	}
 
 }
