@@ -1,4 +1,5 @@
 ﻿using LazuliLibrary.Models;
+using LazuliLibrary.Authentication;
 
 namespace LazuliLibrary.API.Endpoints;
 
@@ -6,10 +7,12 @@ public class PostEndpoint : IPostEndpoint
 {
 	private const string Page = "posts";
 	private readonly IApiHelper _apiHelper;
+	private readonly IUserAuthenticationStateProvider _userAuthenticator;
 
-	public PostEndpoint(IApiHelper apiHelper)
+	public PostEndpoint(IApiHelper apiHelper, IUserAuthenticationStateProvider userAuthenticator)
 	{
 		_apiHelper = apiHelper;
+		_userAuthenticator = userAuthenticator;
 	}
 
 	public int RecordLimit { get; set; } = 10;
@@ -68,7 +71,6 @@ public class PostEndpoint : IPostEndpoint
 		return result;
 	}
 
-
 	public async Task<PostModel?> GetByPostId(int postId)
 	{
 		// checks if there are null values
@@ -101,7 +103,14 @@ public class PostEndpoint : IPostEndpoint
 
 	public async Task DeleteByPostId(int postId)
 	{
-		// todo check if user own this post
+		// checks if logged in user owns this post
+		var post = await GetByPostId(postId);
+		int userId = await _userAuthenticator.GetBoundToUserId();
+        if (post?.UserId != userId)
+		{
+			throw new UnauthorizedAccessException("You have to be the post owner to be able to delete it.");
+		}
+
 
         // checks if there are null values
         ApiHelper.ApiHelperValidator(_apiHelper);
