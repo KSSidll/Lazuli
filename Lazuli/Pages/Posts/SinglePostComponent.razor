@@ -1,5 +1,5 @@
 @inject NavigationManager NavigationManager
-@inject IUserAuthenticationStateProvider UserAuthenticator
+@inject AuthenticationStateProvider UserAuthenticator
 @inject ICommentEndpoint CommentEndpoint
 
 @if (Post is not null)
@@ -20,7 +20,7 @@
 						</button>
 						<button class="btn btn-danger btn-sm" type="button" @onclick="HandlePostDelete">
 							<span class="oi oi-x"></span>
-						</button>					
+						</button>
 					</div>
 				}
 			</div>
@@ -81,9 +81,9 @@
 
 	private bool _showComments = false;
 
-	protected async override Task OnParametersSetAsync()
+	protected override async Task OnParametersSetAsync()
 	{
-		_userId = await UserAuthenticator.GetBoundToUserId();
+		_userId = await ((IUserAuthenticationStateProvider) UserAuthenticator).GetBoundToUserId();
 	}
 
 

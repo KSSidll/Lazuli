@@ -30,7 +30,6 @@ builder.Services.AddTransient<IPhotoEndpoint, PhotoEndpoint>();
 builder.Services.AddAuthenticationCore();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
-builder.Services.AddScoped<IUserAuthenticationStateProvider, UserAuthenticationStateProvider>();
 
 WebApplication app = builder.Build();
 

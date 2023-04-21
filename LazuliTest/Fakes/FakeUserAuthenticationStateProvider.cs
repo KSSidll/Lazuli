@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using Lazuli.Authentication;
+using LazuliLibrary.Authentication;
 using LazuliLibrary.Models;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;

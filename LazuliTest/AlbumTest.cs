@@ -1,6 +1,6 @@
-﻿using Lazuli.Authentication;
-using Lazuli.Pages.Album;
+﻿using Lazuli.Pages.Album;
 using LazuliLibrary.API.Endpoints;
+using LazuliLibrary.Authentication;
 using LazuliLibrary.Models;
 using LazuliTest.Fakes;
 using Microsoft.AspNetCore.Components.Authorization;

@@ -1,6 +1,6 @@
-﻿using Lazuli.Authentication;
-using Lazuli.Pages.Search;
+﻿using Lazuli.Pages.Search;
 using LazuliLibrary.API.Endpoints;
+using LazuliLibrary.Authentication;
 using LazuliTest.Fakes;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
