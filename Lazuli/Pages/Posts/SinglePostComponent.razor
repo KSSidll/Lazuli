@@ -1,5 +1,6 @@
 @inject NavigationManager NavigationManager
 @inject IUserAuthenticationStateProvider UserAuthenticator
+@inject ICommentEndpoint CommentEndpoint
 
 @if (Post is not null)
 {
@@ -50,9 +51,18 @@
 		@if (_showComments && Post.Comments is not null)
 		{
 			<div class="col-8">
-				@foreach (CommentViewModel? comment in Post.Comments)
+				@if (Post.Comments.Count > 0)
 				{
-					<PostCommentComponent Comment="comment"/>
+					@foreach (var comment in Post.Comments)
+					{
+						<PostCommentComponent Comment="comment" OnCommentDelete="DeleteComment" PostOwnerId="Post.UserId"/>
+					}
+				}
+				else
+				{
+					<div>
+						No Comments!
+					</div>
 				}
 			</div>
 		}
@@ -93,6 +103,13 @@
 		{
 			await OnPostDelete.InvokeAsync(Post.Id);
 		}
+	}
+
+	private async Task DeleteComment(int commentId)
+	{
+		await CommentEndpoint.DeleteByCommentId(commentId);
+
+		Post?.Comments.Remove(Post.Comments.First(x => x.Id == commentId));
 	}
 
 }

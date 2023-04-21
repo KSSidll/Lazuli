@@ -1,8 +1,23 @@
-﻿@if (Comment is not null)
+﻿@inject IUserAuthenticationStateProvider UserAuthenticator
+
+
+@if (Comment is not null)
 {
 	<div class="comment d-grid gap-2 rounded rounded-3 p-sm-2 shadow-sm bg-secondary bg-opacity-25 m-2">
-		<div>
-			<a class="fw-bold text-decoration-none" href="mailto: @Comment.Email">@Comment.Email</a>
+		<div class="row">
+			<div class="col-6 d-flex justify-content-start">
+				<a class="fw-bold text-decoration-none" href="mailto: @Comment.Email">
+					@Comment.Email
+				</a>
+			</div>
+			@if (_userId == PostOwnerId)
+			{
+				<div class="col-6 d-flex justify-content-end">
+					<button class="btn btn-danger btn-sm" type="button" @onclick="HandleCommentDelete">
+						<span class="oi oi-x"></span>
+					</button>
+				</div>
+			}
 		</div>
 		<div>
 			@Comment.Body
@@ -15,4 +30,24 @@
 	[Parameter]
 	public CommentViewModel? Comment { get; set; }
 
+	[Parameter]
+	public int PostOwnerId { get; set; }
+
+	[Parameter]
+	public EventCallback<int> OnCommentDelete { get; set; }
+
+	private int _userId;
+
+	protected async override Task OnParametersSetAsync()
+	{
+		_userId = await UserAuthenticator.GetBoundToUserId();
+	}
+
+	private async Task HandleCommentDelete()
+	{
+		if (Comment is not null)
+		{
+			await OnCommentDelete.InvokeAsync(Comment.Id);
+		}
+	}
 }
