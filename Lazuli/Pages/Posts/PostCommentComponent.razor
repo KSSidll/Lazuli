@@ -1,4 +1,4 @@
-﻿@inject IUserAuthenticationStateProvider UserAuthenticator
+﻿@inject AuthenticationStateProvider UserAuthenticator
 
 
 @if (Comment is not null)
@@ -38,9 +38,9 @@
 
 	private int _userId;
 
-	protected async override Task OnParametersSetAsync()
+	protected override async Task OnParametersSetAsync()
 	{
-		_userId = await UserAuthenticator.GetBoundToUserId();
+		_userId = await ((IUserAuthenticationStateProvider) UserAuthenticator).GetBoundToUserId();
 	}
 
 	private async Task HandleCommentDelete()
@@ -50,4 +50,5 @@
 			await OnCommentDelete.InvokeAsync(Comment.Id);
 		}
 	}
+
 }

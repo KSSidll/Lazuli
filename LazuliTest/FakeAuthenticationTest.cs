@@ -1,4 +1,4 @@
-﻿using Lazuli.Authentication;
+﻿using LazuliLibrary.Authentication;
 using LazuliTest.Fakes;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;

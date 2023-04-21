@@ -1,5 +1,6 @@
-﻿using LazuliLibrary.Models;
-using LazuliLibrary.Authentication;
+﻿using LazuliLibrary.Authentication;
+using LazuliLibrary.Models;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace LazuliLibrary.API.Endpoints;
 
@@ -7,9 +8,9 @@ public class PostEndpoint : IPostEndpoint
 {
 	private const string Page = "posts";
 	private readonly IApiHelper _apiHelper;
-	private readonly IUserAuthenticationStateProvider _userAuthenticator;
+	private readonly AuthenticationStateProvider _userAuthenticator;
 
-	public PostEndpoint(IApiHelper apiHelper, IUserAuthenticationStateProvider userAuthenticator)
+	public PostEndpoint(IApiHelper apiHelper, AuthenticationStateProvider userAuthenticator)
 	{
 		_apiHelper = apiHelper;
 		_userAuthenticator = userAuthenticator;
@@ -105,18 +106,18 @@ public class PostEndpoint : IPostEndpoint
 	{
 		// checks if logged in user owns this post
 		var post = await GetByPostId(postId);
-		int userId = await _userAuthenticator.GetBoundToUserId();
-        if (post?.UserId != userId)
+		var userId = await ((IUserAuthenticationStateProvider) _userAuthenticator).GetBoundToUserId();
+		if (post?.UserId != userId)
 		{
 			throw new UnauthorizedAccessException("You have to be the post owner to be able to delete it.");
 		}
 
 
-        // checks if there are null values
-        ApiHelper.ApiHelperValidator(_apiHelper);
+		// checks if there are null values
+		ApiHelper.ApiHelperValidator(_apiHelper);
 
-        using HttpResponseMessage response = await _apiHelper.ApiClient!.DeleteAsync($"/{Page}/{postId}");
+		using HttpResponseMessage response = await _apiHelper.ApiClient!.DeleteAsync($"/{Page}/{postId}");
 
-        if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
-    }
+		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
+	}
 }
