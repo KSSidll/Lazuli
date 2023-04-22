@@ -12,4 +12,5 @@ public interface IPostEndpoint
 	Task<List<PostModel>> GetPartially();
 	Task<List<PostModel>> GetByBodyFuzzy(string body);
 	Task DeleteByPostId(int postId);
+	Task<bool> PatchPostBodyByPostId(int postId, string body);
 }

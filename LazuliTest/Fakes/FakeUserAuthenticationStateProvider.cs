@@ -7,6 +7,7 @@ namespace LazuliTest.Fakes;
 public class FakeUserAuthenticationStateProvider : IUserAuthenticationStateProvider
 {
 	private int _boundToUserId;
+	private string _userEmail = string.Empty;
 
 	public Task<bool> IsAuthenticated()
 	{
@@ -15,12 +16,20 @@ public class FakeUserAuthenticationStateProvider : IUserAuthenticationStateProvi
 
 	public Task Logout()
 	{
-		return Task.Run(() => _boundToUserId = 0);
+		return Task.Run(() =>
+		{
+			_boundToUserId = 0;
+			_userEmail = string.Empty;
+		});
 	}
 
-	public Task Login(int boundToUserId)
+	public Task Login(AuthenticatedUserModel user)
 	{
-		return Task.Run(() => _boundToUserId = boundToUserId);
+		return Task.Run(() =>
+		{
+			_boundToUserId = int.Parse(user.BoundToUserId!);
+			_userEmail = user.Email!;
+		});
 	}
 
 	public Task<int> GetBoundToUserId()
@@ -28,14 +37,25 @@ public class FakeUserAuthenticationStateProvider : IUserAuthenticationStateProvi
 		return Task.Run(() => _boundToUserId);
 	}
 
+	public Task<string> GetUserEmail()
+	{
+		return Task.Run(() => _userEmail);
+	}
+
 	public Task UpdateAuthenticationState(AuthenticatedUserModel? userSession)
 	{
 		return Task.Run(() =>
 		{
 			if (userSession?.BoundToUserId == null)
+			{
 				_boundToUserId = 0;
+				_userEmail = string.Empty;
+			}
 			else
+			{
 				_boundToUserId = int.Parse(userSession.BoundToUserId);
+				_userEmail = userSession.Email!;
+			}
 		});
 	}
 }

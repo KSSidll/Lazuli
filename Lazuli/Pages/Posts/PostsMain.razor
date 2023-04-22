@@ -24,24 +24,24 @@
 		<PostsDisplayComponent Posts="Posts" OnPostDelete="DeletePost"/>
 
 		<div class="container text-center">
-			@if (LoadingFilteredData == false)
+			@if (!LoadingAny && !_displayFilteredPosts)
 			{
-				if (LoadedAllContent == false && _displayFilteredPosts == false)
-				{
-					<button class="load-more-button btn btn-outline-primary btn-lg mt-2" @onclick="LoadNextData">
-						Load More Content
-					</button>
-				}
-				else
+				if (LoadedAllContent)
 				{
 					<button class="btn btn-outline-danger btn-lg mt-2" disabled>
 						No more content
 					</button>
 				}
+				else
+				{
+					<button class="load-more-button btn btn-outline-primary btn-lg mt-2" @onclick="@LoadNextData">
+						Load More Content
+					</button>
+				}
 			}
 		</div>
 	}
-	else if (IsLoadingInitial)
+	@if (LoadingAny && !LoadingFilteredData)
 	{
 		<div class="d-flex align-items-center">
 			<strong>Loading...</strong>
@@ -59,6 +59,8 @@
 	public bool LoadingMoreData { get; private set; }
 
 	public List<PostViewModel>? Posts { get; set; }
+
+	public bool LoadingAny => IsLoadingInitial || LoadingMoreData || LoadingFilteredData;
 
 	protected override async Task OnInitializedAsync()
 	{
@@ -176,7 +178,7 @@
 		{
 			Posts?.Remove(Posts.First(x => x.Id == postId));
 		}
-		catch (InvalidOperationException e)
+		catch (InvalidOperationException)
 		{
 		}
 	}

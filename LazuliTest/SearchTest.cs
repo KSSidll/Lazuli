@@ -2,6 +2,7 @@
 using LazuliLibrary.API.Endpoints;
 using LazuliLibrary.Authentication;
 using LazuliTest.Fakes;
+using LazuliTest.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LazuliTest;
@@ -23,7 +24,7 @@ public class SearchTest
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
 		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
-		userAuthStateProvider.Login(1);
+		userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(1));
 
 		IRenderedComponent<SearchMain> component = context.RenderComponent<SearchMain>(parameter => parameter
 			.Add(p => p.SearchWord, "Bret")
@@ -51,7 +52,7 @@ public class SearchTest
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
 		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
-		userAuthStateProvider.Login(1);
+		userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(1));
 
 		IRenderedComponent<SearchMain> component = context.RenderComponent<SearchMain>(parameter => parameter
 			.Add(p => p.SearchWord, "rerum")
@@ -78,7 +79,7 @@ public class SearchTest
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
 		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
-		userAuthStateProvider.Login(1);
+		userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(1));
 
 		IRenderedComponent<SearchMain> component = context.RenderComponent<SearchMain>(parameter => parameter
 			.Add(p => p.SearchWord, "quia et suscipit")
@@ -112,7 +113,7 @@ public class SearchTest
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
 		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
-		userAuthStateProvider.Login(1);
+		userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(1));
 
 		IRenderedComponent<SearchMain> component = context.RenderComponent<SearchMain>(parameter => parameter
 			.Add(p => p.SearchWord, "est")

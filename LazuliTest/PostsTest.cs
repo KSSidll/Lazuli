@@ -2,6 +2,7 @@
 using LazuliLibrary.API.Endpoints;
 using LazuliLibrary.Authentication;
 using LazuliTest.Fakes;
+using LazuliTest.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LazuliTest;
@@ -23,7 +24,7 @@ public class PostsTest
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
 		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
-		userAuthStateProvider.Login(1);
+		userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(1));
 
 		IRenderedComponent<PostsMain> component = context.RenderComponent<PostsMain>();
 
@@ -57,7 +58,7 @@ public class PostsTest
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
 		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
-		userAuthStateProvider.Login(1);
+		userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(1));
 
 		IRenderedComponent<PostsMain> component = context.RenderComponent<PostsMain>();
 

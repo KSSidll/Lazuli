@@ -35,7 +35,7 @@ public class FakeCommentEndpoint : ICommentEndpoint
 	}
 
 	// shouldn't ever be called in tests
-	public async Task DeleteByCommentId(int commentId)
+	public Task DeleteByCommentId(int commentId)
 	{
 		throw new NotImplementedException();
 	}

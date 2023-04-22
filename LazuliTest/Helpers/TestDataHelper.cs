@@ -1,4 +1,4 @@
-using Lazuli.Data.Database;
+using LazuliLibrary.Data.Database;
 using LazuliLibrary.Models;
 using LazuliLibrary.Utils;
 
@@ -31,6 +31,15 @@ public static class TestDataHelper
 				Password = CipherUtility.Encrypt("Johny", "Joe"),
 				BoundToUserId = 2
 			}
+		};
+	}
+
+	public static AuthenticatedUserModel GetFakeAuthUser(int id)
+	{
+		return new AuthenticatedUserModel
+		{
+			BoundToUserId = id.ToString(),
+			Email = "test@test.com"
 		};
 	}
 

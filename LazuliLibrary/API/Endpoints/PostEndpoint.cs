@@ -119,4 +119,24 @@ public class PostEndpoint : IPostEndpoint
 
 		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
 	}
+
+	public async Task<bool> PatchPostBodyByPostId(int postId, string body)
+	{
+		// checks if logged in user owns this post
+		PostModel? post = await GetByPostId(postId);
+		var userId = await _userAuthenticator.GetBoundToUserId();
+		if (post?.UserId != userId)
+			throw new UnauthorizedAccessException("You have to be the post owner to be able to edit it.");
+
+		// checks if there are null values
+		ApiHelper.ApiHelperValidator(_apiHelper);
+
+		List<KeyValuePair<string, string>> pairsToSend = new() {new KeyValuePair<string, string>("body", body)};
+		var content = new FormUrlEncodedContent(pairsToSend);
+		using HttpResponseMessage response = await _apiHelper.ApiClient!.PatchAsync($"/{Page}/{postId}", content);
+
+		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
+
+		return true;
+	}
 }

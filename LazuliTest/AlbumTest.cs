@@ -3,6 +3,7 @@ using LazuliLibrary.API.Endpoints;
 using LazuliLibrary.Authentication;
 using LazuliLibrary.Models;
 using LazuliTest.Fakes;
+using LazuliTest.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LazuliTest;
@@ -24,7 +25,7 @@ public class AlbumTest
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
 		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
-		await userAuthStateProvider.Login(1);
+		await userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(1));
 
 		AlbumModel? album = await new FakeAlbumEndpoint().GetByAlbumId(1);
 

@@ -6,6 +6,7 @@
 @inject NavigationManager NavigationManager
 @inject IDbContextFactory<UserContext> UserDbFactory
 @inject IUserAuthenticationStateProvider AuthStateProvider
+@inject IUserEndpoint UserEndpoint
 
 <PageTitle>Login</PageTitle>
 
@@ -23,7 +24,16 @@
 			<InputText class="p-3 text-white" type="password" id="password" @bind-Value="_loginModel.Password" placeholder=" Password"/>
 		</div>
 		<div class="row justify-content-center m-3 mt-5">
-			<button class="p-2 submit" type="submit">Log in</button>
+			<button class="p-2 submit" type="submit">
+				@if (LoggingIn)
+				{
+					<div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+				}
+				else
+				{
+					<div>Log in</div>
+				}
+			</button>
 		</div>
 		<div class="row text-white mt-5">
 			<p>
@@ -49,6 +59,8 @@
 	private readonly LoginModel _loginModel = new();
 	private UserContext? _userContext;
 
+	public bool LoggingIn { get; set; }
+
 	private async void HandleLogin()
 	{
 		if (_loginModel.Login is null || _loginModel.Password is null)
@@ -62,8 +74,20 @@
 	// TODO add message when there is no user that matches provided credentials in the database
 		if (user is null) return;
 
+		LoggingIn = true;
+
+		UserModel authUser = (await UserEndpoint.GetByUserId(user.BoundToUserId))!;
+
+		AuthenticatedUserModel authUserModel = new()
+		{
+			BoundToUserId = authUser.Id.ToString(),
+			Email = authUser.Email
+		};
+
+
 	// update authentication status and navigate to index/controller page
-		await AuthStateProvider.Login(user.BoundToUserId);
+		await AuthStateProvider.Login(authUserModel);
+		LoggingIn = false;
 
 		NavigationManager.NavigateTo("/");
 	}

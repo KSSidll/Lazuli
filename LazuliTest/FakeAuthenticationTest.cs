@@ -1,5 +1,6 @@
 ﻿using LazuliLibrary.Authentication;
 using LazuliTest.Fakes;
+using LazuliTest.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LazuliTest;
@@ -19,7 +20,7 @@ public class FakeAuthenticationTest
 		// check if not authenticated by default
 		Assert.False(await userAuthStateProvider.IsAuthenticated());
 
-		await userAuthStateProvider.Login(4);
+		await userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(4));
 
 		// check if authenticated after login
 		Assert.True(await userAuthStateProvider.IsAuthenticated());

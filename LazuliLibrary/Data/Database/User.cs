@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using LazuliLibrary.Utils;
 
-namespace Lazuli.Data.Database;
+namespace LazuliLibrary.Data.Database;
 
 public class User
 {
