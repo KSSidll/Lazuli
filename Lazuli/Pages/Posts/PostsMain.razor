@@ -176,7 +176,7 @@
 		{
 			Posts?.Remove(Posts.First(x => x.Id == postId));
 		}
-		catch (InvalidOperationException e)
+		catch (InvalidOperationException)
 		{
 		}
 	}

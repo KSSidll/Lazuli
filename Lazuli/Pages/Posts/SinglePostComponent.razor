@@ -150,7 +150,7 @@
 		{
 			Post?.Comments?.Remove(Post.Comments.First(x => x.Id == commentId));
 		}
-		catch (InvalidOperationException e)
+		catch (InvalidOperationException)
 		{
 		}
 	}

@@ -102,7 +102,8 @@ public class UserAuthenticationStateProvider : AuthenticationStateProvider, IUse
 				new ClaimsIdentity(
 					new List<Claim>
 					{
-						new(ClaimTypes.Actor, userSession.BoundToUserId!)
+						new(ClaimTypes.Actor, userSession.BoundToUserId!),
+						new(ClaimTypes.Email, userSession.Email!)
 					},
 					"UserAuth"
 				)
