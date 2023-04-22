@@ -109,7 +109,13 @@
 	{
 		await CommentEndpoint.DeleteByCommentId(commentId);
 
-		Post?.Comments.Remove(Post.Comments.First(x => x.Id == commentId));
+		try
+		{
+			Post?.Comments?.Remove(Post.Comments.First(x => x.Id == commentId));
+		}
+		catch (InvalidOperationException e)
+		{
+		}
 	}
 
 }
