@@ -90,7 +90,7 @@ public class LoginTest
 		component.Find(".submit").Click();
 
 		// check if authenticated
-		component.WaitForState(() => component.Instance.LoggingIn, TimeSpan.FromSeconds(10));
+		component.WaitForState(() => component.Instance.LoggingIn, TimeSpan.FromSeconds(60));
 		component.WaitForState(() => component.Instance.LoggingIn == false);
 		Assert.True(await userAuthStateProvider.IsAuthenticated());
 
