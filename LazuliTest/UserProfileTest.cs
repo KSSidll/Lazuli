@@ -1,9 +1,8 @@
-﻿using Lazuli.Authentication;
-using Lazuli.Pages.UserProfile;
+﻿using Lazuli.Pages.UserProfile;
 using LazuliLibrary.API.Endpoints;
+using LazuliLibrary.Authentication;
 using LazuliTest.Fakes;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LazuliTest;
@@ -15,7 +14,7 @@ public class UserProfileTest
 	{
 		using var context = new TestContext();
 
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		context.Services.AddTransient<IAlbumEndpoint, FakeAlbumEndpoint>();
 		context.Services.AddTransient<ICommentEndpoint, FakeCommentEndpoint>();
@@ -24,8 +23,7 @@ public class UserProfileTest
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
+		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
 		userAuthStateProvider.Login(1);
 
 		IRenderedComponent<UserProfileMain> component = context.RenderComponent<UserProfileMain>(parameter => parameter
@@ -43,7 +41,7 @@ public class UserProfileTest
 	{
 		using var context = new TestContext();
 
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		context.Services.AddTransient<IAlbumEndpoint, FakeAlbumEndpoint>();
 		context.Services.AddTransient<ICommentEndpoint, FakeCommentEndpoint>();
@@ -52,8 +50,7 @@ public class UserProfileTest
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
+		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
 		userAuthStateProvider.Login(1);
 
 		IRenderedComponent<UserProfileMain> component = context.RenderComponent<UserProfileMain>(parameter => parameter
@@ -75,7 +72,7 @@ public class UserProfileTest
 	{
 		using var context = new TestContext();
 
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		context.Services.AddTransient<IAlbumEndpoint, FakeAlbumEndpoint>();
 		context.Services.AddTransient<ICommentEndpoint, FakeCommentEndpoint>();
@@ -84,8 +81,7 @@ public class UserProfileTest
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
+		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
 		userAuthStateProvider.Login(1);
 
 		IRenderedComponent<UserProfileMain> component = context.RenderComponent<UserProfileMain>(parameter => parameter

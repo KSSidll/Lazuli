@@ -47,4 +47,10 @@ public class FakePostEndpoint : IPostEndpoint
 								 .ToList();
 		});
 	}
+
+	// shouldn't ever be called in tests
+	public async Task DeleteByPostId(int postId)
+	{
+		throw new NotImplementedException();
+	}
 }

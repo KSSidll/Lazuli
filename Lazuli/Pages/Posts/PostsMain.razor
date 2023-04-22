@@ -21,7 +21,7 @@
 			</div>
 		}
 
-		<PostsDisplayComponent Posts="Posts"/>
+		<PostsDisplayComponent Posts="Posts" OnPostDelete="DeletePost"/>
 
 		<div class="container text-center">
 			@if (LoadingFilteredData == false)
@@ -166,6 +166,19 @@
 		Posts = await ConvertToViewModel(posts);
 
 		IsLoadingInitial = false;
+	}
+
+	private async Task DeletePost(int postId)
+	{
+		await PostEndpoint.DeleteByPostId(postId);
+
+		try
+		{
+			Posts?.Remove(Posts.First(x => x.Id == postId));
+		}
+		catch (InvalidOperationException e)
+		{
+		}
 	}
 
 }

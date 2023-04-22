@@ -1,13 +1,28 @@
 @inject NavigationManager NavigationManager
+@inject IUserAuthenticationStateProvider UserAuthenticator
+@inject ICommentEndpoint CommentEndpoint
 
 @if (Post is not null)
 {
 	<div class="post">
 		<div class="d-grid gap-2">
-			<div>
-				<a href="" @onclick="NavToProfile" @onclick:preventDefault>
-					<label class="fw-bold">@@@Post.Username</label>
-				</a>
+			<div class="row">
+				<div class="col-6 d-flex justify-content-start">
+					<a href="" @onclick="NavToProfile" @onclick:preventDefault>
+						<label class="fw-bold">@@@Post.Username</label>
+					</a>
+				</div>
+				@if (_userId == Post.UserId)
+				{
+					<div class="col-6 d-flex justify-content-end">
+						<button class="btn btn-outline-warning btn-sm" type="button">
+							<span class="oi oi-pencil"></span>
+						</button>
+						<button class="btn btn-danger btn-sm" type="button" @onclick="HandlePostDelete">
+							<span class="oi oi-x"></span>
+						</button>
+					</div>
+				}
 			</div>
 			<div class="fs-5">
 				<label class="fst-italic">@Post.Title</label>
@@ -36,9 +51,18 @@
 		@if (_showComments && Post.Comments is not null)
 		{
 			<div class="col-8">
-				@foreach (CommentViewModel? comment in Post.Comments)
+				@if (Post.Comments.Count > 0)
 				{
-					<PostCommentComponent Comment="comment"/>
+					@foreach (var comment in Post.Comments)
+					{
+						<PostCommentComponent Comment="comment" OnCommentDelete="DeleteComment" PostOwnerId="Post.UserId"/>
+					}
+				}
+				else
+				{
+					<div>
+						No Comments!
+					</div>
 				}
 			</div>
 		}
@@ -50,16 +74,48 @@
 	[Parameter]
 	public PostViewModel? Post { get; set; }
 
+	[Parameter]
+	public EventCallback<int> OnPostDelete { get; set; }
+
+	private int _userId;
+
+	private bool _showComments = false;
+
+	protected override async Task OnParametersSetAsync()
+	{
+		_userId = await UserAuthenticator.GetBoundToUserId();
+	}
+
+
 	public void NavToProfile()
 	{
 		NavigationManager.NavigateTo($"/user/{Post!.UserId}");
 	}
 
-	private bool _showComments = false;
-
 	private void ShowComments()
 	{
 		_showComments ^= true;
+	}
+
+	private async Task HandlePostDelete()
+	{
+		if (Post is not null)
+		{
+			await OnPostDelete.InvokeAsync(Post.Id);
+		}
+	}
+
+	private async Task DeleteComment(int commentId)
+	{
+		await CommentEndpoint.DeleteByCommentId(commentId);
+
+		try
+		{
+			Post?.Comments?.Remove(Post.Comments.First(x => x.Id == commentId));
+		}
+		catch (InvalidOperationException e)
+		{
+		}
 	}
 
 }

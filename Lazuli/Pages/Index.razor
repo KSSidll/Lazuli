@@ -1,16 +1,14 @@
 ﻿@page "/"
 
 @inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider AuthStateProvider
+@inject IUserAuthenticationStateProvider AuthStateProvider
 
 @code {
 
 	protected override async Task OnInitializedAsync()
 	{
 	// check if user is authenticated
-		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
-
-		if (await userAuthStateProvider.IsAuthenticated())
+		if (await AuthStateProvider.IsAuthenticated())
 		{
 			NavigationManager.NavigateTo("/posts");
 		}

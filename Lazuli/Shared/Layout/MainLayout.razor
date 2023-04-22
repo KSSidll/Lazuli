@@ -1,7 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
 @inject NavigationManager NavigationManager
-@inject AuthenticationStateProvider AuthStateProvider
+@inject IUserAuthenticationStateProvider AuthStateProvider
 @inject IUserEndpoint UserEndpoint
 
 <PageTitle>Lazuli</PageTitle>
@@ -48,16 +48,14 @@
 	protected override async Task OnInitializedAsync()
 	{
 	// check if user is authenticated
-		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
-
-		if (!await userAuthStateProvider.IsAuthenticated())
+		if (!await AuthStateProvider.IsAuthenticated())
 		{
 			NavigationManager.NavigateTo("/");
 		}
 		else
 		{
 	// set profile button text to first letter of user that currently logged in user is bound to
-			var boundToUserId = await userAuthStateProvider.GetBoundToUserId();
+			var boundToUserId = await AuthStateProvider.GetBoundToUserId();
 			_firstLetterOfUser = (await UserEndpoint.GetByUserId(boundToUserId))!.Name![0];
 		}
 	}
@@ -74,8 +72,7 @@
 
 	private async void Logout()
 	{
-		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
-		await userAuthStateProvider.Logout();
+		await AuthStateProvider.Logout();
 
 		NavigationManager.NavigateTo("/");
 	}

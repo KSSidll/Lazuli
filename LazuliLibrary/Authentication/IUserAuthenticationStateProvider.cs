@@ -1,6 +1,6 @@
 ﻿using LazuliLibrary.Models;
 
-namespace Lazuli.Authentication;
+namespace LazuliLibrary.Authentication;
 
 public interface IUserAuthenticationStateProvider
 {
