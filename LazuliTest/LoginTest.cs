@@ -90,8 +90,9 @@ public class LoginTest
 		component.Find(".submit").Click();
 
 		// check if authenticated
-		component.WaitForState(() => component.Instance.LoggingIn, TimeSpan.FromSeconds(60));
-		component.WaitForState(() => component.Instance.LoggingIn == false);
+		// For some reason, this wait for state only checks the initial value
+		component.WaitForElement(".spinner-border");
+		component.WaitForState(() => component.Instance.LoggingIn == false, TimeSpan.FromSeconds(10));
 		Assert.True(await userAuthStateProvider.IsAuthenticated());
 
 		await userContext.DisposeAsync();
