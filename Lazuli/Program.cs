@@ -1,8 +1,8 @@
-using Lazuli.Data.Database;
-using Lazuli.Utils;
 using LazuliLibrary.API;
 using LazuliLibrary.API.Endpoints;
 using LazuliLibrary.Authentication;
+using LazuliLibrary.Data.Database;
+using LazuliLibrary.Data.Utils;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 

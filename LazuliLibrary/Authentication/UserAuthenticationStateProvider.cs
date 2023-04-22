@@ -27,11 +27,12 @@ public class UserAuthenticationStateProvider : AuthenticationStateProvider, IUse
 		await UpdateAuthenticationState(null);
 	}
 
-	public async Task Login(int boundToUserId)
+	public async Task Login(AuthenticatedUserModel user)
 	{
 		await UpdateAuthenticationState(new AuthenticatedUserModel
 		{
-			BoundToUserId = boundToUserId.ToString()
+			BoundToUserId = user.BoundToUserId,
+			Email = user.Email
 		});
 	}
 
@@ -43,6 +44,16 @@ public class UserAuthenticationStateProvider : AuthenticationStateProvider, IUse
 																 .Value;
 
 		return int.Parse(boundToUserId);
+	}
+
+	public async Task<string> GetUserEmail()
+	{
+		if (!await IsAuthenticated()) return string.Empty;
+
+		var email = (await GetAuthenticationStateAsync()).User.FindFirst(x => x.Type == ClaimTypes.Email)!
+														 .Value;
+
+		return email;
 	}
 
 	public async Task UpdateAuthenticationState(AuthenticatedUserModel? userSession)
@@ -57,7 +68,8 @@ public class UserAuthenticationStateProvider : AuthenticationStateProvider, IUse
 				new ClaimsIdentity(
 					new List<Claim>
 					{
-						new(ClaimTypes.Actor, userSession.BoundToUserId!)
+						new(ClaimTypes.Actor, userSession.BoundToUserId!),
+						new(ClaimTypes.Email, userSession.Email!)
 					}
 				)
 			);

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Lazuli.Data.Models;
+namespace LazuliLibrary.Data.Models;
 
 public class PostFilterModel
 {

@@ -1,7 +1,7 @@
-using Lazuli.Data.Database;
 using Lazuli.Pages.Auth;
 using LazuliLibrary.API.Endpoints;
 using LazuliLibrary.Authentication;
+using LazuliLibrary.Data.Database;
 using LazuliTest.Fakes;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +21,7 @@ public class LoginTest
 			opt => opt.UseInMemoryDatabase("TestLoginPageRender")
 		);
 
+		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
 		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		IRenderedComponent<Login> component = context.RenderComponent<Login>();
@@ -73,7 +74,7 @@ public class LoginTest
 
 		const string username = "username";
 		const string password = "passwd";
-		const int boundToUserId = 3;
+		const int boundToUserId = 2;
 
 		userContext.Add(new User(username, password, boundToUserId));
 		await userContext.SaveChangesAsync();
@@ -89,6 +90,8 @@ public class LoginTest
 		component.Find(".submit").Click();
 
 		// check if authenticated
+		component.WaitForState(() => component.Instance.LoggingIn, TimeSpan.FromSeconds(10));
+		component.WaitForState(() => component.Instance.LoggingIn == false);
 		Assert.True(await userAuthStateProvider.IsAuthenticated());
 
 		await userContext.DisposeAsync();

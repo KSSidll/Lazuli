@@ -2,7 +2,7 @@ using System.Diagnostics;
 using LazuliLibrary.Utils;
 using Microsoft.EntityFrameworkCore;
 
-namespace Lazuli.Data.Database;
+namespace LazuliLibrary.Data.Database;
 
 /// <summary>
 /// Context for the user database.

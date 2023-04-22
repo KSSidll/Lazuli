@@ -1,7 +1,7 @@
-using Lazuli.Data.Database;
 using Lazuli.Pages.Auth;
 using LazuliLibrary.API.Endpoints;
 using LazuliLibrary.Authentication;
+using LazuliLibrary.Data.Database;
 using LazuliLibrary.Utils;
 using LazuliTest.Fakes;
 using Microsoft.EntityFrameworkCore;
@@ -79,7 +79,7 @@ public class SignupTest
 
 		const string username = "username";
 		const string password = "passwd";
-		const int boundToUserId = 3;
+		const int boundToUserId = 2;
 
 		// set data in signup form, then submit
 		component.WaitForElement("input", TimeSpan.FromSeconds(10));
@@ -94,6 +94,7 @@ public class SignupTest
 		Assert.Equal(1, userContext.Users?.Count());
 
 		// check if authenticated
+		component.WaitForState(() => component.Instance.SigningUp == false);
 		Assert.True(await userAuthStateProvider.IsAuthenticated());
 
 		var hashedPassword = CipherUtility.Encrypt(password, username);
