@@ -76,7 +76,7 @@
 			<div class="col-8">
 				@if (Post.Comments.Count > 0)
 				{
-					@foreach (var comment in Post.Comments)
+					@foreach (CommentViewModel? comment in Post.Comments)
 					{
 						<PostCommentComponent Comment="comment" OnCommentDelete="DeleteComment" PostOwnerId="Post.UserId"/>
 					}

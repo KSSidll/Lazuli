@@ -10,7 +10,7 @@
 					@Comment.Email
 				</a>
 			</div>
-			@if (_userId == PostOwnerId || _userEmail == Comment.Email)
+			@if (_userId == PostOwnerId)
 			{
 				<div class="col-6 d-flex justify-content-end">
 					<button class="btn btn-danger btn-sm" type="button" @onclick="HandleCommentDelete">
@@ -37,12 +37,10 @@
 	public EventCallback<int> OnCommentDelete { get; set; }
 
 	private int _userId;
-	private string? _userEmail;
 
 	protected override async Task OnParametersSetAsync()
 	{
 		_userId = await UserAuthenticator.GetBoundToUserId();
-		_userEmail = await UserAuthenticator.GetUserEmail();
 	}
 
 	private async Task HandleCommentDelete()
