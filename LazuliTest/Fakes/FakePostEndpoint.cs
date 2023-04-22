@@ -53,4 +53,10 @@ public class FakePostEndpoint : IPostEndpoint
 	{
 		throw new NotImplementedException();
 	}
+
+	// shouldn't ever be called in tests
+	public async Task<bool> PatchPostBodyByPostId(int postId, string body)
+	{
+		throw new NotImplementedException();
+	}
 }

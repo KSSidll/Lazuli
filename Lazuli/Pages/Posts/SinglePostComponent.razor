@@ -1,6 +1,7 @@
 @inject NavigationManager NavigationManager
 @inject IUserAuthenticationStateProvider UserAuthenticator
 @inject ICommentEndpoint CommentEndpoint
+@inject IPostEndpoint PostEndpoint
 
 @if (Post is not null)
 {
@@ -15,7 +16,7 @@
 				@if (_userId == Post.UserId)
 				{
 					<div class="col-6 d-flex justify-content-end">
-						<button class="btn btn-outline-warning btn-sm" type="button">
+						<button class="btn btn-outline-warning btn-sm me-1" type="button" @onclick="ToggleEditPost">
 							<span class="oi oi-pencil"></span>
 						</button>
 						<button class="btn btn-danger btn-sm" type="button" @onclick="HandlePostDelete">
@@ -28,23 +29,45 @@
 				<label class="fst-italic">@Post.Title</label>
 			</div>
 			<div class="p-sm-2 shadow-sm">
-				<label>@Post.Body</label>
-			</div>
-			<div>
-				@if (_showComments == false)
+				@if (!_editPost)
 				{
-					<button type="button" class="show-comments btn btn-dark" @onclick="ShowComments">
-						<span class="oi oi-comment-square me-2"></span>
-						<span class="bg-dark">
-							@Post.Comments?.Count
-						</span>
-					</button>
+					<label>@Post.Body</label>
 				}
 				else
 				{
-					<button type="button" class="hide-comments btn btn-secondary col-2" @onclick="ShowComments">
-						<span class="oi oi-x"></span>
-					</button>
+					<textarea class="bg-black text-white w-100 border-dark p-2" rows="4" @bind="EditPostBody"></textarea>
+				}
+			</div>
+			<div class="d-flex">
+				@if (_showComments == false)
+				{
+					<div class="col">
+						<button type="button" class="show-comments btn btn-dark" @onclick="ShowComments">
+							<span class="oi oi-comment-square me-2"></span>
+							<span class="bg-dark">
+								@Post.Comments?.Count
+							</span>
+						</button>
+					</div>
+				}
+				else
+				{
+					<div class="col">
+						<button type="button" class="hide-comments btn btn-secondary ps-4 pe-4" @onclick="ShowComments">
+							<span class="oi oi-x"></span>
+						</button>
+					</div>
+				}
+				@if (_editPost)
+				{
+					<div class="col text-end me-1">
+						<button type="button" class="confirm-edit-post btn btn-secondary" @onclick="ResetEditPost">
+							<span class="oi oi-reload oi-"></span>
+						</button>
+						<button type="button" class="confirm-edit-post btn btn-success" @onclick="ConfirmEditPost">
+							<span class="oi oi-check"></span>
+						</button>
+					</div>
 				}
 			</div>
 		</div>
@@ -80,9 +103,13 @@
 	private int _userId;
 
 	private bool _showComments = false;
+	private bool _editPost = false;
+
+	public string EditPostBody { get; set; } = string.Empty;
 
 	protected override async Task OnParametersSetAsync()
 	{
+		EditPostBody = Post?.Body!;
 		_userId = await UserAuthenticator.GetBoundToUserId();
 	}
 
@@ -95,6 +122,16 @@
 	private void ShowComments()
 	{
 		_showComments ^= true;
+	}
+
+	private void ToggleEditPost()
+	{
+		_editPost ^= true;
+	}
+
+	private void ResetEditPost()
+	{
+		EditPostBody = Post?.Body!;
 	}
 
 	private async Task HandlePostDelete()
@@ -116,6 +153,16 @@
 		catch (InvalidOperationException e)
 		{
 		}
+	}
+
+	private async Task ConfirmEditPost()
+	{
+		if (Post?.Body == EditPostBody) return;
+
+		var succedded = await PostEndpoint.PatchPostBodyByPostId(Post!.Id, EditPostBody);
+
+		if (succedded) Post.Body = EditPostBody;
+		_editPost = false;
 	}
 
 }
