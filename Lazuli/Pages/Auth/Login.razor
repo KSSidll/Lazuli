@@ -5,7 +5,7 @@
 
 @inject NavigationManager NavigationManager
 @inject IDbContextFactory<UserContext> UserDbFactory
-@inject AuthenticationStateProvider AuthStateProvider
+@inject IUserAuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Login</PageTitle>
 
@@ -42,9 +42,7 @@
 		_userContext = await UserDbFactory.CreateDbContextAsync();
 
 	// check if user is authenticated
-		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
-
-		if (await userAuthStateProvider.IsAuthenticated())
+		if (await AuthStateProvider.IsAuthenticated())
 			NavigationManager.NavigateTo("/");
 	}
 
@@ -65,9 +63,7 @@
 		if (user is null) return;
 
 	// update authentication status and navigate to index/controller page
-		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
-
-		await userAuthStateProvider.Login(user.BoundToUserId);
+		await AuthStateProvider.Login(user.BoundToUserId);
 
 		NavigationManager.NavigateTo("/");
 	}

@@ -7,7 +7,7 @@
 @inject NavigationManager NavigationManager
 @inject IUserEndpoint UserEndpoint
 @inject IDbContextFactory<UserContext> UserDbFactory
-@inject AuthenticationStateProvider AuthStateProvider
+@inject IUserAuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Signup</PageTitle>
 
@@ -52,9 +52,7 @@
 		_userContext = await UserDbFactory.CreateDbContextAsync();
 
 	// check if user is authenticated
-		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
-
-		if (await userAuthStateProvider.IsAuthenticated())
+		if (await AuthStateProvider.IsAuthenticated())
 			NavigationManager.NavigateTo("/");
 
 		_users = await UserEndpoint.GetAll();
@@ -85,10 +83,8 @@
 		if (user is null) throw new DbUpdateException("User wasn't found in the database after add operation");
 
 	// update authentication status and navigate to index/controller page
-	// FIXME for some reason state doesn't change here even though the method that changes it is called, and it works normally in manual testing
-		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
-
-		await userAuthStateProvider.Login(user.BoundToUserId);
+	// TODO for some reason state doesn't change here even though the method that changes it is called, and it works normally in manual testing
+		await AuthStateProvider.Login(user.BoundToUserId);
 
 		NavigationManager.NavigateTo("/");
 	}

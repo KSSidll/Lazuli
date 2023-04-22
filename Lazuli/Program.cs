@@ -3,13 +3,12 @@ using Lazuli.Utils;
 using LazuliLibrary.API;
 using LazuliLibrary.API.Endpoints;
 using LazuliLibrary.Authentication;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Add services to theco ntainer.
+// Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 
@@ -29,7 +28,7 @@ builder.Services.AddTransient<IPhotoEndpoint, PhotoEndpoint>();
 // Authentication
 builder.Services.AddAuthenticationCore();
 builder.Services.AddScoped<ProtectedSessionStorage>();
-builder.Services.AddScoped<AuthenticationStateProvider, UserAuthenticationStateProvider>();
+builder.Services.AddScoped<IUserAuthenticationStateProvider, UserAuthenticationStateProvider>();
 
 WebApplication app = builder.Build();
 

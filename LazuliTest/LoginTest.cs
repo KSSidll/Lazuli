@@ -3,7 +3,6 @@ using Lazuli.Pages.Auth;
 using LazuliLibrary.API.Endpoints;
 using LazuliLibrary.Authentication;
 using LazuliTest.Fakes;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -22,7 +21,7 @@ public class LoginTest
 			opt => opt.UseInMemoryDatabase("TestLoginPageRender")
 		);
 
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		IRenderedComponent<Login> component = context.RenderComponent<Login>();
 
@@ -54,7 +53,7 @@ public class LoginTest
 		);
 
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		IRenderedComponent<Login> component = context.RenderComponent<Login>();
 		context.Services.GetService<FakeNavigationManager>();
@@ -64,8 +63,7 @@ public class LoginTest
 		var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
 		UserContext userContext = await userDbFactory.CreateDbContextAsync();
 
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) context.Services.GetRequiredService<AuthenticationStateProvider>();
+		var userAuthStateProvider = context.Services.GetRequiredService<IUserAuthenticationStateProvider>();
 
 		// check if no user in the database
 		Assert.Equal(0, userContext.Users?.Count());
@@ -108,7 +106,7 @@ public class LoginTest
 		);
 
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		IRenderedComponent<Login> component = context.RenderComponent<Login>();
 		context.Services.GetService<FakeNavigationManager>();
@@ -118,8 +116,7 @@ public class LoginTest
 		var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
 		UserContext userContext = await userDbFactory.CreateDbContextAsync();
 
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) context.Services.GetRequiredService<AuthenticationStateProvider>();
+		var userAuthStateProvider = context.Services.GetRequiredService<IUserAuthenticationStateProvider>();
 
 		// check if no user in the database
 		Assert.Equal(0, userContext.Users?.Count());
@@ -165,7 +162,7 @@ public class LoginTest
 		);
 
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		IRenderedComponent<Login> component = context.RenderComponent<Login>();
 		context.Services.GetService<FakeNavigationManager>();
@@ -175,8 +172,7 @@ public class LoginTest
 		var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
 		UserContext userContext = await userDbFactory.CreateDbContextAsync();
 
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) context.Services.GetRequiredService<AuthenticationStateProvider>();
+		var userAuthStateProvider = context.Services.GetRequiredService<IUserAuthenticationStateProvider>();
 
 		// check if no user in the database
 		Assert.Equal(0, userContext.Users?.Count());
@@ -219,7 +215,7 @@ public class LoginTest
 		);
 
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		IRenderedComponent<Login> component = context.RenderComponent<Login>();
 		context.Services.GetService<FakeNavigationManager>();
@@ -229,8 +225,7 @@ public class LoginTest
 		var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
 		UserContext userContext = await userDbFactory.CreateDbContextAsync();
 
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) context.Services.GetRequiredService<AuthenticationStateProvider>();
+		var userAuthStateProvider = context.Services.GetRequiredService<IUserAuthenticationStateProvider>();
 
 		// check if no user in the database
 		Assert.Equal(0, userContext.Users?.Count());
@@ -273,7 +268,7 @@ public class LoginTest
 		);
 
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		IRenderedComponent<Login> component = context.RenderComponent<Login>();
 		context.Services.GetService<FakeNavigationManager>();
@@ -283,8 +278,7 @@ public class LoginTest
 		var userDbFactory = scope.ServiceProvider.GetRequiredService<IDbContextFactory<UserContext>>();
 		UserContext userContext = await userDbFactory.CreateDbContextAsync();
 
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) context.Services.GetRequiredService<AuthenticationStateProvider>();
+		var userAuthStateProvider = context.Services.GetRequiredService<IUserAuthenticationStateProvider>();
 
 		// check if no user in the database
 		Assert.Equal(0, userContext.Users?.Count());

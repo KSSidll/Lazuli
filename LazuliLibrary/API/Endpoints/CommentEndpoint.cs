@@ -1,6 +1,5 @@
 ﻿using LazuliLibrary.Authentication;
 using LazuliLibrary.Models;
-using Microsoft.AspNetCore.Components.Authorization;
 
 namespace LazuliLibrary.API.Endpoints;
 
@@ -9,9 +8,9 @@ public class CommentEndpoint : ICommentEndpoint
 	private const string Page = "comments";
 	private readonly IApiHelper _apiHelper;
 	private readonly IPostEndpoint _postEndpoint;
-	private readonly AuthenticationStateProvider _userAuthenticator;
+	private readonly IUserAuthenticationStateProvider _userAuthenticator;
 
-	public CommentEndpoint(IApiHelper apiHelper, AuthenticationStateProvider userAuthenticator,
+	public CommentEndpoint(IApiHelper apiHelper, IUserAuthenticationStateProvider userAuthenticator,
 						   IPostEndpoint postEndpoint)
 	{
 		_apiHelper = apiHelper;
@@ -84,7 +83,7 @@ public class CommentEndpoint : ICommentEndpoint
 		if (comment is null) return;
 
 		var post = await _postEndpoint.GetByPostId(comment.PostId);
-		var userId = await ((IUserAuthenticationStateProvider) _userAuthenticator).GetBoundToUserId();
+		var userId = await _userAuthenticator.GetBoundToUserId();
 		if (post?.UserId != userId)
 		{
 			throw new UnauthorizedAccessException("You have to be the post owner to be able to delete this comment.");
