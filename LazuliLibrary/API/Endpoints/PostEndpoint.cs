@@ -120,6 +120,25 @@ public class PostEndpoint : IPostEndpoint
 		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
 	}
 
+	public async Task<bool> CreatePost(string body, string title)
+	{
+		// checks if there are null values
+		ApiHelper.ApiHelperValidator(_apiHelper);
+
+		List<KeyValuePair<string, string>> pairsToSend = new()
+		{
+			new KeyValuePair<string, string>("userId", _userAuthenticator.GetBoundToUserId().ToString()!),
+			new KeyValuePair<string, string>("title", title),
+			new KeyValuePair<string, string>("body", body)
+		};
+		var content = new FormUrlEncodedContent(pairsToSend);
+		using HttpResponseMessage response = await _apiHelper.ApiClient!.PostAsync($"/{Page}", content);
+
+		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
+
+		return true;
+	}
+
 	public async Task<bool> PatchPostBodyByPostId(int postId, string body)
 	{
 		// checks if logged in user owns this post
