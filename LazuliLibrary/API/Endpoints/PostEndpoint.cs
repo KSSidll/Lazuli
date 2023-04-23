@@ -106,10 +106,8 @@ public class PostEndpoint : IPostEndpoint
 		// checks if logged in user owns this post
 		var post = await GetByPostId(postId);
 		var userId = await _userAuthenticator.GetBoundToUserId();
-		if (post?.UserId != userId)
-		{
+		if (post?.UserId != userId && post is not null)
 			throw new UnauthorizedAccessException("You have to be the post owner to be able to delete it.");
-		}
 
 
 		// checks if there are null values
@@ -148,7 +146,7 @@ public class PostEndpoint : IPostEndpoint
 		// checks if logged in user owns this post
 		PostModel? post = await GetByPostId(postId);
 		var userId = await _userAuthenticator.GetBoundToUserId();
-		if (post?.UserId != userId)
+		if (post?.UserId != userId && post is not null)
 			throw new UnauthorizedAccessException("You have to be the post owner to be able to edit it.");
 
 		// checks if there are null values
