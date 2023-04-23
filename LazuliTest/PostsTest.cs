@@ -1,8 +1,8 @@
-﻿using Lazuli.Authentication;
-using Lazuli.Pages.Posts;
+﻿using Lazuli.Pages.Posts;
 using LazuliLibrary.API.Endpoints;
+using LazuliLibrary.Authentication;
 using LazuliTest.Fakes;
-using Microsoft.AspNetCore.Components.Authorization;
+using LazuliTest.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LazuliTest;
@@ -14,7 +14,7 @@ public class PostsTest
 	{
 		using var context = new TestContext();
 
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		context.Services.AddTransient<IAlbumEndpoint, FakeAlbumEndpoint>();
 		context.Services.AddTransient<ICommentEndpoint, FakeCommentEndpoint>();
@@ -23,9 +23,8 @@ public class PostsTest
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
-		userAuthStateProvider.Login(1);
+		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
+		userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(1));
 
 		IRenderedComponent<PostsMain> component = context.RenderComponent<PostsMain>();
 
@@ -49,7 +48,7 @@ public class PostsTest
 	{
 		using var context = new TestContext();
 
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		context.Services.AddTransient<IAlbumEndpoint, FakeAlbumEndpoint>();
 		context.Services.AddTransient<ICommentEndpoint, FakeCommentEndpoint>();
@@ -58,9 +57,8 @@ public class PostsTest
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
-		userAuthStateProvider.Login(1);
+		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
+		userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(1));
 
 		IRenderedComponent<PostsMain> component = context.RenderComponent<PostsMain>();
 

@@ -1,9 +1,9 @@
-﻿using Lazuli.Authentication;
-using Lazuli.Pages.Album;
+﻿using Lazuli.Pages.Album;
 using LazuliLibrary.API.Endpoints;
+using LazuliLibrary.Authentication;
 using LazuliLibrary.Models;
 using LazuliTest.Fakes;
-using Microsoft.AspNetCore.Components.Authorization;
+using LazuliTest.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LazuliTest;
@@ -15,7 +15,7 @@ public class AlbumTest
 	{
 		using var context = new TestContext();
 
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		context.Services.AddTransient<IAlbumEndpoint, FakeAlbumEndpoint>();
 		context.Services.AddTransient<ICommentEndpoint, FakeCommentEndpoint>();
@@ -24,9 +24,8 @@ public class AlbumTest
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
-		await userAuthStateProvider.Login(1);
+		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
+		await userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(1));
 
 		AlbumModel? album = await new FakeAlbumEndpoint().GetByAlbumId(1);
 

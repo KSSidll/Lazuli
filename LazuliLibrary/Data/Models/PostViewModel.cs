@@ -1,4 +1,4 @@
-﻿namespace Lazuli.Data.Models;
+﻿namespace LazuliLibrary.Data.Models;
 
 public class PostViewModel
 {

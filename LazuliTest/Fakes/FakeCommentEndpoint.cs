@@ -33,4 +33,10 @@ public class FakeCommentEndpoint : ICommentEndpoint
 								 .ToList();
 		});
 	}
+
+	// shouldn't ever be called in tests
+	public Task DeleteByCommentId(int commentId)
+	{
+		throw new NotImplementedException();
+	}
 }

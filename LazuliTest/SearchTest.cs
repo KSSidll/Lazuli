@@ -1,8 +1,8 @@
-﻿using Lazuli.Authentication;
-using Lazuli.Pages.Search;
+﻿using Lazuli.Pages.Search;
 using LazuliLibrary.API.Endpoints;
+using LazuliLibrary.Authentication;
 using LazuliTest.Fakes;
-using Microsoft.AspNetCore.Components.Authorization;
+using LazuliTest.Helpers;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace LazuliTest;
@@ -14,7 +14,7 @@ public class SearchTest
 	{
 		using var context = new TestContext();
 
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		context.Services.AddTransient<IAlbumEndpoint, FakeAlbumEndpoint>();
 		context.Services.AddTransient<ICommentEndpoint, FakeCommentEndpoint>();
@@ -23,9 +23,8 @@ public class SearchTest
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
-		userAuthStateProvider.Login(1);
+		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
+		userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(1));
 
 		IRenderedComponent<SearchMain> component = context.RenderComponent<SearchMain>(parameter => parameter
 			.Add(p => p.SearchWord, "Bret")
@@ -43,7 +42,7 @@ public class SearchTest
 	{
 		using var context = new TestContext();
 
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		context.Services.AddTransient<IAlbumEndpoint, FakeAlbumEndpoint>();
 		context.Services.AddTransient<ICommentEndpoint, FakeCommentEndpoint>();
@@ -52,9 +51,8 @@ public class SearchTest
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
-		userAuthStateProvider.Login(1);
+		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
+		userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(1));
 
 		IRenderedComponent<SearchMain> component = context.RenderComponent<SearchMain>(parameter => parameter
 			.Add(p => p.SearchWord, "rerum")
@@ -71,7 +69,7 @@ public class SearchTest
 	{
 		using var context = new TestContext();
 
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		context.Services.AddTransient<IAlbumEndpoint, FakeAlbumEndpoint>();
 		context.Services.AddTransient<ICommentEndpoint, FakeCommentEndpoint>();
@@ -80,9 +78,8 @@ public class SearchTest
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
-		userAuthStateProvider.Login(1);
+		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
+		userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(1));
 
 		IRenderedComponent<SearchMain> component = context.RenderComponent<SearchMain>(parameter => parameter
 			.Add(p => p.SearchWord, "quia et suscipit")
@@ -106,7 +103,7 @@ public class SearchTest
 	{
 		using var context = new TestContext();
 
-		context.Services.AddSingleton<AuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
+		context.Services.AddSingleton<IUserAuthenticationStateProvider, FakeUserAuthenticationStateProvider>();
 
 		context.Services.AddTransient<IAlbumEndpoint, FakeAlbumEndpoint>();
 		context.Services.AddTransient<ICommentEndpoint, FakeCommentEndpoint>();
@@ -115,9 +112,8 @@ public class SearchTest
 		context.Services.AddTransient<IUserEndpoint, FakeUserEndpoint>();
 
 		using IServiceScope scope = context.Services.GetRequiredService<IServiceScopeFactory>().CreateScope();
-		var userAuthStateProvider =
-			(IUserAuthenticationStateProvider) scope.ServiceProvider.GetRequiredService<AuthenticationStateProvider>();
-		userAuthStateProvider.Login(1);
+		var userAuthStateProvider = scope.ServiceProvider.GetRequiredService<IUserAuthenticationStateProvider>();
+		userAuthStateProvider.Login(TestDataHelper.GetFakeAuthUser(1));
 
 		IRenderedComponent<SearchMain> component = context.RenderComponent<SearchMain>(parameter => parameter
 			.Add(p => p.SearchWord, "est")

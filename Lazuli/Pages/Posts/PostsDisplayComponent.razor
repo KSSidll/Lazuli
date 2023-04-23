@@ -3,7 +3,7 @@
 	@foreach (PostViewModel? post in Posts)
 	{
 		<div class="border border-top-0 border-dark p-2 bg-black text-white">
-			<SinglePostComponent Post="post"/>
+			<SinglePostComponent Post="post" OnPostDelete="OnPostDelete"/>
 		</div>
 	}
 }
@@ -12,5 +12,8 @@
 
 	[Parameter]
 	public List<PostViewModel>? Posts { get; set; }
+
+	[Parameter]
+	public EventCallback<int> OnPostDelete { get; set; }
 
 }

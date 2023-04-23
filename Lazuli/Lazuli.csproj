@@ -8,6 +8,5 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\LazuliLibrary\LazuliLibrary.csproj"/>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.0-preview.3.23174.2"/>
 	</ItemGroup>
 </Project>

@@ -67,10 +67,10 @@ Run project
         4. Browsing user profiles
     - Should have
         1. Publishing posts
-        2. Publishing comments
         3. Deleting posts, comments
-        4. Editing posts, comments
-        5. Filtering and searching posts and users
+        4. Editing posts
+        5. Filtering posts
+        6. Searching posts, users and comments
     - Could have
         1. Deleting photos
         2. Editing account data
@@ -78,3 +78,5 @@ Run project
         1. Publishing photos
         2. Use without logging in
         3. Deleting accounts
+        4. Publishing comments
+        5. Editing comments

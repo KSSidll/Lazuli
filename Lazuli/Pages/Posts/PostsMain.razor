@@ -10,7 +10,38 @@
 	@if (Posts is not null && IsLoadingInitial == false)
 	{
 		<FilterByComponent OnFilterEvent="FilterPosts" OnClearResults="Reset"/>
+	}
 
+	@if (IsLoadingInitial == false)
+	{
+		<div class="text-end border border-dark border-top-0">
+			<button class="btn btn-success rounded-0" type="button" @onclick="ToggleCreatingNewPost">
+				<span class="oi oi-plus p-1"></span>
+			</button>
+			@if (CreatingNewPost)
+			{
+				<EditForm Model="_postCreateModel" OnValidSubmit="CreatePost">
+					<div class="m-3 p-sm-2">
+						<div class="mb-3 input-group">
+							<label for="phraseInput">
+								<span class="input-group-text bg-black text-white border-0">Title</span>
+							</label>
+							<InputText class="form-control ms-2 bg-black text-white border-dark" id="phraseInput" @bind-Value="_postCreateModel.Title"/>
+						</div>
+						<div class="mb-3 input-group">
+							<InputTextArea class="form-control ms-2 bg-black text-white border-dark" id="phraseInput" @bind-Value="_postCreateModel.Body"/>
+						</div>
+						<div class="justify-content-end">
+							<button type="submit" class="btn btn-dark">Add Post</button>
+						</div>
+					</div>
+				</EditForm>
+			}
+		</div>
+	}
+
+	@if (Posts is not null && IsLoadingInitial == false)
+	{
 		@if (LoadingFilteredData)
 		{
 			<div class="container text-center">
@@ -21,27 +52,27 @@
 			</div>
 		}
 
-		<PostsDisplayComponent Posts="Posts"/>
+		<PostsDisplayComponent Posts="Posts" OnPostDelete="DeletePost"/>
 
 		<div class="container text-center">
-			@if (LoadingFilteredData == false)
+			@if (!LoadingAny && !_displayFilteredPosts)
 			{
-				if (LoadedAllContent == false && _displayFilteredPosts == false)
-				{
-					<button class="load-more-button btn btn-outline-primary btn-lg mt-2" @onclick="LoadNextData">
-						Load More Content
-					</button>
-				}
-				else
+				if (LoadedAllContent)
 				{
 					<button class="btn btn-outline-danger btn-lg mt-2" disabled>
 						No more content
 					</button>
 				}
+				else
+				{
+					<button class="load-more-button btn btn-outline-primary btn-lg mt-2" @onclick="@LoadNextData">
+						Load More Content
+					</button>
+				}
 			}
 		</div>
 	}
-	else if (IsLoadingInitial)
+	@if (LoadingAny && !LoadingFilteredData)
 	{
 		<div class="d-flex align-items-center">
 			<strong>Loading...</strong>
@@ -53,16 +84,48 @@
 @code {
 	private bool _displayFilteredPosts;
 
+	public bool CreatingNewPost { get; set; }
+
 	public bool IsLoadingInitial { get; private set; }
 	public bool LoadedAllContent { get; private set; }
 	public bool LoadingFilteredData { get; private set; }
 	public bool LoadingMoreData { get; private set; }
 
 	public List<PostViewModel>? Posts { get; set; }
+	private PostCreateModel _postCreateModel = new();
+
+	public bool LoadingAny => IsLoadingInitial || LoadingMoreData || LoadingFilteredData;
 
 	protected override async Task OnInitializedAsync()
 	{
 		await Reset();
+	}
+
+	private void ToggleCreatingNewPost()
+	{
+		CreatingNewPost = !CreatingNewPost;
+	}
+
+	private async Task<PostViewModel> ConvertToViewModel(PostModel post)
+	{
+		var postView = new PostViewModel
+		{
+			Id = post.Id,
+			Title = post.Title,
+			Body = post.Body,
+			UserId = post.UserId
+		};
+
+		postView.Username = (await UserEndpoint.GetByUserId(postView.UserId))?.Username;
+		List<CommentModel> comments = await CommentEndpoint.GetByPostId(postView.Id);
+		postView.Comments = new List<CommentViewModel>(comments.Select(x => new CommentViewModel
+		{
+			Email = x.Email,
+			Id = x.Id,
+			Body = x.Body
+		}));
+
+		return postView;
 	}
 
 	private async Task<List<PostViewModel>> ConvertToViewModel(List<PostModel> posts)
@@ -71,28 +134,17 @@
 
 		foreach (PostModel post in posts)
 		{
-			var postView = new PostViewModel
-			{
-				Id = post.Id,
-				Title = post.Title,
-				Body = post.Body,
-				UserId = post.UserId
-			};
-
-			postView.Username = (await UserEndpoint.GetByUserId(postView.UserId))?.Username;
-			List<CommentModel> comments = await CommentEndpoint.GetByPostId(postView.Id);
-			postView.Comments = new List<CommentViewModel>(comments.Select(x => new CommentViewModel
-			{
-				Email = x.Email,
-				Id = x.Id,
-				Body = x.Body
-			}));
-
-			output.Add(postView);
+			output.Add(await ConvertToViewModel(post));
 		}
 
-		return output.OrderBy(_ => Random.Shared.NextDouble()).ToList();
+		return output;
 	}
+
+	private async Task<List<PostViewModel>> ConvertToViewModelRandom(List<PostModel> posts)
+	{
+		return (await ConvertToViewModel(posts)).OrderBy(_ => Random.Shared.NextDouble()).ToList();
+	}
+
 
 	private async Task LoadNextData()
 	{
@@ -106,10 +158,19 @@
 			LoadedAllContent = true;
 		}
 
-		List<PostViewModel> converted = await ConvertToViewModel(newPosts);
+		List<PostViewModel> converted = await ConvertToViewModelRandom(newPosts);
 
 		Posts.AddRange(converted);
 		LoadingMoreData = false;
+	}
+
+	private async Task CreatePost()
+	{
+		PostModel postModel = await PostEndpoint.CreatePost(_postCreateModel.Body!, _postCreateModel.Title!);
+
+		PostViewModel post = await ConvertToViewModel(postModel);
+
+		Posts?.Insert(0, post);
 	}
 
 	// TODO add Unit Tests for filtering
@@ -144,7 +205,7 @@
 			posts = posts.Where(x => x.Body!.Length <= postFilter.MaxCharCount).ToList();
 		}
 
-		Posts = await ConvertToViewModel(posts);
+		Posts = await ConvertToViewModelRandom(posts);
 
 		LoadingFilteredData = false;
 	}
@@ -163,9 +224,22 @@
 			LoadedAllContent = true;
 		}
 
-		Posts = await ConvertToViewModel(posts);
+		Posts = await ConvertToViewModelRandom(posts);
 
 		IsLoadingInitial = false;
+	}
+
+	private async Task DeletePost(int postId)
+	{
+		await PostEndpoint.DeleteByPostId(postId);
+
+		try
+		{
+			Posts?.Remove(Posts.First(x => x.Id == postId));
+		}
+		catch (InvalidOperationException)
+		{
+		}
 	}
 
 }

@@ -7,7 +7,7 @@
 @inject NavigationManager NavigationManager
 @inject IUserEndpoint UserEndpoint
 @inject IDbContextFactory<UserContext> UserDbFactory
-@inject AuthenticationStateProvider AuthStateProvider
+@inject IUserAuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Signup</PageTitle>
 
@@ -33,7 +33,16 @@
 			</InputSelect>
 		</div>
 		<div class="row justify-content-center m-3 mt-5">
-			<button class="p-2 submit" type="submit">Sign up</button>
+			<button class="p-2 submit" type="submit">
+				@if (SigningUp)
+				{
+					<div class="spinner-border ms-auto" role="status" aria-hidden="true"></div>
+				}
+				else
+				{
+					<div>Sign up</div>
+				}
+			</button>
 		</div>
 		<div class="row text-white mt-5">
 			<p>
@@ -52,9 +61,7 @@
 		_userContext = await UserDbFactory.CreateDbContextAsync();
 
 	// check if user is authenticated
-		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
-
-		if (await userAuthStateProvider.IsAuthenticated())
+		if (await AuthStateProvider.IsAuthenticated())
 			NavigationManager.NavigateTo("/");
 
 		_users = await UserEndpoint.GetAll();
@@ -69,6 +76,8 @@
 	private List<UserModel>? _users = new();
 	private UserContext? _userContext;
 
+	public bool SigningUp { get; set; }
+
 	private async void HandleSignup()
 	{
 		if (_signupModel.Login is null || _signupModel.Password is null || _signupModel.BoundToUserId < 1)
@@ -76,6 +85,8 @@
 
 		if (_userContext is null)
 			throw new InvalidOperationException("userContext is null in HandleSignup method, which shouldn't be possible");
+
+		SigningUp = true;
 
 		_userContext.Add(new User(_signupModel.Login, _signupModel.Password, _signupModel.BoundToUserId));
 		await _userContext.SaveChangesAsync();
@@ -85,10 +96,18 @@
 		if (user is null) throw new DbUpdateException("User wasn't found in the database after add operation");
 
 	// update authentication status and navigate to index/controller page
-	// FIXME for some reason state doesn't change here even though the method that changes it is called, and it works normally in manual testing
-		var userAuthStateProvider = (IUserAuthenticationStateProvider) AuthStateProvider;
 
-		await userAuthStateProvider.Login(user.BoundToUserId);
+		UserModel authUser = _users!.Find(x => x.Id == user.BoundToUserId)!;
+
+		AuthenticatedUserModel authUserModel = new()
+		{
+			BoundToUserId = authUser.Id.ToString(),
+			Email = authUser.Email
+		};
+
+		await AuthStateProvider.Login(authUserModel);
+
+		SigningUp = false;
 
 		NavigationManager.NavigateTo("/");
 	}

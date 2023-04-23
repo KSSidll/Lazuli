@@ -1,4 +1,4 @@
-﻿using Lazuli.Data.Database;
+﻿using LazuliLibrary.Data.Database;
 using LazuliLibrary.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
