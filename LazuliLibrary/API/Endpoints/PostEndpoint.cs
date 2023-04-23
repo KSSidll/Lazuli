@@ -120,14 +120,16 @@ public class PostEndpoint : IPostEndpoint
 		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
 	}
 
-	public async Task<bool> CreatePost(string body, string title)
+	public async Task<PostModel> CreatePost(string body, string title)
 	{
 		// checks if there are null values
 		ApiHelper.ApiHelperValidator(_apiHelper);
 
+		var a = (await _userAuthenticator.GetBoundToUserId()).ToString();
+
 		List<KeyValuePair<string, string>> pairsToSend = new()
 		{
-			new KeyValuePair<string, string>("userId", _userAuthenticator.GetBoundToUserId().ToString()!),
+			new KeyValuePair<string, string>("userId", (await _userAuthenticator.GetBoundToUserId()).ToString()),
 			new KeyValuePair<string, string>("title", title),
 			new KeyValuePair<string, string>("body", body)
 		};
@@ -136,7 +138,9 @@ public class PostEndpoint : IPostEndpoint
 
 		if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
 
-		return true;
+		var result = await response.Content.ReadAsAsync<PostModel>();
+
+		return result;
 	}
 
 	public async Task<bool> PatchPostBodyByPostId(int postId, string body)
