@@ -55,6 +55,12 @@ public class FakePostEndpoint : IPostEndpoint
 	}
 
 	// shouldn't ever be called in tests
+	public Task<PostModel> CreatePost(string body, string title)
+	{
+		throw new NotImplementedException();
+	}
+
+	// shouldn't ever be called in tests
 	public Task<bool> PatchPostBodyByPostId(int postId, string body)
 	{
 		throw new NotImplementedException();
