@@ -14,4 +14,5 @@ public interface IPostEndpoint
 	Task DeleteByPostId(int postId);
 	public Task<PostModel> CreatePost(string body, string title);
 	Task<bool> PatchPostBodyByPostId(int postId, string body);
+    Task<List<PostModel>> GetByCharacterCountInBodyAndBodyFuzzy(int? lower = 0, int? upper = null, string? body = "");
 }

@@ -57,6 +57,67 @@ public class PostEndpoint : IPostEndpoint
 		return result;
 	}
 
+	public async Task<List<PostModel>> GetByCharacterCountInBodyAndBodyFuzzy(int? lower=0, int? upper=null, string? body="")
+	{
+		string regex;
+
+        // checks if there are null values
+        ApiHelper.ApiHelperValidator(_apiHelper);
+
+		body ??= "";
+
+		if (lower is null && upper is null)
+		{
+			regex = body;
+		}
+		else
+		{
+			// checks if given parameters are correct and converts them to strings
+            (string lowerStr, string upperStr) = ValidateBoundary(lower, upper);
+			
+			// filter by character count {lower, upper}
+			// and checks if text contains 'body'
+			regex = $"^(?=[\\s\\S]{{{lowerStr},{upperStr}}}$)(?=.*{body})[\\s\\S]*$";
+        }
+
+        using HttpResponseMessage response = await _apiHelper.ApiClient!.GetAsync($"/{Page}?body_like={regex}");
+
+        if (!response.IsSuccessStatusCode) throw new HttpRequestException(response.ReasonPhrase);
+
+        var result = await response.Content.ReadAsAsync<List<PostModel>>();
+
+        return result;
+    }
+
+	private static (string lower, string upper) ValidateBoundary(int? lower, int? upper)
+	{
+		string lowerOutput = "0";
+		string upperOutput = "";
+
+		// prevent negative numbers
+        if (lower is not null && lower < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(lower));
+        }
+        if (upper is not null && upper < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(upper));
+        }
+
+		// assign only if holds some value
+		if (lower is not null)
+		{
+			lowerOutput = ((int)lower).ToString();
+		}
+		if (upper is not null)
+		{
+			upperOutput = ((int)upper).ToString();
+		}
+
+
+		return (lower: lowerOutput, upper: upperOutput);
+    }
+
 	public async Task<List<PostModel>> GetAll()
 	{
 		// checks if there are null values
