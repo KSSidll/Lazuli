@@ -47,9 +47,32 @@ public class FakePostEndpoint : IPostEndpoint
 								 .ToList();
 		});
 	}
+    public async Task<List<PostModel>> GetByCharacterCountInBodyAndBodyFuzzy(int? lower = 0, int? upper = null, string? body = "")
+    {
+        return await Task.Run(() =>
+        {
+			var posts = TestDataHelper.GetFakePostModelList();
 
-	// shouldn't ever be called in tests
-	public Task DeleteByPostId(int postId)
+			if (body is not null)
+			{
+				posts = posts.Where(x => x.Body!.Contains(body)).ToList();
+			}
+			if (lower is not null)
+			{
+				posts = posts.Where(x => x.Body!.Length >= lower).ToList();
+			}
+			if (upper is not null)
+			{
+				posts = posts.Where(x => x.Body!.Length <= upper).ToList();
+			}
+
+			return posts;
+
+        });
+    }
+
+    // shouldn't ever be called in tests
+    public Task DeleteByPostId(int postId)
 	{
 		throw new NotImplementedException();
 	}
