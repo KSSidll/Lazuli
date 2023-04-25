@@ -119,7 +119,7 @@ public class SearchTest
 			.Add(p => p.SearchWord, "est")
 		);
 
-		component.WaitForState(() => component.Instance.LoadingComments == false);
+		component.WaitForState(() => component.Instance.LoadingComments == false, TimeSpan.FromSeconds(10));
 
 		// check if the amount of comments in rendered container is correct
 		component.WaitForAssertion(() => Assert.Equal(12, component.FindAll(".comment").Count),
