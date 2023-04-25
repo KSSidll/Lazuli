@@ -407,3 +407,6 @@ build.bat
 *.db
 *.db-shm
 *.db-wal
+
+# NeoVIM plugin files
+tags
