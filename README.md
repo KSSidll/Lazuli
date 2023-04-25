@@ -1,4 +1,3 @@
-
 # Project Lazuli
 
 ## Introduction
@@ -7,16 +6,16 @@ Social Media website that pulls data from JSONPlaceholder fake API
 
 ### Main features
 
-* Create and login with fake accounts that are bound to
-selected JSONPlaceholder profile
-* Waste your time on your profile feed filled with fake data,
-just like a real social media website!
-* Browse your and other profiles, check posts, comments and photo albums
-* [TBC] Publish your own posts and comments, Delete them, or Edit them \
- \* Data is only stored in Session, restarting the webpage will erase it
-* [TBC] Find posts and users using a search bar that supports filtering
-* [TBC] Delete your photos
-* [TBC] Edit your profile data
+-   Create and login with fake accounts that are bound to
+    selected JSONPlaceholder profile
+-   Waste your time on your profile feed filled with fake data,
+    just like a real social media website!
+-   Browse your and other profiles, check posts, comments and photo albums
+-   [TBC] Publish your own posts and comments, Delete them, or Edit them \
+    \* Data is only stored in Session, restarting the webpage will erase it
+-   [TBC] Find posts and users using a search bar that supports filtering
+-   [TBC] Delete your photos
+-   [TBC] Edit your profile data
 
 ## How to run
 
@@ -31,7 +30,6 @@ Open
 
 Run project
 
-
 ### CLI
 
 for development
@@ -40,7 +38,7 @@ for development
 
 for release
 
-    dotnet publish "Lazuli/Lazuli.csproj" -c Release -o /publish
+    dotnet publish "Lazuli/Lazuli.csproj" -c Release -o ./publish
 
 or alternatively look at [Dockerfile](Dockerfile)
 
