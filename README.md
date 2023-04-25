@@ -34,7 +34,15 @@ Run project
 
 ### CLI
 
+for development
+
     dotnet watch
+
+for release
+
+    dotnet publish "Lazuli/Lazuli.csproj" -c Release -o /publish
+
+or alternatively look at [Dockerfile](Dockerfile)
 
 ## Acceptance Tests and Project Details for Project Lazuli
 
