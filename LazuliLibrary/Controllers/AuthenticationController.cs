@@ -2,7 +2,6 @@
 using LazuliLibrary.Authentication;
 using LazuliLibrary.Data.Database;
 using LazuliLibrary.Data.Models;
-using LazuliLibrary.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -49,29 +48,29 @@ public class AuthenticationController : ControllerBase
 		return Ok();
 	}
 
-	[HttpPost("login")]
-	public async Task<IActionResult> Login([FromBody] LoginModel model)
-	{
-		if (!ModelState.IsValid || model.Login is null || model.Password is null) return BadRequest(ModelState);
-
-		User? user = _userContext.GetUser(model.Login, model.Password);
-
-		if (user is null) return StatusCode(500);
-
-		UserModel? authUser = await _userEndpoint.GetByUserId(user.BoundToUserId);
-
-		if (authUser is null) return BadRequest();
-
-		AuthenticatedUserModel authUserModel = new()
-		{
-			BoundToUserId = authUser.Id.ToString(),
-			Email = authUser.Email
-		};
-
-		await _authenticationStateProvider.Login(authUserModel);
-
-		return Ok();
-	}
+	// [HttpPost("login")]
+	// public async Task<IActionResult> Login([FromBody] LoginModel model)
+	// {
+	// 	if (!ModelState.IsValid || model.Login is null || model.Password is null) return BadRequest(ModelState);
+	//
+	// 	User? user = _userContext.GetUser(model.Login, model.Password);
+	//
+	// 	if (user is null) return StatusCode(500);
+	//
+	// 	UserModel? authUser = await _userEndpoint.GetByUserId(user.BoundToUserId);
+	//
+	// 	if (authUser is null) return BadRequest();
+	//
+	// 	AuthenticatedUserModel authUserModel = new()
+	// 	{
+	// 		BoundToUserId = authUser.Id.ToString(),
+	// 		Email = authUser.Email
+	// 	};
+	//
+	// 	await _authenticationStateProvider.Login(authUserModel);
+	//
+	// 	return Ok();
+	// }
 
 	[HttpGet("logout")]
 	public async Task<IActionResult> Logout()
