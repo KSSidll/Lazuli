@@ -50,7 +50,7 @@ public class AuthenticationController : ControllerBase
 	}
 
 	[HttpPost("login")]
-	public async Task<IActionResult> Login(LoginModel model)
+	public async Task<IActionResult> Login([FromBody] LoginModel model)
 	{
 		if (!ModelState.IsValid || model.Login is null || model.Password is null) return BadRequest(ModelState);
 
