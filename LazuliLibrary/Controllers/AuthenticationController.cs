@@ -24,8 +24,7 @@ public class AuthenticationController : ControllerBase
 		_userEndpoint = userEndpoint;
 	}
 
-	[HttpGet]
-	[Route("authenticated")]
+	[HttpGet("authenticated")]
 	public async Task<IActionResult> IsAuthenticated()
 	{
 		var authenticated = await _authenticationStateProvider.IsAuthenticated();
@@ -70,6 +69,15 @@ public class AuthenticationController : ControllerBase
 		};
 
 		await _authenticationStateProvider.Login(authUserModel);
+
+		return Ok();
+	}
+
+	[HttpGet("logout")]
+	public async Task<IActionResult> Logout()
+	{
+		if (await _authenticationStateProvider.IsAuthenticated())
+			await _authenticationStateProvider.Logout();
 
 		return Ok();
 	}
