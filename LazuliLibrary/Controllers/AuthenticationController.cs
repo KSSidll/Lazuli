@@ -28,9 +28,9 @@ public class AuthenticationController : ControllerBase
 	{
 		var authenticated = await _authenticationStateProvider.IsAuthenticated();
 
-		if (authenticated) return Ok();
+		if (authenticated) return Ok("authenticated");
 
-		return Unauthorized();
+		return Ok("not authenticated");
 	}
 
 	[HttpPost("register")]
