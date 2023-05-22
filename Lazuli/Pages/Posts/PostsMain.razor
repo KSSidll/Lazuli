@@ -39,19 +39,17 @@
 			}
 		</div>
 	}
-
+	@if (LoadingFilteredData)
+	{
+		<div class="container text-center">
+			<button class="btn btn-warning" type="button" disabled>
+				<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
+				Loading filtered results...
+			</button>
+		</div>
+	}
 	@if (Posts is not null && IsLoadingInitial == false)
 	{
-		@if (LoadingFilteredData)
-		{
-			<div class="container text-center">
-				<button class="btn btn-warning" type="button" disabled>
-					<span class="spinner-grow spinner-grow-sm" role="status" aria-hidden="true"></span>
-					Loading filtered results...
-				</button>
-			</div>
-		}
-
 		<PostsDisplayComponent Posts="Posts" OnPostDelete="DeletePost"/>
 
 		<div class="container text-center">
@@ -178,6 +176,7 @@
 	{
 		LoadingFilteredData = true;
 		_displayFilteredPosts = true;
+		Posts = null;
 
 		var posts = await PostEndpoint.GetByCharacterCountInBodyAndBodyFuzzy(
 			lower: postFilter.MinCharCount,
