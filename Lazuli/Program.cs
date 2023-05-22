@@ -30,6 +30,9 @@ builder.Services.AddAuthenticationCore();
 builder.Services.AddScoped<ProtectedSessionStorage>();
 builder.Services.AddScoped<IUserAuthenticationStateProvider, UserAuthenticationStateProvider>();
 
+// Controllers
+builder.Services.AddControllers();
+
 WebApplication app = builder.Build();
 
 await using AsyncServiceScope scope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateAsyncScope();
@@ -45,5 +48,6 @@ app.UseRouting();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/Special/_Host");
+app.MapControllers();
 
 app.Run();
