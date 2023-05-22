@@ -8,9 +8,11 @@
 @inject IUserAuthenticationStateProvider AuthStateProvider
 @inject IUserEndpoint UserEndpoint
 
+@using System.Threading
+
 <PageTitle>Login</PageTitle>
 
-<EditForm Model="@_loginModel" OnValidSubmit="@HandleLogin">
+<EditForm Model="@_loginModel" OnValidSubmit="@HandleLogin" OnInvalidSubmit="@(() => _incorrectData = true)">
 	<DataAnnotationsValidator/>
 
 	<div class="container">
@@ -23,6 +25,12 @@
 		<div class="row justify-content-center m-3">
 			<InputText class="p-3 text-white" type="password" id="password" @bind-Value="_loginModel.Password" placeholder=" Password"/>
 		</div>
+		@if (_incorrectData)
+		{
+			<div class="alert alert-danger" role="alert">
+				<strong>Incorrect Login or Password</strong>
+			</div>
+		}
 		<div class="row justify-content-center m-3 mt-5">
 			<button class="p-2 submit" type="submit">
 				@if (LoggingIn)
@@ -47,11 +55,13 @@
 
 @code {
 
+	private bool _incorrectData = false;
+
 	protected override async Task OnInitializedAsync()
 	{
 		_userContext = await UserDbFactory.CreateDbContextAsync();
 
-	// check if user is authenticated
+		// check if user is authenticated
 		if (await AuthStateProvider.IsAuthenticated())
 			NavigationManager.NavigateTo("/");
 	}
@@ -63,6 +73,9 @@
 
 	private async void HandleLogin()
 	{
+		_incorrectData = false;
+		LoggingIn = true;
+
 		if (_loginModel.Login is null || _loginModel.Password is null)
 			throw new InvalidOperationException("HandleLogin was called without login form being filled, DataAnnotationsValidator failed");
 
@@ -71,10 +84,12 @@
 
 		User? user = _userContext.GetUser(_loginModel.Login, _loginModel.Password);
 
-	// TODO add message when there is no user that matches provided credentials in the database
-		if (user is null) return;
-
-		LoggingIn = true;
+		if (user is null)
+		{
+			_incorrectData = true;
+			LoggingIn = false;
+			return;
+		}
 
 		UserModel authUser = (await UserEndpoint.GetByUserId(user.BoundToUserId))!;
 
